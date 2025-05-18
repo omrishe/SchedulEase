@@ -13,6 +13,9 @@ function App() {
     { name: "F", price: "60" },
   ];
   const [isClicked, setIsClicked] = useState(false);
+  const [dateObject, setDate] = useState(new Date());
+  const [windowChooser, setWindow] = useState("items");
+
   function openWaze() {
     const latitude = 32.051403;
     const longitude = 34.811563;
@@ -26,12 +29,26 @@ function App() {
   function openPhone() {
     window.location.href = "tel:+00000000";
   }
-  function setDate() {
-    setIsClicked((prev) => !prev);
-    if (isClicked) {
-    }
-    return;
+  function handleDayClick(dateObj) {
+    setDate(new Date(dateObj["start"]));
   }
+  function handleTimeBtnClick(event, time) {}
+  const times = [
+    "10:00",
+    "10:30",
+    "11:00",
+    "11:30",
+    "12:00",
+    "12:30",
+    "13:00",
+    "13:30",
+    "14:00",
+    "14:30",
+    "15:00",
+    "15:30",
+    "16:00",
+    "16:30",
+  ];
   return (
     <>
       <div className="mainWindow">
@@ -42,14 +59,32 @@ function App() {
           <button className="phoneBtn" onClick={openPhone}></button>
           <button className="wazeBtn" onClick={openWaze}></button>
         </div>
-        <MenuItems
-          menuItemsList={menuItemsList}
-          onClick={() => setIsClicked((prev) => !prev)}
-        ></MenuItems>
-        <DateContainer></DateContainer>
+        {windowChooser == "items" && (
+          <MenuItems
+            menuItemsList={menuItemsList}
+            onClick={() => setIsClicked((prev) => !prev)}
+          ></MenuItems>
+        )}
         <button className="NextBtn" hidden={!isClicked}>
           Next
         </button>
+        <DateContainer handleDayClick={handleDayClick}></DateContainer>
+        <div className="chooseTimeContainer">
+          <button className="backBtn">Back</button>
+          <span>Date Selected:{dateObject.toLocaleDateString("en-GB")}</span>
+          <span>please choose time</span>
+          <div className="timeOptions">
+            {times.map((time) => (
+              <button
+                className="TimeOptionBtn"
+                key={time}
+                onClick={() => handleTimeBtnClick(time)}
+              >
+                {time}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </>
   );
