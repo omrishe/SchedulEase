@@ -10,6 +10,7 @@ export default function DateContainer({
   menuItemsList,
   onClick,
   handleDayClick,
+  setWindow,
 }) {
   const locales = {
     "en-US": enUS,
@@ -23,16 +24,24 @@ export default function DateContainer({
     locales,
   });
   return (
-    <Calendar
-      localizer={localizer}
-      events={myEventsList}
-      startAccessor="start"
-      endAccessor="end"
-      views={["month"]}
-      style={{ height: "250px", color: "black" }}
-      //onSelectSlot={({ start }) => handleDayClick(start)}
-      onSelectSlot={handleDayClick}
-      selectable={true}
-    />
+    <>
+      <Calendar
+        localizer={localizer}
+        events={myEventsList}
+        startAccessor="start"
+        endAccessor="end"
+        views={["month"]}
+        style={{ height: "250px", color: "black" }}
+        onSelectSlot={handleDayClick}
+        selectable={true}
+      />
+      <button
+        onClick={() => {
+          setWindow("setAppointment");
+        }}
+      >
+        Next
+      </button>
+    </>
   );
 }

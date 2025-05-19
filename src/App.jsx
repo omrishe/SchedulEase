@@ -2,18 +2,23 @@ import "./App.css";
 import MenuItems from "./MenuItem";
 import { useState } from "react";
 import DateContainer from "./DateContainer.jsx";
+import SetAppointment from "./SetAppointment.jsx";
 
 function App() {
   const menuItemsList = [
-    { name: "A", price: "10" },
-    { name: "B", price: "20" },
-    { name: "C", price: "30" },
-    { name: "D", price: "40" },
-    { name: "E", price: "50" },
-    { name: "F", price: "60" },
+    { name: "צילום תמונה", price: "100" },
+    { name: "וידאו", price: "150" },
+    { name: "פוטושופ", price: "250" },
+    { name: "צילום תמונה+פוטושופ", price: "300" },
+    { name: "וידאו + עריכה", price: "350" },
+    { name: "הכל", price: "500" },
   ];
-  const [isClicked, setIsClicked] = useState(false);
-  const [dateObject, setDate] = useState(new Date());
+
+  const [appointmentInfo, setAppointment] = useState({
+    date: new Date(),
+    service: "",
+    additionalRequests: "",
+  });
   const [windowChooser, setWindow] = useState("items");
 
   function openWaze() {
@@ -30,7 +35,10 @@ function App() {
     window.location.href = "tel:+00000000";
   }
   function handleDayClick(dateObj) {
-    setDate(new Date(dateObj["start"]));
+    setAppointment((prev) => ({
+      ...prev,
+      date: new Date(dateObj["start"]),
+    }));
   }
   function handleTimeBtnClick(event, time) {}
   const times = [
@@ -60,30 +68,33 @@ function App() {
           <button className="wazeBtn" onClick={openWaze}></button>
         </div>
         {windowChooser == "items" && (
-          <MenuItems
-            menuItemsList={menuItemsList}
-            onClick={() => setIsClicked((prev) => !prev)}
-          ></MenuItems>
+          <>
+            <MenuItems
+              menuItemsList={menuItemsList}
+              onClick={() => setIsClicked((prev) => !prev)}
+              setWindow={setWindow}
+            ></MenuItems>
+          </>
         )}
-        <button className="NextBtn" hidden={!isClicked}>
-          Next
-        </button>
-        <DateContainer handleDayClick={handleDayClick}></DateContainer>
+
+        {windowChooser == "date" && (
+          <DateContainer
+            handleDayClick={handleDayClick}
+            setWindow={setWindow}
+          ></DateContainer>
+        )}
         <div className="chooseTimeContainer">
-          <button className="backBtn">Back</button>
-          <span>Date Selected:{dateObject.toLocaleDateString("en-GB")}</span>
-          <span>please choose time</span>
-          <div className="timeOptions">
-            {times.map((time) => (
-              <button
-                className="TimeOptionBtn"
-                key={time}
-                onClick={() => handleTimeBtnClick(time)}
-              >
-                {time}
-              </button>
-            ))}
-          </div>
+          {windowChooser == "setAppointment" && (
+            <>
+              <SetAppointment /*display set appointment area*/
+                date={appointmentInfo["date"]}
+                setAppointment={setAppointment}
+                times={times}
+                setWindow={setWindow}
+                handleTimeBtnClick={handleTimeBtnClick}
+              ></SetAppointment>
+            </>
+          )}
         </div>
       </div>
     </>

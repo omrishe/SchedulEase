@@ -1,13 +1,31 @@
+import { Fragment, useState } from "react";
 import "./App.css";
-export default function MenuItems({ menuItemsList, onClick }) {
+export default function MenuItems({ menuItemsList, setWindow }) {
+  const [isClicked, setIsClicked] = useState(false);
   return (
-    <div className="scrollableMenu">
-      {menuItemsList.map((item) => (
-        <button className="itemBtn" key={item.name} onClick={onClick}>
-          <span>{item.name}</span>
-          <span>{item.price}</span>
-        </button>
-      ))}
-    </div>
+    <>
+      <div className="scrollableMenu">
+        {menuItemsList.map((item) => (
+          <Fragment key={item.name}>
+            <button
+              className="itemBtn"
+              onClick={() => setIsClicked((prev) => !prev)}
+            >
+              <span>{item.name}</span>
+              <span>{item.price}</span>
+            </button>
+          </Fragment>
+        ))}
+      </div>
+      <button
+        hidden={!isClicked}
+        onClick={() => {
+          setWindow("date");
+          setIsClicked((prev) => !prev);
+        }}
+      >
+        Next
+      </button>
+    </>
   );
 }
