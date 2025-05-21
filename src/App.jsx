@@ -1,8 +1,8 @@
 import "./App.css";
 import MenuItems from "./MenuItem";
-import { useState } from "react";
-import DateContainer from "./DateContainer.jsx";
-import SetAppointment from "./SetAppointment.jsx";
+import { useEffect, useState } from "react";
+import ChooseDateContainer from "./ChooseDateContainer.jsx";
+import ChooseTime from "./ChooseTime.jsx";
 
 function App() {
   const menuItemsList = [
@@ -18,6 +18,7 @@ function App() {
     date: new Date(),
     service: "",
     additionalRequests: "",
+    email: "",
   });
   const [windowChooser, setWindow] = useState("items");
 
@@ -40,7 +41,29 @@ function App() {
       date: new Date(dateObj["start"]),
     }));
   }
-  function handleTimeBtnClick(event, time) {}
+  function handleTimeBtnClick(event, time) {
+    useEffect(() => {
+      fetch(inhere, {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          date: appointmentInfo["date"],
+          time: appointmentInfo["time"],
+          additionalRequests: appointmentInfo["additionalRequests"],
+          email: appointmentInfo["email"],
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("Success:", data);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+    }, []);
+  }
   const times = [
     "10:00",
     "10:30",
@@ -78,21 +101,21 @@ function App() {
         )}
 
         {windowChooser == "date" && (
-          <DateContainer
+          <ChooseDateContainer
             handleDayClick={handleDayClick}
             setWindow={setWindow}
-          ></DateContainer>
+          ></ChooseDateContainer>
         )}
         <div className="chooseTimeContainer">
           {windowChooser == "setAppointment" && (
             <>
-              <SetAppointment /*display set appointment area*/
-                date={appointmentInfo["date"]}
+              <ChooseTime /*display set appointment area*/
+                date={appointmentInfo}
                 setAppointment={setAppointment}
                 times={times}
                 setWindow={setWindow}
                 handleTimeBtnClick={handleTimeBtnClick}
-              ></SetAppointment>
+              ></ChooseTime>
             </>
           )}
         </div>

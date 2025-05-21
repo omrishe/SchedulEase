@@ -6,7 +6,7 @@ import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-export default function DateContainer({
+export default function ChooseDateContainer({
   menuItemsList,
   onClick,
   handleDayClick,
