@@ -9,7 +9,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 export default function ChooseDateContainer({
   menuItemsList,
   onClick,
-  handleDayClick,
+  updateAppointmentInfo,
   setWindow,
 }) {
   const locales = {
@@ -32,7 +32,7 @@ export default function ChooseDateContainer({
         endAccessor="end"
         views={["month"]}
         style={{ height: "250px", color: "black" }}
-        onSelectSlot={handleDayClick}
+        onSelectSlot={(slotinfo)=> updateAppointmentInfo({date: new Date(slotinfo["start"])})}
         selectable={true}
       />
       <button

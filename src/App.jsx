@@ -35,15 +35,14 @@ function App() {
   function openPhone() {
     window.location.href = "tel:+00000000";
   }
-  function handleDayClick(dateObj) {
+  function updateAppointmentInfo(newInfo) {
     setAppointment((prev) => ({
-      ...prev,
-      date: new Date(dateObj["start"]),
+      ...prev,      // keep all old fields
+      ...newInfo,   // overwrite with new fields
     }));
   }
-  function handleTimeBtnClick(event, time) {
-    useEffect(() => {
-      fetch(inhere, {
+  function SendObjToServer(time) {
+      fetch("http://localhost:5000/api/appointments", {
         method: "post",
         headers: {
           "Content-Type": "application/json",
@@ -62,8 +61,7 @@ function App() {
         .catch((error) => {
           console.error("Error:", error);
         });
-    }, []);
-  }
+      };
   const times = [
     "10:00",
     "10:30",
@@ -102,7 +100,7 @@ function App() {
 
         {windowChooser == "date" && (
           <ChooseDateContainer
-            handleDayClick={handleDayClick}
+          updateAppointmentInfo={updateAppointmentInfo}
             setWindow={setWindow}
           ></ChooseDateContainer>
         )}
@@ -111,10 +109,10 @@ function App() {
             <>
               <ChooseTime /*display set appointment area*/
                 date={appointmentInfo}
-                setAppointment={setAppointment}
+                updateAppointmentInfo={updateAppointmentInfo}
                 times={times}
                 setWindow={setWindow}
-                handleTimeBtnClick={handleTimeBtnClick}
+                SendObjToServer={SendObjToServer}
               ></ChooseTime>
             </>
           )}

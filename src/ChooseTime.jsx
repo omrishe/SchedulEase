@@ -3,11 +3,11 @@ import { useState } from "react";
 export default function ChooseTime({
   date: appointmentInfo,
   times,
-  handleTimeBtnClick,
+  updateAppointmentInfo,
+  SendObjToServer,
   setWindow,
 }) {
   const [time, setTime] = useState("Null");
-  function handleTimeBtnClick(time) {}
   return (
     <>
       <span>please choose time</span>
@@ -30,8 +30,8 @@ export default function ChooseTime({
           </span>
           <button
             onClick={() => {
-              appointmentInfo["time"] = time;
-              handleTimeBtnClick(appointmentInfo);
+              updateAppointmentInfo({"time" :time})
+              SendObjToServer(appointmentInfo);
             }}
           >
             Confirm
