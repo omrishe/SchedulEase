@@ -1,5 +1,42 @@
+const express = require("express");
+const Appointment = require("../Models/appointmentModel.js");
 
-async function insertAppointment(data) {
-    if (!data.date || !data.email) throw new Error("Missing fields");
-    return insert(data, "appointments");
+const router = express.Router();
+
+router.post("/new", async (req, res) => {
+  try {
+    //add validation
+    const newAppointment = new Appointment(req.body); //recieves the data sent
+    const savedAppointment = await newAppointment.save(); //saves the data to database
+    res.status(201);
+    res.json(savedAppointment); //return the object that was saved as it appears in the db
+  } catch (err) {
+    res.status(400);
+    res.json({ error: err.message });
   }
+});
+
+router.get("/getAppointment", async (req, res) => {
+  try {
+    let query = {}; //sets it so query is any empty object
+    const email = req.query.email; //get email from query -{} if no query is used
+    if (validateData(email)) {
+      query["email"] = email;
+    }
+    const getAppointmentByEmail = await Appointment.find(query); //get appointment data associated with the email if it exists else it returns all
+    res.status(200);
+    res.json(getAppointmentByEmail); //return appointmenet data
+  } catch (err) {
+    res.status(500);
+    res.json({ message: err.message });
+  }
+});
+
+function validateData(email) {
+  //checks if email exists and valid
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (email && emailPattern.test(email)) return true;
+  else return false;
+}
+
+module.exports = router;

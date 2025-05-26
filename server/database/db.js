@@ -1,11 +1,10 @@
+const { MongoClient } = require("mongodb");
 
-
-const { MongoClient } = require("mongodb"); 
-
-const uri = "";//add uri
+const uri =
+  "mongodb+srv://virvir5:<db_password>@cluster0.ubhx9bj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"; //add uri
 const client = new MongoClient(uri);
 
-let db=null;
+let db = null;
 
 async function connectToMongo() {
   if (!db) {
@@ -19,4 +18,4 @@ async function connectToMongo() {
   }
   return db;
 }
-module.exports=connectToMongo;
+module.exports = connectToMongo;

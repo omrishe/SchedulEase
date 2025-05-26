@@ -37,31 +37,31 @@ function App() {
   }
   function updateAppointmentInfo(newInfo) {
     setAppointment((prev) => ({
-      ...prev,      // keep all old fields
-      ...newInfo,   // overwrite with new fields
+      ...prev, // keep all old fields
+      ...newInfo, // overwrite with new fields
     }));
   }
   function SendObjToServer(time) {
-      fetch("http://localhost:5000/api/appointments", {
-        method: "post",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          date: appointmentInfo["date"],
-          time: appointmentInfo["time"],
-          additionalRequests: appointmentInfo["additionalRequests"],
-          email: appointmentInfo["email"],
-        }),
+    fetch("http://localhost:5000/api/appointments", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        date: appointmentInfo["date"],
+        time: appointmentInfo["time"],
+        additionalRequests: appointmentInfo["additionalRequests"],
+        email: appointmentInfo["email"],
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Success:", data);
       })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("Success:", data);
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
-      };
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
   const times = [
     "10:00",
     "10:30",
@@ -100,7 +100,7 @@ function App() {
 
         {windowChooser == "date" && (
           <ChooseDateContainer
-          updateAppointmentInfo={updateAppointmentInfo}
+            updateAppointmentInfo={updateAppointmentInfo}
             setWindow={setWindow}
           ></ChooseDateContainer>
         )}
