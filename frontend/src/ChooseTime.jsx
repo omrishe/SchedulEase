@@ -1,9 +1,9 @@
 import "./App.css";
 import { useState } from "react";
 export default function ChooseTime({
-  date: appointmentInfo,
-  times,
+  appointmentInfo,
   updateAppointmentInfo,
+  times,
   SendObjToServer,
   setWindow,
 }) {
@@ -30,8 +30,9 @@ export default function ChooseTime({
           </span>
           <button
             onClick={() => {
+              const tempAppointmentInfo={...appointmentInfo,time};
               updateAppointmentInfo({"time" :time})
-              SendObjToServer(appointmentInfo);
+              SendObjToServer(tempAppointmentInfo);
             }}
           >
             Confirm

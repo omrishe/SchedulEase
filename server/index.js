@@ -6,18 +6,17 @@ const connectToMongo = require("./database/db");
 const app = express();
 const PORT = 5000;
 
-app.use(cors()); //sets to allow all origins add origin: "http://localhost:5173"
+app.use(cors()); //sets to allow all origins, to add specific origin write eg:(:"http://localhost:5173")
 app.use(express.json());
 
 async function startDatabase() {
   try {
     await connectToMongo(); // wait for DB connection
     console.log("Database connected, starting server...");
-
+    app.use("/api/appointments", appointmentRoute);
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
-    app.use("/api/appointments", appointmentRoute);
   } catch (err) {
     console.error("Failed to start server:", err);
   }
