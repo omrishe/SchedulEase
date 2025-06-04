@@ -3,23 +3,23 @@ import MenuItems from "./MenuItem";
 import { useEffect, useState } from "react";
 import ChooseDateContainer from "./ChooseDateContainer.jsx";
 import ChooseTime from "./ChooseTime.jsx";
-import * as appointmentsAPI from "./api/appointments.jsx"
-import params from "./params.json"
-
-const {menuItemsList,times} = params;
+import * as appointmentsAPI from "./api/appointments.jsx";
+import params from "./params.json";
+import LoginPopUp from "./components/loginPopUp.jsx";
+const { menuItemsList, times } = params;
 //todo
 //apperently i forgot js date can contain date and time,so todo combine them into 1 object
 function App() {
-
   const [appointmentInfo, setAppointment] = useState({
     date: new Date(),
     service: "",
-    name:"test",
+    name: "test",
     additionalRequests: "",
     email: "test@test.com",
   });
   const [windowChooser, setWindow] = useState("items");
-
+  const [token, setToken] = useState("");
+  const [isLoginBtnClicked, setLoginBtnClicked] = useState(false);
   function openWaze() {
     const latitude = 32.051403;
     const longitude = 34.811563;
@@ -39,18 +39,18 @@ function App() {
   function updateAppointmentInfo(newInfo) {
     setAppointment((prev) => ({
       ...prev, // keep all old fields
-      ...newInfo // overwrite with new fields
-    }))}
+      ...newInfo, // overwrite with new fields
+    }));
+  }
 
   async function SendObjToServer(data) {
-    try{
-    const resolve = await appointmentsAPI.createAppointment(data);
-    if(resolve){
-      console.log("successfully created appointment")
-    }
-    }
-    catch(error){
-      console.error("failed to create appointment")
+    try {
+      const resolve = await appointmentsAPI.createAppointment(data);
+      if (resolve) {
+        console.log("successfully created appointment");
+      }
+    } catch (error) {
+      console.error("failed to create appointment");
     }
   }
 
@@ -58,14 +58,28 @@ function App() {
     <>
       <div className="mainWindow">
         <p className="welcomeParagraph">welcome</p>
-        <button className="loginBtn" onClick={appointmentsAPI.fetchAllAppointment}>already have a user? log in</button>
-        <button className="GetAllAppointments" onClick={appointmentsAPI.fetchAllAppointment}></button>
+        <button
+          className="loginBtn"
+          onClick={(isLoginBtnClicked) =>
+            setLoginBtnClicked(!isLoginBtnClicked)
+          }
+        >
+          already have a user? log in
+        </button>
+        <button
+          className="GetAllAppointments"
+          onClick={appointmentsAPI.fetchAllAppointment}
+        >
+          login?
+        </button>
         <div className="ContactInfoContainer">
           <button className="whatsappBtn" onClick={openWhatsapp}></button>
           <button className="phoneBtn" onClick={openPhone}></button>
           <button className="wazeBtn" onClick={openWaze}></button>
-          
         </div>
+        <LoginPopUp
+          className={`LoginPopUp ${isLoginBtnClicked ? "show" : ""}`}
+        ></LoginPopUp>
         {windowChooser == "items" && (
           <>
             <MenuItems
