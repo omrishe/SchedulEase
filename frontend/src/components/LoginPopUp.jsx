@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createAuth } from "../api/auth";
+import { Signup, logIn } from "../api/auth";
 
 export default function LoginPopUp() {
   const [formData, setFormData] = useState({
@@ -13,12 +13,29 @@ export default function LoginPopUp() {
   }
 
   function handleSubmit(e) {
-    e.preventdefault();
+    e.preventDefault();
     //add show errors
     //createtoken
-    const token = createAuth(formData);
-    if (!token) {
+    const Status = Signup(formData);
+    console.log("success");
+    if (!Status) {
       setFormData((prev) => ({ ...prev, password: "" }));
+    }
+  }
+
+  async function login() {
+    const token = await logIn(formData);
+    console.log("success");
+    if (token instanceof Error) {
+      //there was an error
+      console.log(token);
+    }
+    if (!token) {
+      //returns ok
+      setFormData((prev) => ({ ...prev, password: "" }));
+    } else {
+      //token is empty
+      console.log(token);
     }
   }
 
@@ -45,7 +62,10 @@ export default function LoginPopUp() {
         name="password"
         onChange={handleChange}
       />
-      <button>confirm</button>
+      <button type="button" onClick={login}>
+        confirm
+      </button>
+      <button>register</button>
     </form>
   );
 }

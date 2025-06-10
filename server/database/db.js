@@ -1,7 +1,6 @@
 const params = require("../params.json");
 const mongoose = require("mongoose");
 const uri = params.uri;
-console.log(params.uri);
 
 async function connectToMongo() {
   try {
