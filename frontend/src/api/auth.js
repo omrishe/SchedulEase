@@ -1,3 +1,8 @@
+/**
+ * signup api function sends data to server
+ * -HTTP errors are caught if !response.ok
+ * -other errors like .json or network issues are caught in the catch(error)
+ */
 export async function Signup(formData) {
   try {
     const response = await fetch("http://localhost:5000/api/auth/signup", {
@@ -10,17 +15,24 @@ export async function Signup(formData) {
         password: formData.password,
       }),
     });
-    const data = await response.json();
-    if (!response.ok) {
-      handlePostError(data);
-      return null;
-    }
-    return data;
+    const serverResponse = await response.json(); //wont reach here if couldnt get to the server
+    /**console.log(
+      "in auth.js in frontend the returned object is:",
+      serverResponse.message
+    );
+    **/
+    return serverResponse;
   } catch (error) {
     console.log("error:", error.errors);
-    return null;
+    return extractErrorDetails(error);
   }
 }
+
+/**
+ * login api function sends data to verify user to the server
+ * -HTTP errors are caught if !response.ok
+ * -other errors like .json or network issues are caught in the catch(error)
+ */
 export async function logIn(formData) {
   try {
     const response = await fetch("http://localhost:5000/api/auth/login", {
@@ -34,26 +46,16 @@ export async function logIn(formData) {
       }),
     });
     const data = await response.json();
-    if (!response.ok) {
-      handlePostError(data);
-      return null;
-    }
     return data;
   } catch (error) {
-    console.log("error:", error.errors);
-    return null;
+    return error;
   }
 }
 
-function handlePostError(data) {
-  if (data.error) {
-    console.error("Error:", data.error);
-    console.error("error details:", data.details);
-  }
-  if (data.message) {
-    console.error("Message:", data.message);
-  }
-  if (!data.message && !data.error) {
-    console.error("unknown error occured during auth");
-  }
+function extractErrorDetails(error) {
+  return {
+    message: error.message,
+    details: error.details,
+    stack: error.stack,
+  };
 }

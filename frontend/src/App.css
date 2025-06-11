@@ -19,7 +19,7 @@
   border: none;
 }
 
-.LoginPopUp {
+.LoginPopUp{
   opacity: 0;
   pointer-events: none;
 }

@@ -1,43 +1,42 @@
 import { useEffect, useState } from "react";
 import { Signup, logIn } from "../api/auth";
 
-export default function LoginPopUp() {
+export default function LoginPopUp({setToken,className}) {
   const [formData, setFormData] = useState({
     name: "",
     password: "",
     email: "",
   });
+  const [message,setMessage]=useState("");
 
   function handleChange(e) {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
-  function handleSubmit(e) {
+  async function handleRegister(e) {
     e.preventDefault();
     //add show errors
-    //createtoken
-    const Status = Signup(formData);
-    console.log("success");
-    if (!Status) {
+    const serverResponse = await Signup(formData);
+    //console.log("in compnent loging Popup status is ",serverResponse.message);
+    if(serverResponse.message){
+      setMessage(serverResponse.message);
+    }
+    if (serverResponse.message==="created successfully") {
       setFormData((prev) => ({ ...prev, password: "" }));
     }
   }
 
   async function login() {
-    const token = await logIn(formData);
-    console.log("success");
-    if (token instanceof Error) {
-      //there was an error
-      console.log(token);
-    }
-    if (!token) {
-      //returns ok
+    const authResult = await logIn(formData);
+    if(authResult.message==="logged in successfully"){
+      setMessage("logged in successfully");
+      setToken(authResult.token);
       setFormData((prev) => ({ ...prev, password: "" }));
-    } else {
-      //token is empty
-      console.log(token);
     }
-  }
+    else{
+      setMessage(authResult.message);
+    }
+    }
 
   function validate() {
     const errors = {};
@@ -52,7 +51,8 @@ export default function LoginPopUp() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div className={className}>
+    <form onSubmit={handleRegister}>
       <label htmlFor="emailInput">email</label>
       <input id="emailInput" type="text" name="email" onChange={handleChange} />
       <label htmlFor="password">password</label>
@@ -67,5 +67,7 @@ export default function LoginPopUp() {
       </button>
       <button>register</button>
     </form>
+    {message && <p>{message}</p>}
+    </div>
   );
 }

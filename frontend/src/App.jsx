@@ -3,9 +3,9 @@ import MenuItems from "./MenuItem";
 import { useEffect, useState } from "react";
 import ChooseDateContainer from "./ChooseDateContainer.jsx";
 import ChooseTime from "./ChooseTime.jsx";
-import * as appointmentsAPI from "./api/appointments.jsx";
+import * as appointmentsAPI from "./api/appointments.js";
 import params from "./params.json";
-import LoginPopUp from "./components/loginPopUp.jsx";
+import LoginPopUp from "./components/LoginPopUp.jsx";
 const { menuItemsList, times } = params;
 //todo
 //apperently i forgot js date can contain date and time,so todo combine them into 1 object
@@ -20,6 +20,7 @@ function App() {
   const [windowChooser, setWindow] = useState("items");
   const [token, setToken] = useState("");
   const [isLoginBtnClicked, setLoginBtnClicked] = useState(false);
+
   function openWaze() {
     const latitude = 32.051403;
     const longitude = 34.811563;
@@ -60,12 +61,15 @@ function App() {
         <p className="welcomeParagraph">welcome</p>
         <button
           className="loginBtn"
-          onClick={(isLoginBtnClicked) =>
-            setLoginBtnClicked(!isLoginBtnClicked)
+          onClick={() =>
+            setLoginBtnClicked((prev)=>!prev)
           }
         >
           already have a user? log in
         </button>
+        <LoginPopUp setToken={setToken}
+          className={`LoginPopUp${isLoginBtnClicked ? " show" : ""}`}//can also use "LoginPopUp" + (isLoginBtnClicked ? " show" : "")
+        ></LoginPopUp>
         <button
           className="GetAllAppointments"
           onClick={appointmentsAPI.fetchAllAppointment}
@@ -77,9 +81,6 @@ function App() {
           <button className="phoneBtn" onClick={openPhone}></button>
           <button className="wazeBtn" onClick={openWaze}></button>
         </div>
-        <LoginPopUp
-          className={`LoginPopUp ${isLoginBtnClicked ? "show" : ""}`}
-        ></LoginPopUp>
         {windowChooser == "items" && (
           <>
             <MenuItems
@@ -99,7 +100,7 @@ function App() {
         <div className="chooseTimeContainer">
           {windowChooser == "setAppointment" && (
             <>
-              <ChooseTime /*display set appointment area*/
+              <ChooseTime //display set appointment area
                 appointmentInfo={appointmentInfo}
                 updateAppointmentInfo={updateAppointmentInfo}
                 times={times}
