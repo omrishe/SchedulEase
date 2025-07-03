@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const appointmentRoute = require("./routes/appointmentRoute");
 const authRoute = require("./routes/authRoute");
 const connectToMongo = require("./database/db");
+const https = require("https");
+const fs = require("fs");
 const app = express();
 const PORT = 5000;
 
@@ -16,8 +18,14 @@ async function startDatabase() {
     console.log("Database connected, starting server...");
     app.use("/api/appointments", appointmentRoute);
     app.use("/api/auth", authRoute);
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+    //load certificate and key
+    const sslOptions = {
+      key: fs.readFileSync("./localhost-key.pem"),
+      cert: fs.readFileSync("./localhost.pem"),
+    };
+    //starts https server
+    https.createServer(sslOptions, app).listen(PORT, () => {
+      console.log(`HTTPS Server running on https://localhost:${PORT}`);
     });
   } catch (err) {
     console.error("Failed to start server:", err);

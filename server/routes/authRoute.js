@@ -45,17 +45,21 @@ router.post("/login", async (req, res) => {
     if (!userData) {
       throw new Error("no user found");
     }
+    //generate a new token for that specific user
     const secretKey = process.env.SECRET_HASH_PASSWORD;
     const token = jwt.sign({ userId: userData._id }, secretKey, {
       expiresIn: "12h",
     });
-    res
-      .status(200)
-      .json({
-        token: token,
-        userId: userData._id,
-        message: "logged in successfully",
-      }); //return the object that was saved as it appears in the db
+    res.cookie("loginToken", token, {
+      httpOnly: true,
+      secure: true,
+      samesite: "None", //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!change this when deploying the server!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      maxAge: 12 * 60 * 60 * 1000, //12 hours life of token cookie
+    });
+    res.status(200).json({
+      userId: userData._id,
+      message: "logged in successfully",
+    }); //return the user ID
   } catch (err) {
     /**console.log(
       "after serilize in authRoute in logIn in server:",
@@ -66,6 +70,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
+//function for returning the error in same consistant pattern
 function serilizeResponse(error) {
   return {
     message: error.message,
