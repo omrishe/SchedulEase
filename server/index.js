@@ -7,10 +7,18 @@ const connectToMongo = require("./database/db");
 const https = require("https");
 const fs = require("fs");
 const app = express();
+const cookieParser = require("cookie-parser");
 const PORT = 5000;
 
-app.use(cors()); //sets to allow all origins, to add specific origin write eg:(:"http://localhost:5173")
+app.use(
+  cors({
+    origin: "https://localhost:5173",
+    credentials: true,
+  })
+); //sets to allow all origins, to add specific origin write eg:(:"http://localhost:5173")
 app.use(express.json());
+//cookie parser middleware
+app.use(cookieParser());
 
 async function startDatabase() {
   try {

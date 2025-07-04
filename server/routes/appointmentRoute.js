@@ -1,13 +1,13 @@
 //server interaction
 const express = require("express");
 const Appointment = require("../Models/appointmentModel.js");
+const authenticateToken = require("../tokenauth/authenticateToken.js");
 
 const router = express.Router();
 
-router.post("/new", async (req, res) => {
+router.post("/new", authenticateToken, async (req, res) => {
   try {
     //add validation check errors
-    console.log(req.body);
     const newAppointment = new Appointment(req.body); //recieves the data sent and set it as
     const savedAppointment = await newAppointment.save(); //saves the data to database
     res.status(201);
@@ -24,7 +24,7 @@ router.post("/new", async (req, res) => {
   }
 });
 
-router.get("/getAppointment", async (req, res) => {
+router.get("/getAppointment", authenticateToken, async (req, res) => {
   try {
     let query = {}; //sets it so query is any empty object
     const email = req.query.email; //get email from query -{} if no query is used

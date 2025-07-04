@@ -36,17 +36,21 @@ router.post("/signup", async (req, res) => {
     }
   }
 });
-
+//first authenticate token then continue
 router.post("/login", async (req, res) => {
   try {
-    email = req.body.email;
-    password = req.body.password;
+    const email = req.body.email;
+    const password = req.body.password;
     const userData = await auth.findOne({ email: req.body.email });
     if (!userData) {
       throw new Error("no user found");
     }
     //generate a new token for that specific user
     const secretKey = process.env.SECRET_HASH_PASSWORD;
+    //checking correct password
+    if (!(await bcrypt.compare(password, userData.hashedPassword))) {
+      throw new Error("wrong password");
+    }
     const token = jwt.sign({ userId: userData._id }, secretKey, {
       expiresIn: "12h",
     });

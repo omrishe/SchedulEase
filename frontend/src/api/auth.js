@@ -3,9 +3,10 @@
  * -HTTP errors are caught if !response.ok
  * -other errors like .json or network issues are caught in the catch(error)
  */
+const serverAddress = "https://localhost:5000";
 export async function Signup(formData) {
   try {
-    const response = await fetch("http://localhost:5000/api/auth/signup", {
+    const response = await fetch(`${serverAddress}/api/auth/signup`, {
       method: "post",
       headers: {
         "Content-Type": "application/json",
@@ -35,11 +36,12 @@ export async function Signup(formData) {
  */
 export async function logIn(formData) {
   try {
-    const response = await fetch("http://localhost:5000/api/auth/login", {
+    const response = await fetch(`${serverAddress}/api/auth/login`, {
       method: "post",
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: "include",
       body: JSON.stringify({
         email: formData.email,
         password: formData.password,

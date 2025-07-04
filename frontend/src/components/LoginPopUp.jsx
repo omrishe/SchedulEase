@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Signup, logIn } from "../api/auth";
+import { Signup, logIn as userLogIn } from "../api/auth";
 
 export default function LoginPopUp({setToken,className}) {
   const [formData, setFormData] = useState({
@@ -27,7 +27,7 @@ export default function LoginPopUp({setToken,className}) {
   }
 
   async function login() {
-    const authResult = await logIn(formData);
+    const authResult = await userLogIn(formData);
     if(authResult.message==="logged in successfully"){
       setMessage("logged in successfully");
       setToken(authResult.token);

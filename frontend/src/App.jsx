@@ -46,7 +46,7 @@ function App() {
 
   async function SendObjToServer(data) {
     try {
-      const resolve = await appointmentsAPI.createAppointment(data);
+      const resolve = await appointmentsAPI.createAppointment(data);//resolve contains the appointment info
       if (resolve) {
         console.log("successfully created appointment");
       }
