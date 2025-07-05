@@ -6,6 +6,7 @@ import ChooseTime from "./ChooseTime.jsx";
 import * as appointmentsAPI from "./api/appointments.js";
 import params from "./params.json";
 import LoginPopUp from "./components/LoginPopUp.jsx";
+import RegisterPopUp from "./components/RegisterPopUp.jsx";
 const { menuItemsList, times } = params;
 //todo
 //apperently i forgot js date can contain date and time,so todo combine them into 1 object
@@ -67,9 +68,10 @@ function App() {
         >
           already have a user? log in
         </button>
-        <LoginPopUp setToken={setToken}
+        <RegisterPopUp></RegisterPopUp>
+        {/*<LoginPopUp setToken={setToken}
           className={`LoginPopUp${isLoginBtnClicked ? " show" : ""}`}//can also use "LoginPopUp" + (isLoginBtnClicked ? " show" : "")
-        ></LoginPopUp>
+        ></LoginPopUp>*/}
         <button
           className="GetAllAppointments"
           onClick={appointmentsAPI.fetchAllAppointment}

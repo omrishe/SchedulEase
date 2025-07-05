@@ -11,10 +11,7 @@ export async function Signup(formData) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.password,
-      }),
+      body: JSON.stringify(formData),
     });
     const serverResponse = await response.json(); //wont reach here if couldnt get to the server
     /**console.log(
@@ -34,7 +31,7 @@ export async function Signup(formData) {
  * -HTTP errors are caught if !response.ok
  * -other errors like .json or network issues are caught in the catch(error)
  */
-export async function logIn(formData) {
+export async function userLogIn(formData) {
   try {
     const response = await fetch(`${serverAddress}/api/auth/login`, {
       method: "post",

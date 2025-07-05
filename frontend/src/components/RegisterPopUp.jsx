@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Signup, userLogIn} from "../api/auth";
 
-export default function LoginPopUp({setToken,className}) {
+export default function RegisterPopUp({setToken,className}) {
   const [formData, setFormData] = useState({
-    name: "",
+    name:"",
     password: "",
     email: "",
   });
@@ -13,19 +13,22 @@ export default function LoginPopUp({setToken,className}) {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
-  async function handleLogIn(e) {
+  async function handleRegister(e) {
     e.preventDefault();
-    const authResult = await userLogIn(formData);
-    console.log(authResult);
-    if(authResult.message==="logged in successfully"){
-      setMessage("logged in successfully");
-      setToken(authResult.token);
-      setFormData((prev) => ({ ...prev, password: "" }));
+    //add show errors
+    //add validate
+    console.log(formData)
+    const serverResponse = await Signup(formData);
+    //console.log("in compnent loging Popup status is ",serverResponse.message);
+    if(serverResponse.message){
+      setMessage(serverResponse.message);
     }
-    else{
-      setMessage(authResult.message);
+    if (serverResponse.message==="created Successfully") {
+      setFormData({ name:"",
+    password: "",
+    email: "", });
     }
-    }
+  }
 
   function validate() {
     const errors = {};
@@ -40,18 +43,21 @@ export default function LoginPopUp({setToken,className}) {
   }
 
   return (
-    <div className={className}>
-    <form onSubmit={handleLogIn}>
+    <div >
+    <form onSubmit={handleRegister} style={{flexDirection: "column",display: "flex",}}>
+      <label htmlFor="nameInput">name</label>
+      <input id="nameInput" type="text" name="name" value={formData.name} onChange={handleChange} />
       <label htmlFor="emailInput">email</label>
-      <input id="emailInput" type="text" name="email" onChange={handleChange} />
+      <input id="emailInput" type="text" name="email" onChange={handleChange} value={formData.email}/>
       <label htmlFor="password">password</label>
       <input
         id="password"
         type="password"
         name="password"
         onChange={handleChange}
+        value={formData.password}
       />
-      <button type="submit">login</button>
+      <button type="submit"> submit</button>
     </form>
     {message && <p>{message}</p>}
     </div>
