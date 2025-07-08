@@ -4,7 +4,7 @@
  * -other errors like .json or network issues are caught in the catch(error)
  */
 const serverAddress = "https://localhost:5000";
-export async function Signup(formData) {
+export async function signup(formData) {
   try {
     const response = await fetch(`${serverAddress}/api/auth/signup`, {
       method: "post",

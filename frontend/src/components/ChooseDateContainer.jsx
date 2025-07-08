@@ -1,4 +1,3 @@
-import "./App.css";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
@@ -7,8 +6,6 @@ import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 export default function ChooseDateContainer({
-  menuItemsList,
-  onClick,
   updateAppointmentInfo,
   setWindow,
 }) {

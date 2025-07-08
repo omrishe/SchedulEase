@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Signup, userLogIn} from "../api/auth";
+import {userLogIn} from "../api/auth";
 
-export default function LoginPopUp({setToken,className}) {
+function Login({setToken,className}) {
   const [formData, setFormData] = useState({
     name: "",
     password: "",
@@ -19,7 +19,6 @@ export default function LoginPopUp({setToken,className}) {
     console.log(authResult);
     if(authResult.message==="logged in successfully"){
       setMessage("logged in successfully");
-      setToken(authResult.token);
       setFormData((prev) => ({ ...prev, password: "" }));
     }
     else{
@@ -40,7 +39,8 @@ export default function LoginPopUp({setToken,className}) {
   }
 
   return (
-    <div className={className}>
+    <div className="mainWindow">
+        <p className="welcomeParagraph">login to your account</p>
     <form onSubmit={handleLogIn}>
       <label htmlFor="emailInput">email</label>
       <input id="emailInput" type="text" name="email" onChange={handleChange} />
@@ -57,3 +57,4 @@ export default function LoginPopUp({setToken,className}) {
     </div>
   );
 }
+export default Login;

@@ -12,6 +12,7 @@
     "react": "^19.0.0",
     "react-big-calendar": "^1.18.0",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.6.3",
     "simple-keyboard": "^3.8.59"
   },
   "devDependencies": {

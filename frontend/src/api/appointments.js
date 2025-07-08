@@ -7,13 +7,7 @@ export async function createAppointment(appointmentInfo) {
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify({
-        name: appointmentInfo["name"],
-        date: appointmentInfo["date"],
-        time: appointmentInfo["time"],
-        additionalRequests: appointmentInfo["additionalRequests"],
-        email: appointmentInfo["email"],
-      }),
+      body: JSON.stringify(appointmentInfo),
     });
     const data = await response.json();
     if (!response.ok) {

@@ -1,5 +1,4 @@
 import { Fragment, useState } from "react";
-import "./App.css";
 export default function MenuItems({ menuItemsList, setWindow }) {
   const [isClicked, setIsClicked] = useState(false);
   return (

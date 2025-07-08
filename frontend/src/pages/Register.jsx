@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import { Signup, userLogIn} from "../api/auth";
-
-export default function RegisterPopUp({setToken,className}) {
+import { useState } from "react";
+import { signup} from "../api/auth";
+function Register({setToken,className}) {
   const [formData, setFormData] = useState({
     name:"",
     password: "",
@@ -18,7 +17,7 @@ export default function RegisterPopUp({setToken,className}) {
     //add show errors
     //add validate
     console.log(formData)
-    const serverResponse = await Signup(formData);
+    const serverResponse = await signup(formData);
     //console.log("in compnent loging Popup status is ",serverResponse.message);
     if(serverResponse.message){
       setMessage(serverResponse.message);
@@ -43,7 +42,8 @@ export default function RegisterPopUp({setToken,className}) {
   }
 
   return (
-    <div >
+    <div className="mainWindow">
+        <p className="welcomeParagraph">register new account</p>
     <form onSubmit={handleRegister} style={{flexDirection: "column",display: "flex",}}>
       <label htmlFor="nameInput">name</label>
       <input id="nameInput" type="text" name="name" value={formData.name} onChange={handleChange} />
@@ -63,3 +63,4 @@ export default function RegisterPopUp({setToken,className}) {
     </div>
   );
 }
+export default Register;

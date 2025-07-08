@@ -1,4 +1,3 @@
-import "./App.css";
 import { useState } from "react";
 export default function ChooseTime({
   appointmentInfo,
@@ -7,12 +6,23 @@ export default function ChooseTime({
   SendObjToServer,
   setWindow,
 }) {
-  const [time, setTime] = useState("Null");
+  const [time, setTime] = useState("");
+
+  async function handleOnlick(){
+    const tempDate=new Date(appointmentInfo.date);
+                const [hours,minutes]=time.split(":");
+                tempDate.setHours(hours,minutes);
+                updateAppointmentInfo({date:tempDate})
+                const tempAppointmentInfo={...appointmentInfo,date : tempDate};
+                const serverResponse=await SendObjToServer(tempAppointmentInfo)
+                setResponse(serverResponse);
+  }
+
   return (
     <>
       <span>please choose time</span>
       <div className="timeOptions">
-        {times.map((timeInput) => (
+        {times.map((timeInput) => ( // sets the times user can choose
           <button
             className="TimeOptionBtn"
             key={timeInput}
@@ -22,7 +32,7 @@ export default function ChooseTime({
           </button>
         ))}
       </div>
-      {time != "Null" && (
+      {time && (
         <div style={{ display: "flex", flexDirection: "column" }}>
           <span>
             Date Selected:{appointmentInfo["date"].toLocaleDateString("en-GB")}{" "}
@@ -30,13 +40,12 @@ export default function ChooseTime({
           </span>
           <button
             onClick={() => {
-              const tempAppointmentInfo={...appointmentInfo,time};
-              updateAppointmentInfo({"time" :time})
-              SendObjToServer(tempAppointmentInfo);
+                handleOnlick()
             }}
           >
             Confirm
           </button>
+          {response && <p>{response.message}</p>}
         </div>
       )}
       <button className="backBtn" onClick={() => setWindow("date")}>
