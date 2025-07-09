@@ -67,11 +67,6 @@ router.post("/login", async (req, res) => {
       message: "logged in successfully",
     }); //return the user ID
   } catch (err) {
-    /**console.log(
-      "after serilize in authRoute in logIn in server:",
-      serilizeResponse(err)
-    );
-    **/
     res.status(400).json(serilizeResponse(err));
   }
 });

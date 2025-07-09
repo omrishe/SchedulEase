@@ -5,12 +5,12 @@ import ChooseDateContainer from "../components/ChooseDateContainer.jsx";
 import ChooseTime from "../components/ChooseTime.jsx";
 import * as appointmentsAPI from "../api/appointments.js";
 import params from "../params.json";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 //todo uplift the appointmentinfo or do a new auth object containing the user info
 const { menuItemsList, times } = params;
-function MainPage() {
-  const navigatePage=useNavigate();
+function MainPage(userAuthData) {
+  const navigatePage = useNavigate();
   const [appointmentInfo, setAppointment] = useState({
     date: new Date(),
     service: "",
@@ -19,7 +19,7 @@ function MainPage() {
     email: "test@test.com",
   });
   const [windowChooser, setWindow] = useState("items");
-  const [userName,setUserName]=useState();
+  const [userName, setUserName] = useState();
   function openWaze() {
     const latitude = 32.051403;
     const longitude = 34.811563;
@@ -45,30 +45,29 @@ function MainPage() {
 
   async function SendObjToServer(data) {
     try {
-      const resolve = await appointmentsAPI.createAppointment(data);//resolve contains the appointment info
+      const resolve = await appointmentsAPI.createAppointment(data); //resolve contains the appointment info
       if (resolve) {
         console.log("successfully created appointment");
         setUserName(resolve.name);
-        return {...resolve,message : "successfully created appointment"}
+        return { ...resolve, message: "successfully created appointment" };
       }
     } catch (error) {
       console.error("failed to create appointment");
-      return {message :"failed to create appointment"}
+      return { message: "failed to create appointment" };
     }
-  } 
+  }
   return (
     <>
       <div className="mainWindow">
-        <p className="welcomeParagraph">{userName && `welcome ${userName}`}</p>
-        <button
-          className="loginBtn"
-          onClick={() =>
-            navigatePage("/login")
-          }
-        >
+        <p className="welcomeParagraph">
+          {userAuthData && `welcome ${userAuthData.userName}`}
+        </p>
+        <button className="loginBtn" onClick={() => navigatePage("/login")}>
           login
         </button>
-        <button onClick={()=>navigatePage("register")}>dont have a user? Register</button>
+        <button onClick={() => navigatePage("register")}>
+          dont have a user? Register
+        </button>
         <div className="ContactInfoContainer">
           <button className="whatsappBtn" onClick={openWhatsapp}></button>
           <button className="phoneBtn" onClick={openPhone}></button>

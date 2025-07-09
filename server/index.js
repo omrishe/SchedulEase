@@ -28,8 +28,8 @@ async function startDatabase() {
     app.use("/api/auth", authRoute);
     //load certificate and key
     const sslOptions = {
-      key: fs.readFileSync("./localhost-key.pem"),
-      cert: fs.readFileSync("./localhost.pem"),
+      key: fs.readFileSync("./cert/localhost-key.pem"),
+      cert: fs.readFileSync("./cert/localhost.pem"),
     };
     //starts https server
     https.createServer(sslOptions, app).listen(PORT, () => {

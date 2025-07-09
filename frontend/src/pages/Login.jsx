@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import {userLogIn} from "../api/auth";
+import { userLogIn } from "../api/auth";
 
-function Login({setToken,className}) {
+function Login({ userAuthData, setUserAuthData }) {
   const [formData, setFormData] = useState({
     name: "",
     password: "",
     email: "",
   });
-  const [message,setMessage]=useState("");
+  const [message, setMessage] = useState("");
 
   function handleChange(e) {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -17,14 +17,15 @@ function Login({setToken,className}) {
     e.preventDefault();
     const authResult = await userLogIn(formData);
     console.log(authResult);
-    if(authResult.message==="logged in successfully"){
-      setMessage("logged in successfully");
+    if (authResult.message === "logged in successfully") {
+      const { message, ...authData } = authResult;
+      setUserAuthData(authData);
+      setMessage(message);
       setFormData((prev) => ({ ...prev, password: "" }));
-    }
-    else{
+    } else {
       setMessage(authResult.message);
     }
-    }
+  }
 
   function validate() {
     const errors = {};
@@ -40,20 +41,25 @@ function Login({setToken,className}) {
 
   return (
     <div className="mainWindow">
-        <p className="welcomeParagraph">login to your account</p>
-    <form onSubmit={handleLogIn}>
-      <label htmlFor="emailInput">email</label>
-      <input id="emailInput" type="text" name="email" onChange={handleChange} />
-      <label htmlFor="password">password</label>
-      <input
-        id="password"
-        type="password"
-        name="password"
-        onChange={handleChange}
-      />
-      <button type="submit">login</button>
-    </form>
-    {message && <p>{message}</p>}
+      <p className="welcomeParagraph">login to your account</p>
+      <form onSubmit={handleLogIn}>
+        <label htmlFor="emailInput">email</label>
+        <input
+          id="emailInput"
+          type="text"
+          name="email"
+          onChange={handleChange}
+        />
+        <label htmlFor="password">password</label>
+        <input
+          id="password"
+          type="password"
+          name="password"
+          onChange={handleChange}
+        />
+        <button type="submit">login</button>
+      </form>
+      {message && <p>{message}</p>}
     </div>
   );
 }
