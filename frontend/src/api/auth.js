@@ -13,16 +13,15 @@ export async function signup(formData) {
       },
       body: JSON.stringify(formData),
     });
-    const serverResponse = await response.json(); //wont reach here if couldnt get to the server
-    /**console.log(
-      "in auth.js in frontend the returned object is:",
-      serverResponse.message
-    );
-    **/
-    return serverResponse;
+    const data = await response.json(); //wont reach here if couldnt get to the server
+    console.log("in auth.js in frontend the returned object is:", data);
+    if (!response.ok) {
+      //altough in any http code that returned the return is the same,i left it for clearer code or future expension
+      return data;
+    }
+    return data;
   } catch (error) {
-    console.log("error:", error.errors);
-    return extractErrorDetails(error);
+    return handleError(error, "signup");
   }
 }
 
@@ -45,10 +44,50 @@ export async function userLogIn(formData) {
       }),
     });
     const data = await response.json();
+    if (!response.ok) {
+      //altough in any http code that returned the return is the same,i left it for clearer code or future expension
+      return data;
+    }
     return data;
   } catch (error) {
-    return error;
+    return handleError(error, "userLogIn");
   }
+}
+/**
+ *  validate api function to verify that the user is still logged in
+ *
+ *
+ */
+export async function validateToken() {
+  try {
+    const response = await fetch(`${serverAddress}/api/auth/validateToken`, {
+      method: "get",
+      credentials: "include",
+    });
+    if (!response.ok) {
+      response.success = false;
+      return response.json();
+    }
+    response.success = true;
+    return response.json();
+  } catch (error) {
+    error.success = false;
+    return handleError(error, "validateToken");
+  }
+}
+
+export async function logout() {
+  const response = await fetch(`${serverAddress}/api/auth/logout`, {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+  });
+  if (response.ok) {
+    return true;
+  }
+  return false;
 }
 
 function extractErrorDetails(error) {
@@ -57,4 +96,16 @@ function extractErrorDetails(error) {
     details: error.details,
     stack: error.stack,
   };
+}
+
+function handleError(error, location) {
+  if (!error.message) {
+    console.error(
+      `an error occured on api auth in ${location} error details:`,
+      error
+    );
+    error.message = "Something went wrong. Please try again later.";
+    return error;
+  }
+  return error;
 }

@@ -6,10 +6,11 @@ import ChooseTime from "../components/ChooseTime.jsx";
 import * as appointmentsAPI from "../api/appointments.js";
 import params from "../params.json";
 import { useNavigate } from "react-router-dom";
+import {logout} from "../api/auth.js"
 
 //todo uplift the appointmentinfo or do a new auth object containing the user info
 const { menuItemsList, times } = params;
-function MainPage(userAuthData) {
+function MainPage({userAuthData}) {
   const navigatePage = useNavigate();
   const [appointmentInfo, setAppointment] = useState({
     date: new Date(),
@@ -18,6 +19,7 @@ function MainPage(userAuthData) {
     additionalRequests: "",
     email: "test@test.com",
   });
+  console.log("in mainpage.jsx",userAuthData);
   const [windowChooser, setWindow] = useState("items");
   const [userName, setUserName] = useState();
   function openWaze() {
@@ -56,15 +58,28 @@ function MainPage(userAuthData) {
       return { message: "failed to create appointment" };
     }
   }
+
+  function handleLogout(){
+    localStorage.clear();
+    if(logout()){
+      console.log("logged out sucessfully")
+      return "logged out sucessfully"
+    }
+    console.log("an error occured")
+    return "an error occured"//add this message to display
+  }
+
   return (
     <>
       <div className="mainWindow">
         <p className="welcomeParagraph">
-          {userAuthData && `welcome ${userAuthData.userName}`}
+          {userAuthData.userName ? `welcome ${userAuthData.userName}` : "welcome"}
         </p>
-        <button className="loginBtn" onClick={() => navigatePage("/login")}>
+        {userAuthData.userName?<button className="loginBtn" onClick={() => handleLogout()}>
+          logout
+        </button> : <button className="loginBtn" onClick={() => navigatePage("/login")}>
           login
-        </button>
+        </button>}
         <button onClick={() => navigatePage("register")}>
           dont have a user? Register
         </button>

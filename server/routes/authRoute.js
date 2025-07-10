@@ -5,7 +5,7 @@ const dotenv = require("dotenv").config();
 const router = express.Router();
 const jwt = require("jsonwebtoken"); //token creation and auth
 const bcrypt = require("bcrypt"); //password hashing
-
+const authenticateToken = require("../tokenauth/authenticateToken.js");
 //signup request post
 router.post("/signup", async (req, res) => {
   try {
@@ -70,7 +70,16 @@ router.post("/login", async (req, res) => {
     res.status(400).json(serilizeResponse(err));
   }
 });
-
+/**
+ * function for routing for validating token
+ */
+router.get("/validateToken", authenticateToken, async (req, res) => {
+  res.status(200).json({ message: "logged in successfully" });
+});
+router.post("/logout", async (req, res) => {
+  res.clearCookie("loginToken", { path: "/" });
+  res.status(200).json({ message: "Logged out" });
+});
 //function for returning the error in same consistant pattern
 function serilizeResponse(error) {
   return {
