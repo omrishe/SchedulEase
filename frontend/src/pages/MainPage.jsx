@@ -1,17 +1,18 @@
 import "../App.css";
 import MenuItems from "../components/MenuItem.jsx";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import ChooseDateContainer from "../components/ChooseDateContainer.jsx";
 import ChooseTime from "../components/ChooseTime.jsx";
 import * as appointmentsAPI from "../api/appointments.js";
 import params from "../params.json";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation  } from "react-router-dom";
 import {logout} from "../api/auth.js"
 
 //todo uplift the appointmentinfo or do a new auth object containing the user info
 const { menuItemsList, times } = params;
-function MainPage({userAuthData}) {
+function MainPage({userAuthData,resetUserData,resetlocalStorage,setUserAuthData}) {
   const navigatePage = useNavigate();
+  const location = useLocation();
   const [appointmentInfo, setAppointment] = useState({
     date: new Date(),
     service: "",
@@ -19,9 +20,9 @@ function MainPage({userAuthData}) {
     additionalRequests: "",
     email: "test@test.com",
   });
-  console.log("in mainpage.jsx",userAuthData);
+  const [logoutMsg,setLogoutMsg]=useState();
   const [windowChooser, setWindow] = useState("items");
-  const [userName, setUserName] = useState();
+  const [refresh, setRefresh] = useState(false);
   function openWaze() {
     const latitude = 32.051403;
     const longitude = 34.811563;
@@ -58,15 +59,21 @@ function MainPage({userAuthData}) {
       return { message: "failed to create appointment" };
     }
   }
+    useEffect(() => {
+      //makes is so it rerenders the screen every route/page change
+      console.log("Route changed:", location);
+      setRefresh(r => !r);
+}, [location]);
 
   function handleLogout(){
-    localStorage.clear();
     if(logout()){
-      console.log("logged out sucessfully")
-      return "logged out sucessfully"
-    }
-    console.log("an error occured")
-    return "an error occured"//add this message to display
+      console.log("logged out sucessfully");
+      setLogoutMsg("logged out sucessfully");
+      resetUserData();
+      resetlocalStorage();
+    }else
+    {console.log("an error occured")
+    setLogoutMsg("an Error occured see log for more info");}
   }
 
   return (
@@ -80,6 +87,7 @@ function MainPage({userAuthData}) {
         </button> : <button className="loginBtn" onClick={() => navigatePage("/login")}>
           login
         </button>}
+        {logoutMsg && <p>{logoutMsg}</p>}
         <button onClick={() => navigatePage("register")}>
           dont have a user? Register
         </button>

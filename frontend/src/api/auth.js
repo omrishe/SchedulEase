@@ -64,12 +64,11 @@ export async function validateToken() {
       method: "get",
       credentials: "include",
     });
+    const data = await response.json();
     if (!response.ok) {
-      response.success = false;
-      return response.json();
+      return { ...data, success: false };
     }
-    response.success = true;
-    return response.json();
+    return { ...data, success: true };
   } catch (error) {
     error.success = false;
     return handleError(error, "validateToken");
@@ -90,13 +89,14 @@ export async function logout() {
   return false;
 }
 
-function extractErrorDetails(error) {
+/**function extractErrorDetails(error) {
   return {
     message: error.message,
     details: error.details,
     stack: error.stack,
   };
 }
+  **/
 
 function handleError(error, location) {
   if (!error.message) {

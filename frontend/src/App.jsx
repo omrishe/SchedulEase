@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainPage from "./pages/MainPage.jsx";
 import Login from "./pages/login.jsx";
@@ -11,22 +11,39 @@ function App() {
     userName: localStorage.getItem("userName"),
     email: localStorage.getItem("userEmail"),
   });
+  const [isDoneCheckingToken,setIsDoneCheckingToken]=useState(false)
   console.log("in app.jsx" ,localStorage.getItem("userName"))
   console.log("in app.jsx",userAuthData);
-  const isTokenValid=validateToken();
-  if(!isTokenValid){
+
+  function resetUserData() {
+  setUserAuthData({
+    userId: null,
+    userName: null,
+    email: null,
+  });
+}
+function resetlocalStorage(){
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
     localStorage.removeItem("userEmail");
+}
+  useEffect(()=>{
+    async function verifyTokenAndClearData(){
+    const isTokenValid=await validateToken();
+  if(!isTokenValid){
+    resetlocalStorage();
     setUserAuthData({userId : null, userName: null, userEmail: null});
   }
+  setIsDoneCheckingToken(true);
+}
+  verifyTokenAndClearData();},[])
 
   return (
     <BrowserRouter>
       <Routes>
         <Route
           path="/"
-          element={<MainPage userAuthData={userAuthData}></MainPage>}
+          element={<MainPage userAuthData={userAuthData} resetUserData={resetUserData} resetlocalStorage={resetlocalStorage} setUserAuthData={setUserAuthData}></MainPage>}
         ></Route>
         <Route
           path="/login"
