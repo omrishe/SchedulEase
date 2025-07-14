@@ -13,9 +13,14 @@ router.post("/signup", async (req, res) => {
       throw new Error("email already exists");
     }
     const { email, password, ...otherData } = req.body;
+    otherData.role = "user";
     const saltrounds = 10; // move this into params file
     hashedPassword = await bcrypt.hash(password, saltrounds);
-    const signupData = new auth({ email, hashedPassword, ...otherData });
+    const signupData = new auth({
+      email,
+      hashedPassword,
+      ...otherData,
+    });
     const savedDoc = await signupData.save(); //if the file failed saving it jumps to catch cause it threw an error
     res.status(201);
     res.json({ message: "created Successfully" }); //return the object that was saved as it appears in the db

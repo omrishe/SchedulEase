@@ -12,6 +12,7 @@ const authSchema = new mongoose.Schema(
     },
     username: { type: String, required: false },
     hashedPassword: { type: String, required: true },
+    role: { type: String, required: true },
   },
   { timestamps: true }
 );

@@ -19,12 +19,13 @@ function Login({ userAuthData, setUserAuthData }) {
     console.log(authResult);
     if (authResult.message === "logged in successfully") {
       const { message, ...authData } = authResult;
-      console.log("in login.jsx" ,authData.userName)
-      console.log("in login.jsx" ,localStorage.getItem("userName"))
-      localStorage.setItem("userId",authData.userId);
-      localStorage.setItem("userName",authData.userName);
-      localStorage.setItem("userEmail",authData.userEmail);
-      setMessage(message);  
+      console.log("in login.jsx", authData.userName);
+      console.log("in login.jsx", localStorage.getItem("userName"));
+      localStorage.setItem("userId", authData.userId);
+      localStorage.setItem("userName", authData.userName);
+      localStorage.setItem("userEmail", authData.userEmail);
+      setUserAuthData(authData);
+      setMessage(message);
       setFormData((prev) => ({ ...prev, password: "" }));
     } else {
       setMessage(authResult.message);

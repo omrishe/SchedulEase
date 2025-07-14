@@ -1,26 +1,31 @@
 import "../App.css";
 import MenuItems from "../components/MenuItem.jsx";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import ChooseDateContainer from "../components/ChooseDateContainer.jsx";
 import ChooseTime from "../components/ChooseTime.jsx";
 import * as appointmentsAPI from "../api/appointments.js";
 import params from "../params.json";
-import { useNavigate,useLocation  } from "react-router-dom";
-import {logout} from "../api/auth.js"
+import { useNavigate, useLocation } from "react-router-dom";
+import { logout } from "../api/auth.js";
 
 //todo uplift the appointmentinfo or do a new auth object containing the user info
 const { menuItemsList, times } = params;
-function MainPage({userAuthData,resetUserData,resetlocalStorage,setUserAuthData}) {
+function MainPage({
+  userAuthData,
+  resetUserData,
+  resetlocalStorage,
+  setUserAuthData,
+}) {
   const navigatePage = useNavigate();
   const location = useLocation();
   const [appointmentInfo, setAppointment] = useState({
     date: new Date(),
     service: "",
-    name: "test",
+    name: "",
     additionalRequests: "",
-    email: "test@test.com",
+    email: "",
   });
-  const [logoutMsg,setLogoutMsg]=useState();
+  const [logoutMsg, setLogoutMsg] = useState();
   const [windowChooser, setWindow] = useState("items");
   const [refresh, setRefresh] = useState(false);
   function openWaze() {
@@ -59,38 +64,52 @@ function MainPage({userAuthData,resetUserData,resetlocalStorage,setUserAuthData}
       return { message: "failed to create appointment" };
     }
   }
-    useEffect(() => {
-      //makes is so it rerenders the screen every route/page change
-      console.log("Route changed:", location);
-      setRefresh(r => !r);
-}, [location]);
 
-  function handleLogout(){
-    if(logout()){
+  function handleLogout() {
+    if (logout()) {
       console.log("logged out sucessfully");
       setLogoutMsg("logged out sucessfully");
       resetUserData();
       resetlocalStorage();
-    }else
-    {console.log("an error occured")
-    setLogoutMsg("an Error occured see log for more info");}
+    } else {
+      console.log("an error occured");
+      setLogoutMsg("an Error occured see log for more info");
+    }
   }
+  const welcomeMsg = (
+    <p className="welcomeParagraph">
+      {userAuthData.userName ? `welcome ${userAuthData.userName}` : "welcome"}
+    </p>
+  );
+  const authControls = userAuthData["userName"] ? (
+    <button className="logoutBtn" onClick={() => handleLogout()}>
+      logout
+    </button>
+  ) : (
+    <>
+      <button className="loginBtn" onClick={() => navigatePage("/login")}>
+        login
+      </button>
+      <button onClick={() => navigatePage("register")}>
+        dont have a user? Register
+      </button>
+    </>
+  );
 
   return (
     <>
       <div className="mainWindow">
-        <p className="welcomeParagraph">
-          {userAuthData.userName ? `welcome ${userAuthData.userName}` : "welcome"}
-        </p>
-        {userAuthData.userName?<button className="loginBtn" onClick={() => handleLogout()}>
-          logout
-        </button> : <button className="loginBtn" onClick={() => navigatePage("/login")}>
-          login
-        </button>}
+        {welcomeMsg}
+        {/**displays welcome msg if not logged in and welcome userName if logged in */}
+        {authControls}
+        {/**displays login/register or logout depending if logged in */}
         {logoutMsg && <p>{logoutMsg}</p>}
-        <button onClick={() => navigatePage("register")}>
-          dont have a user? Register
-        </button>
+        {/**logout msg to display after logging out */}
+        {
+          <button onClick={() => navigatePage("AdminPanel")}>
+            admin panel
+          </button>
+        }
         <div className="ContactInfoContainer">
           <button className="whatsappBtn" onClick={openWhatsapp}></button>
           <button className="phoneBtn" onClick={openPhone}></button>

@@ -19,7 +19,11 @@
   border: none;
 }
 
-.LoginPopUp{
+.logoutBtn {
+  border: none;
+}
+
+.LoginPopUp {
   opacity: 0;
   pointer-events: none;
 }
