@@ -27,7 +27,6 @@ function MainPage({
   });
   const [logoutMsg, setLogoutMsg] = useState();
   const [windowChooser, setWindow] = useState("items");
-  const [refresh, setRefresh] = useState(false);
   function openWaze() {
     const latitude = 32.051403;
     const longitude = 34.811563;

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { userLogIn } from "../api/auth";
+import { useNavigate } from "react-router-dom";
 
 function Login({ userAuthData, setUserAuthData }) {
+  const navigatePage = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     password: "",
@@ -19,14 +21,10 @@ function Login({ userAuthData, setUserAuthData }) {
     console.log(authResult);
     if (authResult.message === "logged in successfully") {
       const { message, ...authData } = authResult;
-      console.log("in login.jsx", authData.userName);
-      console.log("in login.jsx", localStorage.getItem("userName"));
-      localStorage.setItem("userId", authData.userId);
-      localStorage.setItem("userName", authData.userName);
-      localStorage.setItem("userEmail", authData.userEmail);
       setUserAuthData(authData);
-      setMessage(message);
+      setMessage(message + " you will be redirected soon");
       setFormData((prev) => ({ ...prev, password: "" }));
+      setTimeout(() => navigatePage("/"), 1500);
     } else {
       setMessage(authResult.message);
     }

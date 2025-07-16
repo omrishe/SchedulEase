@@ -11,7 +11,22 @@ function App() {
     userId: localStorage.getItem("userId"),
     userName: localStorage.getItem("userName"),
     email: localStorage.getItem("userEmail"),
+    role: localStorage.getItem("role"),
   });
+
+  useEffect(() => setUserDataToLocalStorage(userAuthData), [userAuthData]); //sync userdata to localstorage
+
+  function setUserDataToLocalStorage(data) {
+    //does not work for inherited objects
+    try {
+      for (const key in data) {
+        localStorage.setItem(key, data[key]);
+      }
+    } catch (err) {
+      console.error("failed to save to local storage see log ", err);
+    }
+  }
+
   const [isDoneCheckingToken, setIsDoneCheckingToken] = useState(false);
   console.log("in app.jsx", localStorage.getItem("userName"));
   console.log("in app.jsx", userAuthData);
@@ -58,6 +73,7 @@ function App() {
           path="/login"
           element={
             <Login
+              setUserDataToLocalStorage={setUserDataToLocalStorage}
               userAuthData={userAuthData}
               setUserAuthData={setUserAuthData}
             ></Login>

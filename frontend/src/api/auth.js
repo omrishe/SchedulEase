@@ -89,15 +89,6 @@ export async function logout() {
   return false;
 }
 
-/**function extractErrorDetails(error) {
-  return {
-    message: error.message,
-    details: error.details,
-    stack: error.stack,
-  };
-}
-  **/
-
 function handleError(error, location) {
   if (!error.message) {
     console.error(

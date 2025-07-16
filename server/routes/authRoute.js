@@ -1,7 +1,7 @@
 //server interaction
 const express = require("express");
 const auth = require("../Models/authModel.js");
-const dotenv = require("dotenv").config();
+const dotenv = require("dotenv").config(); //do not remove!,loads .env and sets it in process.env
 const router = express.Router();
 const jwt = require("jsonwebtoken"); //token creation and auth
 const bcrypt = require("bcrypt"); //password hashing
@@ -28,6 +28,7 @@ router.post("/signup", async (req, res) => {
     if (err.name === "ValidationError") {
       res.status(400);
       return res.json({
+        //return here prevents the code from keep running to the next lines -- just as a habit i kept it since it doesnt really needed here
         message: "couldnt save document to database-validation error",
         details: err.errors,
       });
@@ -37,7 +38,7 @@ router.post("/signup", async (req, res) => {
         "after serilize in authRoute in signup in server:",
         serilizeResponse(err)
       );
-      res.json(serilizeResponse(err));
+      return res.json(serilizeResponse(err));
     }
   }
 });
@@ -69,8 +70,9 @@ router.post("/login", async (req, res) => {
     res.status(200).json({
       userId: userData._id,
       userName: userData.name,
+      role: userData.role,
       message: "logged in successfully",
-    }); //return the user ID
+    });
   } catch (err) {
     res.status(400).json(serilizeResponse(err));
   }
