@@ -28,7 +28,6 @@ router.post("/signup", async (req, res) => {
     if (err.name === "ValidationError") {
       res.status(400);
       return res.json({
-        //return here prevents the code from keep running to the next lines -- just as a habit i kept it since it doesnt really needed here
         message: "couldnt save document to database-validation error",
         details: err.errors,
       });

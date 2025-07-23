@@ -7,6 +7,7 @@ import Register from "./pages/Register.jsx";
 import { validateToken } from "./api/auth.js";
 import { AdminPanel } from "./pages/AdminPanel.jsx";
 function App() {
+  const { menuItemsList, times } = params;
   const [userAuthData, setUserAuthData] = useState({
     userId: localStorage.getItem("userId"),
     userName: localStorage.getItem("userName"),
@@ -66,6 +67,8 @@ function App() {
               resetUserData={resetUserData}
               resetlocalStorage={resetlocalStorage}
               setUserAuthData={setUserAuthData}
+              menuItemsList={menuItemsList}
+              times={times}
             ></MainPage>
           }
         ></Route>
@@ -82,7 +85,9 @@ function App() {
         <Route path="/register" element={<Register></Register>}></Route>
         <Route
           path="/adminPanel"
-          element={<AdminPanel userAuthData={userAuthData}></AdminPanel>}
+          element={
+            <AdminPanel userAuthData={userAuthData} times={times}></AdminPanel>
+          }
         ></Route>
       </Routes>
     </BrowserRouter>

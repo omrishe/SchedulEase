@@ -1,10 +1,10 @@
-import format from "date-fns/format";
-import parse from "date-fns/parse";
+import { format, parse } from "date-fns";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+
 export default function ChooseDateContainer({
   updateAppointmentInfo,
   setWindow,
@@ -29,7 +29,9 @@ export default function ChooseDateContainer({
         endAccessor="end"
         views={["month"]}
         style={{ height: "250px", color: "black" }}
-        onSelectSlot={(slotinfo)=> updateAppointmentInfo({date: new Date(slotinfo["start"])})}
+        onSelectSlot={(slotinfo) =>
+          updateAppointmentInfo({ date: new Date(slotinfo["start"]) })
+        }
         selectable={true}
       />
       <button

@@ -11,6 +11,8 @@ import { logout } from "../api/auth.js";
 //todo uplift the appointmentinfo or do a new auth object containing the user info
 const { menuItemsList, times } = params;
 function MainPage({
+  menuItemsList,
+  times,
   userAuthData,
   resetUserData,
   resetlocalStorage,
