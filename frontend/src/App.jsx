@@ -6,6 +6,7 @@ import Login from "./pages/login.jsx";
 import Register from "./pages/Register.jsx";
 import { validateToken } from "./api/auth.js";
 import { AdminPanel } from "./pages/AdminPanel.jsx";
+import params from "./params.json";
 function App() {
   const { menuItemsList, times } = params;
   const [userAuthData, setUserAuthData] = useState({
@@ -37,22 +38,24 @@ function App() {
       userId: null,
       userName: null,
       email: null,
+      role: null,
     });
   }
   function resetlocalStorage() {
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
     localStorage.removeItem("userEmail");
+    localStorage.removeItem("role");
   }
   useEffect(() => {
     async function verifyTokenAndClearData() {
       const isTokenValid = await validateToken();
-      if (!isTokenValid) {
-        resetlocalStorage();
-        setUserAuthData({ userId: null, userName: null, userEmail: null });
+      if (!isTokenValid.success) {
+        resetUserData();
       }
       setIsDoneCheckingToken(true);
     }
+    console.log("in usereffect", userAuthData);
     verifyTokenAndClearData();
   }, []);
 
