@@ -5,8 +5,9 @@ import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
 import { useMemo, useState } from "react";
+import ChooseTime from "../components/ChooseTime";
 
-export function AdminPanel({ userAuthData, times }) {
+export function AdminPanel({ userAuthData, allTimes }) {
   const { timesSelected, setTimeSelected } = [];
   const locales = {
     "en-US": enUS,
@@ -19,7 +20,7 @@ export function AdminPanel({ userAuthData, times }) {
     getDay,
     locales,
   });
-  let eventlist = [];
+  let eventList = [];
   const { defaultDate } = useMemo(
     () => ({
       defaultDate: new Date(),
@@ -42,7 +43,7 @@ export function AdminPanel({ userAuthData, times }) {
         startAccessor="start"
         endAccessor="end"
       />
-      <times></times>
+      <ChooseTime times={allTimes}></ChooseTime>
     </div>
   );
   function handleSetMenuItemBtn() {

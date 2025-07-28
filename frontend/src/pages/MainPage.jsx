@@ -45,6 +45,15 @@ function MainPage({
     window.location.href = "tel:+00000000";
   }
 
+  async function handleChooseTimeOnlick() {
+    const tempDate = new Date(appointmentInfo.date);
+    const [hours, minutes] = time.split(":");
+    tempDate.setHours(hours, minutes);
+    updateAppointmentInfo({ date: tempDate });
+    const tempAppointmentInfo = { ...appointmentInfo, date: tempDate };
+    const serverResponse = await SendObjToServer(tempAppointmentInfo);
+  }
+
   function updateAppointmentInfo(newInfo) {
     setAppointment((prev) => ({
       ...prev, // keep all old fields
@@ -127,21 +136,32 @@ function MainPage({
         )}
 
         {windowChooser == "date" && (
-          <ChooseDateContainer
-            updateAppointmentInfo={updateAppointmentInfo}
-            setWindow={setWindow}
-          ></ChooseDateContainer>
+          <>
+            <ChooseDateContainer
+              updateAppointmentInfo={updateAppointmentInfo}
+              setWindow={setWindow}
+            ></ChooseDateContainer>
+            <button
+              onClick={() => {
+                setWindow("setAppointment");
+              }}
+            >
+              Next
+            </button>
+          </>
         )}
+
         <div className="chooseTimeContainer">
           {windowChooser == "setAppointment" && (
             <>
               <ChooseTime //display set appointment area
                 appointmentInfo={appointmentInfo}
-                updateAppointmentInfo={updateAppointmentInfo}
                 times={times}
-                setWindow={setWindow}
-                SendObjToServer={SendObjToServer}
+                handleChooseTimeOnlick={handleChooseTimeOnlick}
               ></ChooseTime>
+              <button className="backBtn" onClick={() => setWindow("date")}>
+                Back
+              </button>
             </>
           )}
         </div>

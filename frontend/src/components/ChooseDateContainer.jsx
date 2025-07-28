@@ -5,10 +5,7 @@ import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
-export default function ChooseDateContainer({
-  updateAppointmentInfo,
-  setWindow,
-}) {
+export default function ChooseDateContainer({ updateAppointmentInfo }) {
   const locales = {
     "en-US": enUS,
   };
@@ -34,13 +31,6 @@ export default function ChooseDateContainer({
         }
         selectable={true}
       />
-      <button
-        onClick={() => {
-          setWindow("setAppointment");
-        }}
-      >
-        Next
-      </button>
     </>
   );
 }

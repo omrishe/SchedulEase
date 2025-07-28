@@ -127,3 +127,11 @@
 .TimeOptionBtn {
   background-color: rgb(235, 102, 102);
 }
+.calanderDiv {
+  flex-direction: row;
+  display: flex;
+}
+.mainChooseTimeDiv {
+  flex-direction: column;
+  display: flex;
+}

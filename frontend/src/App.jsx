@@ -89,7 +89,10 @@ function App() {
         <Route
           path="/adminPanel"
           element={
-            <AdminPanel userAuthData={userAuthData} times={times}></AdminPanel>
+            <AdminPanel
+              userAuthData={userAuthData}
+              allTimes={params.allTimes}
+            ></AdminPanel>
           }
         ></Route>
       </Routes>
