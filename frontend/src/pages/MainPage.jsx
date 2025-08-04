@@ -8,7 +8,6 @@ import params from "../params.json";
 import { useNavigate, useLocation } from "react-router-dom";
 import { logout } from "../api/auth.js";
 
-//todo uplift the appointmentinfo or do a new auth object containing the user info
 const { menuItemsList, times } = params;
 function MainPage({
   menuItemsList,
@@ -16,19 +15,19 @@ function MainPage({
   userAuthData,
   resetUserData,
   resetlocalStorage,
-  setUserAuthData,
 }) {
   const navigatePage = useNavigate();
   const location = useLocation();
   const [appointmentInfo, setAppointment] = useState({
     date: new Date(),
     service: "",
-    name: "",
+    userName: localStorage.getItem("userName"),
     additionalRequests: "",
-    email: "",
+    email: localStorage.getItem("userEmail"),
   });
   const [logoutMsg, setLogoutMsg] = useState();
   const [windowChooser, setWindow] = useState("items");
+  useEffect(()=>updateAppointmentInfo({email:userAuthData["email"],userName:userAuthData["userName"]}),[userAuthData.email,userAuthData.userName])
   function openWaze() {
     const latitude = 32.051403;
     const longitude = 34.811563;
@@ -45,13 +44,16 @@ function MainPage({
     window.location.href = "tel:+00000000";
   }
 
-  async function handleChooseTimeOnlick() {
+  async function handleChooseTimeOnlick(timeArray) {
     const tempDate = new Date(appointmentInfo.date);
-    const [hours, minutes] = time.split(":");
+    const [hours, minutes] = timeArray[0].split(":");
     tempDate.setHours(hours, minutes);
+    console.log(appointmentInfo)
     updateAppointmentInfo({ date: tempDate });
     const tempAppointmentInfo = { ...appointmentInfo, date: tempDate };
+    console.log(tempAppointmentInfo)
     const serverResponse = await SendObjToServer(tempAppointmentInfo);
+    return serverResponse;
   }
 
   function updateAppointmentInfo(newInfo) {
@@ -157,6 +159,7 @@ function MainPage({
               <ChooseTime //display set appointment area
                 appointmentInfo={appointmentInfo}
                 times={times}
+                maxTimeSelections={1}
                 handleChooseTimeOnlick={handleChooseTimeOnlick}
               ></ChooseTime>
               <button className="backBtn" onClick={() => setWindow("date")}>

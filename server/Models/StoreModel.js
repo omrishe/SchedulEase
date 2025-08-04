@@ -17,7 +17,7 @@ const servicesSchema = new mongoose.Schema(
 
 const storeSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true },
+    storeName: { type: String, required: true, trim: true },
     services: [servicesSchema],
     storeNote: { type: String, required: false },
     announcement: { type: String, required: false },

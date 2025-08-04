@@ -69,7 +69,6 @@ function App() {
               userAuthData={userAuthData}
               resetUserData={resetUserData}
               resetlocalStorage={resetlocalStorage}
-              setUserAuthData={setUserAuthData}
               menuItemsList={menuItemsList}
               times={times}
             ></MainPage>

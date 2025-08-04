@@ -2,7 +2,7 @@ import { useState } from "react";
 import { signup } from "../api/auth";
 function Register({ setToken, className }) {
   const [formData, setFormData] = useState({
-    name: "",
+    userName: "",
     password: "",
     email: "",
   });
@@ -23,7 +23,7 @@ function Register({ setToken, className }) {
       setMessage(serverResponse.message);
     }
     if (serverResponse.message === "created Successfully") {
-      setFormData({ name: "", password: "", email: "" });
+      setFormData({ userName: "", password: "", email: "" });
     }
   }
 
@@ -33,8 +33,8 @@ function Register({ setToken, className }) {
     if (!emailPattern.test(formData.email) || !formData.email) {
       errors.email = "email is invalid";
     }
-    if (!formData.name) {
-      errors.name = "name is invalid";
+    if (!formData.userName) {
+      errors.userName = "name is invalid";
     }
     return errors;
   }
@@ -46,12 +46,12 @@ function Register({ setToken, className }) {
         onSubmit={handleRegister}
         style={{ flexDirection: "column", display: "flex" }}
       >
-        <label htmlFor="nameInput">name</label>
+        <label htmlFor="userNameInput">name</label>
         <input
-          id="nameInput"
+          id="userNameInput"
           type="text"
-          name="name"
-          value={formData.name}
+          name="userName"
+          value={formData.userName}
           onChange={handleChange}
         />
         <label htmlFor="emailInput">email</label>

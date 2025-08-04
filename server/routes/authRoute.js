@@ -21,7 +21,7 @@ router.post("/signup", async (req, res) => {
       hashedPassword,
       ...otherData,
     });
-    const savedDoc = await signupData.save(); //if the file failed saving it jumps to catch cause it threw an error
+    await signupData.save(); //if the file failed saving it jumps to catch cause it threw an error
     res.status(201);
     res.json({ message: "created Successfully" }); //return the object that was saved as it appears in the db
   } catch (err) {
@@ -44,7 +44,6 @@ router.post("/signup", async (req, res) => {
 //first authenticate token then continue
 router.post("/login", async (req, res) => {
   try {
-    const email = req.body.email;
     const password = req.body.password;
     const userData = await auth.findOne({ email: req.body.email });
     console.log(userData);
@@ -66,11 +65,12 @@ router.post("/login", async (req, res) => {
       samesite: "None", //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!change this when deploying the server!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       maxAge: 12 * 60 * 60 * 1000, //12 hours life of token cookie
     });
+    const { _id, name, ...data } = userData.toObject();
     res.status(200).json({
-      userId: userData._id,
-      userName: userData.name,
-      role: userData.role,
+      userId: _id,
+      userName: name,
       message: "logged in successfully",
+      ...data,
     });
   } catch (err) {
     res.status(400).json(serilizeResponse(err));

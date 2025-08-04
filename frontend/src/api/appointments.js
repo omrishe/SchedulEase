@@ -9,6 +9,7 @@ export async function createAppointment(appointmentInfo) {
       credentials: "include",
       body: JSON.stringify(appointmentInfo),
     });
+    console.log("appointment data is", appointmentInfo);
     const data = await response.json();
     if (!response.ok) {
       handlePostError(data);

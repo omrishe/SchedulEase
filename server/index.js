@@ -36,6 +36,7 @@ async function startDatabase() {
       console.log(`HTTPS Server running on https://localhost:${PORT}`);
     });
   } catch (err) {
+    ``;
     console.error("Failed to start server:", err);
   }
 }
