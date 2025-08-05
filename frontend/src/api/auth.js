@@ -38,11 +38,9 @@ export async function userLogIn(formData) {
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.password,
-      }),
+      body: JSON.stringify(formData),
     });
+    console.log("in auth.js", formData);
     const data = await response.json();
     if (!response.ok) {
       //altough in any http code that returned the return is the same,i left it for clearer code or future expension

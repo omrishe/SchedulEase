@@ -29,8 +29,6 @@ function App() {
     }
   }
 
-  const [isDoneCheckingToken, setIsDoneCheckingToken] = useState(false);
-  console.log("in app.jsx", localStorage.getItem("userName"));
   console.log("in app.jsx", userAuthData);
 
   function resetUserData() {
@@ -41,24 +39,31 @@ function App() {
       role: null,
     });
   }
+
   function resetlocalStorage() {
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
     localStorage.removeItem("userEmail");
     localStorage.removeItem("role");
   }
+
   useEffect(() => {
     async function verifyTokenAndClearData() {
       const isTokenValid = await validateToken();
       if (!isTokenValid.success) {
         resetUserData();
       }
-      setIsDoneCheckingToken(true);
     }
     console.log("in usereffect", userAuthData);
     verifyTokenAndClearData();
   }, []);
 
+  async function updateAuthData(tempAuthData)
+  {
+    console.log(tempAuthData)
+    setUserAuthData({...userAuthData,...tempAuthData});
+  }
+  
   return (
     <BrowserRouter>
       <Routes>
@@ -69,6 +74,7 @@ function App() {
               userAuthData={userAuthData}
               resetUserData={resetUserData}
               resetlocalStorage={resetlocalStorage}
+              updateAuthData={updateAuthData}
               menuItemsList={menuItemsList}
               times={times}
             ></MainPage>
@@ -80,7 +86,7 @@ function App() {
             <Login
               setUserDataToLocalStorage={setUserDataToLocalStorage}
               userAuthData={userAuthData}
-              setUserAuthData={setUserAuthData}
+              updateAuthData={updateAuthData}
             ></Login>
           }
         ></Route>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 export default function ChooseTime({
-  appointmentInfo,
+  appointmentInfo: date={date:new Date()},
   times,
   handleChooseTimeOnlick,
   maxTimeSelections,
@@ -21,24 +21,24 @@ export default function ChooseTime({
 
   function timeBtnSelect(timeInput){
     resetResponse();
-    //add new time in the array
-    if(timeArray.length<maxTimeSelections){
-      if(! timeArray.includes(timeInput)){
+    const index = timeArray.indexOf(timeInput);
+    //time wasnt chosen yet
+    if(index === -1){
+      //add new time in the array if max selection set is less than amount of chosen times
+      if(timeArray.length<maxTimeSelections){
         setTimeArray([...timeArray,timeInput]);
       }
+      //amount of chosen times is greater than the allowed set in max selection
       else{
-        setResponse({message : "time already chosen"})
-      }
-    }
-    //replace the last selected time
+      setResponse({message:`maximum amount of choices ${maxTimeSelections===1 ? "is 1": ` are ${maxTimeSelections}`}`})
+      }}
+    //time was chosen already->remove the selection
     else{
-      let tempTimeArray=[...timeArray];
-      tempTimeArray[tempTimeArray.length - 1]=timeInput
+      const tempTimeArray=[...timeArray]
+      tempTimeArray.splice(index,1);
       setTimeArray(tempTimeArray);
-    }
-    console.log(timeArray)
-  }
-
+    }}
+    
   return (
     <div className="mainChooseTimeDiv">
       <span>please choose time</span>
@@ -48,7 +48,7 @@ export default function ChooseTime({
             timeInput // sets the times user can choose
           ) => (
             <button
-              className="TimeOptionBtn"
+              className={`TimeOptionBtn ${timeArray.includes(timeInput) ?"clicked" : ""}`}
               key={timeInput}
               onClick={() => timeBtnSelect(timeInput)}
             >
@@ -60,8 +60,8 @@ export default function ChooseTime({
       {timeArray && (
         <div style={{ display: "flex", flexDirection: "column" }}>
           <span>
-            Date Selected:{appointmentInfo["date"].toLocaleDateString("en-GB")}{" "}
-            at {timeArray.map((time)=> `${time} ,`)}
+            Date Selected:{date["date"].toLocaleDateString("en-GB")}{" "}
+            {(maxTimeSelections===1 && timeArray[0]) ? `at ${timeArray[0]}`:""}
           </span>
           <button onClick={submitSelectedTime}>Confirm</button>
           {response && <p>{response.message}</p>}

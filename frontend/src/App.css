@@ -127,6 +127,11 @@
 .TimeOptionBtn {
   background-color: rgb(235, 102, 102);
 }
+
+.TimeOptionBtn.clicked{
+  background-color: rgb(83, 73, 73);
+}
+
 .calanderDiv {
   flex-direction: row;
   display: flex;
@@ -134,4 +139,7 @@
 .mainChooseTimeDiv {
   flex-direction: column;
   display: flex;
+}
+.AdminPanelMainDiv{
+  align-items: center;
 }

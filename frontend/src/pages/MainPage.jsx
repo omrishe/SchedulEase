@@ -1,4 +1,3 @@
-import "../App.css";
 import MenuItems from "../components/MenuItem.jsx";
 import { useState, useEffect } from "react";
 import ChooseDateContainer from "../components/ChooseDateContainer.jsx";
@@ -14,6 +13,7 @@ function MainPage({
   times,
   userAuthData,
   resetUserData,
+  updateAuthData,
   resetlocalStorage,
 }) {
   const navigatePage = useNavigate();
@@ -27,7 +27,13 @@ function MainPage({
   });
   const [logoutMsg, setLogoutMsg] = useState();
   const [windowChooser, setWindow] = useState("items");
-  useEffect(()=>updateAppointmentInfo({email:userAuthData["email"],userName:userAuthData["userName"]}),[userAuthData.email,userAuthData.userName])
+
+  //synchronize the email and userName with appointment info on change
+  useEffect(()=> {
+    const updateAppointment= async ()=> await updateAppointmentInfo({email:userAuthData["email"],userName:userAuthData["userName"]})
+    updateAppointment();
+  },[userAuthData.email,userAuthData.userName])
+
   function openWaze() {
     const latitude = 32.051403;
     const longitude = 34.811563;
@@ -56,7 +62,7 @@ function MainPage({
     return serverResponse;
   }
 
-  function updateAppointmentInfo(newInfo) {
+  async function updateAppointmentInfo(newInfo) {
     setAppointment((prev) => ({
       ...prev, // keep all old fields
       ...newInfo, // overwrite with new fields
@@ -68,11 +74,11 @@ function MainPage({
       const resolve = await appointmentsAPI.createAppointment(data); //resolve contains the appointment info
       if (resolve) {
         console.log("successfully created appointment");
-        setUserName(resolve.name);
+        await updateAuthData({...userAuthData,userName:resolve.userName});
         return { ...resolve, message: "successfully created appointment" };
       }
     } catch (error) {
-      console.error("failed to create appointment");
+      console.error("failed to create appointment",error);
       return { message: "failed to create appointment" };
     }
   }
@@ -88,6 +94,7 @@ function MainPage({
       setLogoutMsg("an Error occured see log for more info");
     }
   }
+
   const welcomeMsg = (
     <p className="welcomeParagraph">
       {userAuthData.userName ? `welcome ${userAuthData.userName}` : "welcome"}
@@ -140,8 +147,7 @@ function MainPage({
         {windowChooser == "date" && (
           <>
             <ChooseDateContainer
-              updateAppointmentInfo={updateAppointmentInfo}
-              setWindow={setWindow}
+              updateDate={updateAppointmentInfo}
             ></ChooseDateContainer>
             <button
               onClick={() => {

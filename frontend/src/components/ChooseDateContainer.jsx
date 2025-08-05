@@ -5,7 +5,7 @@ import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
-export default function ChooseDateContainer({ updateAppointmentInfo }) {
+export default function ChooseDateContainer({ updateDate,date }) {
   const locales = {
     "en-US": enUS,
   };
@@ -20,6 +20,7 @@ export default function ChooseDateContainer({ updateAppointmentInfo }) {
   return (
     <>
       <Calendar
+      date={date}
         localizer={localizer}
         events={myEventsList}
         startAccessor="start"
@@ -27,7 +28,7 @@ export default function ChooseDateContainer({ updateAppointmentInfo }) {
         views={["month"]}
         style={{ height: "250px", color: "black" }}
         onSelectSlot={(slotinfo) =>
-          updateAppointmentInfo({ date: new Date(slotinfo["start"]) })
+        updateDate({date:new Date(slotinfo["start"])})
         }
         selectable={true}
       />

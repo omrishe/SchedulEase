@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { userLogIn } from "../api/auth";
 import { useNavigate } from "react-router-dom";
 
-function Login({ userAuthData, setUserAuthData }) {
+function Login({ userAuthData, updateAuthData }) {
   const navigatePage = useNavigate();
   const [formData, setFormData] = useState({
     Username: "",
@@ -21,7 +21,7 @@ function Login({ userAuthData, setUserAuthData }) {
     console.log(authResult);
     if (authResult.message === "logged in successfully") {
       const { message, ...authData } = authResult;
-      setUserAuthData(authData);
+      await updateAuthData(authData);
       setMessage(message + " you will be redirected soon");
       setFormData((prev) => ({ ...prev, password: "" }));
       setTimeout(() => navigatePage("/"), 1500);

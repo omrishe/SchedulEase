@@ -46,7 +46,7 @@ router.post("/login", async (req, res) => {
   try {
     const password = req.body.password;
     const userData = await auth.findOne({ email: req.body.email });
-    console.log(userData);
+    console.log("in authroute.js", userData);
     if (!userData) {
       throw new Error("no user found");
     }

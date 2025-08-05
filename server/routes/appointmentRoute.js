@@ -7,11 +7,10 @@ const router = express.Router();
 
 router.post("/new", authenticateToken, async (req, res) => {
   try {
-    //add validation check errors
     const newAppointment = new Appointment(req.body); //recieves the data sent and set it as
-    const savedAppointment = await newAppointment.save(); //saves the data to database
+    const savedAppointment = await newAppointment.save(); //saves the data to database -- mongoose automatically convert string date to js date
+    console.log("saved appointment is", savedAppointment);
     res.status(201);
-    console.log(req.body);
     res.json(savedAppointment); //return the object that was saved as it appears in the db
   } catch (err) {
     if (err.name === "ValidationError") {
