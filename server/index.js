@@ -3,6 +3,7 @@ const cors = require("cors"); //for testing purposes allows the requests of loca
 const mongoose = require("mongoose");
 const appointmentRoute = require("./routes/appointmentRoute");
 const authRoute = require("./routes/authRoute");
+const storeRoute = require("./routes/StoreRoute");
 const connectToMongo = require("./database/db");
 const https = require("https");
 const fs = require("fs");
@@ -26,6 +27,7 @@ async function startDatabase() {
     console.log("Database connected, starting server...");
     app.use("/api/appointments", appointmentRoute);
     app.use("/api/auth", authRoute);
+    app.use("/api/store", storeRoute);
     //load certificate and key
     const sslOptions = {
       key: fs.readFileSync("./cert/localhost-key.pem"),

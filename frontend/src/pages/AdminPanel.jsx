@@ -7,9 +7,10 @@ import enUS from "date-fns/locale/en-US";
 import { useMemo, useState } from "react";
 import ChooseTime from "../components/ChooseTime";
 import ChooseDateContainer from "../components/ChooseDateContainer";
+import { createStore } from "../api/store";
 
 export function AdminPanel({ userAuthData, allTimes }) {
-  const { timesSelected, setTimeSelected } = [];
+  const maxTimeSelections=24;
   const locales = {
     "en-US": enUS,
   };
@@ -33,17 +34,33 @@ export function AdminPanel({ userAuthData, allTimes }) {
     setDate(dateClicked["date"]);
   }
 
-  function handleSetMenuItemBtn() {
-    return;
+  //handles sending store owner time available
+  function handleSetMenuItemBtn(timeArray,maxSelections) {
+    return "hi";
   }
+
+  //temp function to create a testing store - delete after
+  async function createNewStore(){
+  const tempStore={
+  "storeName": "Omri's Barbershop",
+  "storeNote": "Walk-ins welcome",
+  "announcement": "Holiday discounts available",
+  services: [
+    { name: "Haircut", price: "20", serviceNote: "Includes wash" }
+  ]
+}
+    const response = await createStore(tempStore);
+    return response.message;
+  }
+
   return userAuthData.role === "admin" ? (
     <div className="AdminPanelMainDiv">
       <p>welcome Admin</p>
       <div className="calanderDiv">
       <ChooseDateContainer updateDate={updateDate} date={date}></ChooseDateContainer>
-      <ChooseTime times={allTimes} appointmentInfo={{date : date}} maxTimeSelections={24} /*</div>handleChooseTimeOnlick={sendDataToServer}*/></ChooseTime>
+      <ChooseTime times={allTimes} appointmentInfo={{date : date}} maxTimeSelections={maxTimeSelections} handleSetMenuItemBtn={handleSetMenuItemBtn} /*</div>handleChooseTimeOnlick={sendDataToServer}*/></ChooseTime>
     </div>
-      <button onClick={handleSetMenuItemBtn}>dont click</button>
+      <button onClick={createNewStore}>temp create store button</button>
     </div>
   ) : (
     <p>forbidden</p>

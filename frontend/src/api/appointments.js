@@ -17,7 +17,7 @@ export async function createAppointment(appointmentInfo) {
       return data;
     }
   } catch (error) {
-    console.log("error:", error.errors);
+    console.error("error:", error.errors);
     throw error;
   }
 }
