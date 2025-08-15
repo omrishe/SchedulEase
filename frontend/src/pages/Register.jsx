@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { signup } from "../api/auth";
+import { useNavigate,useParams} from "react-router-dom";
+
 function Register({ setToken, className }) {
   const [formData, setFormData] = useState({
     userName: "",
     password: "",
     email: "",
   });
+  const {slug}=useParams()
+  const navigatePage = useNavigate();
   const [message, setMessage] = useState("");
 
   function handleChange(e) {
@@ -23,7 +27,9 @@ function Register({ setToken, className }) {
       setMessage(serverResponse.message);
     }
     if (serverResponse.message === "created Successfully") {
+      setMessage("created successfully you will be redirected soon");
       setFormData({ userName: "", password: "", email: "" });
+      setTimeout(() => navigatePage(`/store/${slug}/`), 1500);
     }
   }
 

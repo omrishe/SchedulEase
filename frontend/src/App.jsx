@@ -7,6 +7,7 @@ import Register from "./pages/Register.jsx";
 import { validateToken } from "./api/auth.js";
 import { AdminPanel } from "./pages/AdminPanel.jsx";
 import params from "./params.json";
+import SuperAdminPanel from "./pages/SuperAdminPanel.jsx";
 function App() {
   const { menuItemsList, times } = params;
   const [userAuthData, setUserAuthData] = useState({
@@ -68,7 +69,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route
-          path="/"
+          path="/store/:slug"
           element={
             <MainPage
               userAuthData={userAuthData}
@@ -81,7 +82,7 @@ function App() {
           }
         ></Route>
         <Route
-          path="/login"
+          path="/store/:slug/login"
           element={
             <Login
               setUserDataToLocalStorage={setUserDataToLocalStorage}
@@ -90,14 +91,21 @@ function App() {
             ></Login>
           }
         ></Route>
-        <Route path="/register" element={<Register></Register>}></Route>
+        <Route path="/store/:slug/register" element={<Register></Register>}></Route>
         <Route
-          path="/adminPanel"
+          path="/store/:slug/adminPanel"
           element={
             <AdminPanel
               userAuthData={userAuthData}
               allTimes={params.allTimes}
             ></AdminPanel>
+          }
+        ></Route>
+        <Route
+          path="/superadminPanel"
+          element={
+            <SuperAdminPanel
+            ></SuperAdminPanel>
           }
         ></Route>
       </Routes>

@@ -7,7 +7,6 @@ import enUS from "date-fns/locale/en-US";
 import { useMemo, useState } from "react";
 import ChooseTime from "../components/ChooseTime";
 import ChooseDateContainer from "../components/ChooseDateContainer";
-import { createStore } from "../api/store";
 
 export function AdminPanel({ userAuthData, allTimes }) {
   const maxTimeSelections=24;
@@ -39,19 +38,7 @@ export function AdminPanel({ userAuthData, allTimes }) {
     return "hi";
   }
 
-  //temp function to create a testing store - delete after
-  async function createNewStore(){
-  const tempStore={
-  "storeName": "Omri's Barbershop",
-  "storeNote": "Walk-ins welcome",
-  "announcement": "Holiday discounts available",
-  services: [
-    { name: "Haircut", price: "20", serviceNote: "Includes wash" }
-  ]
-}
-    const response = await createStore(tempStore);
-    return response.message;
-  }
+
 
   return userAuthData.role === "admin" ? (
     <div className="AdminPanelMainDiv">
@@ -60,7 +47,6 @@ export function AdminPanel({ userAuthData, allTimes }) {
       <ChooseDateContainer updateDate={updateDate} date={date}></ChooseDateContainer>
       <ChooseTime times={allTimes} appointmentInfo={{date : date}} maxTimeSelections={maxTimeSelections} handleSetMenuItemBtn={handleSetMenuItemBtn} /*</div>handleChooseTimeOnlick={sendDataToServer}*/></ChooseTime>
     </div>
-      <button onClick={createNewStore}>temp create store button</button>
     </div>
   ) : (
     <p>forbidden</p>

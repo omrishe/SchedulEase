@@ -4,7 +4,7 @@ import ChooseDateContainer from "../components/ChooseDateContainer.jsx";
 import ChooseTime from "../components/ChooseTime.jsx";
 import * as appointmentsAPI from "../api/appointments.js";
 import params from "../params.json";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation,useParams, } from "react-router-dom";
 import { logout } from "../api/auth.js";
 
 const { menuItemsList, times } = params;
@@ -25,6 +25,7 @@ function MainPage({
     additionalRequests: "",
     email: localStorage.getItem("userEmail"),
   });
+  const { slug } = useParams();
   const [logoutMsg, setLogoutMsg] = useState();
   const [windowChooser, setWindow] = useState("items");
 
@@ -106,10 +107,10 @@ function MainPage({
     </button>
   ) : (
     <>
-      <button className="loginBtn" onClick={() => navigatePage("/login")}>
+      <button className="loginBtn" onClick={() => navigatePage(`/store/${slug}/login`)}>
         login
       </button>
-      <button onClick={() => navigatePage("register")}>
+      <button onClick={() => navigatePage(`/store/${slug}/register`)}>
         dont have a user? Register
       </button>
     </>

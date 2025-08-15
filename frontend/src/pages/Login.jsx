@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { userLogIn } from "../api/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useParams} from "react-router-dom";
 
 function Login({ userAuthData, updateAuthData }) {
+  const {slug}=useParams()
   const navigatePage = useNavigate();
   const [formData, setFormData] = useState({
     Username: "",
     password: "",
     email: "",
   });
+  console.log(slug)
   const [message, setMessage] = useState("");
 
   function handleChange(e) {
@@ -24,7 +26,7 @@ function Login({ userAuthData, updateAuthData }) {
       await updateAuthData(authData);
       setMessage(message + " you will be redirected soon");
       setFormData((prev) => ({ ...prev, password: "" }));
-      setTimeout(() => navigatePage("/"), 1500);
+      setTimeout(() => navigatePage(`/store/${slug}/`), 1500);
     } else {
       setMessage(authResult.message);
     }
