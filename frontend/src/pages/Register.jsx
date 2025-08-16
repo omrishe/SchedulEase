@@ -3,12 +3,13 @@ import { signup } from "../api/auth";
 import { useNavigate,useParams} from "react-router-dom";
 
 function Register({ setToken, className }) {
+  const {slug}=useParams()
   const [formData, setFormData] = useState({
     userName: "",
     password: "",
     email: "",
+    storeSlug:slug
   });
-  const {slug}=useParams()
   const navigatePage = useNavigate();
   const [message, setMessage] = useState("");
 

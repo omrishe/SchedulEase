@@ -9,7 +9,7 @@ export default function ChooseTime({
   const [timeArray, setTimeArray] = useState([]);
 
   async function submitSelectedTime() {
-    const serverResponse = await handleChooseTimeOnlick(timeArray,maxTimeSelections);
+    const serverResponse = await handleChooseTimeOnlick(timeArray);
     setResponse(serverResponse);
   }
 

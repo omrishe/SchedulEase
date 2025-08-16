@@ -7,13 +7,21 @@ import enUS from "date-fns/locale/en-US";
 import { useMemo, useState } from "react";
 import ChooseTime from "../components/ChooseTime";
 import ChooseDateContainer from "../components/ChooseDateContainer";
+import { setStoreOwnerAvailability } from "../api/store";
 
-export function AdminPanel({ userAuthData, allTimes }) {
+export function AdminPanel({ userAuthData, allTimes, _id }) {
+  const [formData,setFormaData]=useState({
+    serviceName:"",
+    servicePrice:"",
+    serviceNote:""
+  })
+  const [date,setDate]=useState(new Date());
   const maxTimeSelections=24;
   const locales = {
     "en-US": enUS,
   };
-  const [date,setDate]=useState(new Date());
+  console.log("in admin panel",userAuthData)
+  
   const buttons = <div>times.map()</div>;
   const localizer = dateFnsLocalizer({
     format,
@@ -34,19 +42,42 @@ export function AdminPanel({ userAuthData, allTimes }) {
   }
 
   //handles sending store owner time available
-  function handleSetMenuItemBtn(timeArray,maxSelections) {
-    return "hi";
+  async function handleSetMenuItemBtn(timeArray) {
+    const dateObjects = timeArray.map(time => createDateWithTime(time));
+    const response=await setStoreOwnerAvailability(dateObjects,userAuthData.storeID)
+    //add status label
   }
 
+  //function to create a new date
+  function createDateWithTime(time){
+    const [hours, minutes] = time.split(":").map(Number);
+    return new Date(date.getFullYear(),date.getMonth(),date.getDate(),hours,minutes)
+  }
 
+  //function to add service to the store
+  function addService(){
+    return;
+  }
+function handleChange(e) {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  }
 
   return userAuthData.role === "admin" ? (
     <div className="AdminPanelMainDiv">
       <p>welcome Admin</p>
       <div className="calanderDiv">
       <ChooseDateContainer updateDate={updateDate} date={date}></ChooseDateContainer>
-      <ChooseTime times={allTimes} appointmentInfo={{date : date}} maxTimeSelections={maxTimeSelections} handleSetMenuItemBtn={handleSetMenuItemBtn} /*</div>handleChooseTimeOnlick={sendDataToServer}*/></ChooseTime>
+      <ChooseTime times={allTimes} appointmentInfo={{date : date}} maxTimeSelections={maxTimeSelections} handleChooseTimeOnlick={handleSetMenuItemBtn}></ChooseTime>
     </div>
+    <form>
+        <label htmlFor="serviceName">service name </label>
+        <input name="serviceName" onChange={handleChange} value={formData["serviceName"]}/>
+        <label htmlFor="serviceNote">service note </label>
+        <input name="serviceNote" onChange={handleChange} value={formData["serviceNote"]}/>
+        <label htmlFor="servicePrice">service price </label>
+        <input name="servicePrice" onChange={handleChange} value={formData["servicePrice"]}/>
+        <button type="submit" onClick={addService}>add new service</button>
+    </form>
     </div>
   ) : (
     <p>forbidden</p>

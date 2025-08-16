@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+//embeded service schema as array- since most of them will be less than 50 its better for understandability and querying
+//other options that got used(in users schema) is ref, which is better for large amount of users 1000< and stores
 const servicesSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -32,5 +34,4 @@ const storeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const stores = mongoose.model("store", storeSchema);
-module.exports = stores;
+module.exports = mongoose.models.Store || mongoose.model("Store", storeSchema);

@@ -55,13 +55,12 @@ function App() {
         resetUserData();
       }
     }
-    console.log("in usereffect", userAuthData);
     verifyTokenAndClearData();
+    console.log("on new instance load", userAuthData);
   }, []);
 
   async function updateAuthData(tempAuthData)
   {
-    console.log(tempAuthData)
     setUserAuthData({...userAuthData,...tempAuthData});
   }
   

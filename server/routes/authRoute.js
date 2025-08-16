@@ -1,26 +1,31 @@
 //server interaction
 const express = require("express");
-const auth = require("../Models/authModel.js");
+const auth = require("../Models/userModel.js");
 const dotenv = require("dotenv").config(); //do not remove!,loads .env and sets it in process.env
 const router = express.Router();
 const jwt = require("jsonwebtoken"); //token creation and auth
 const bcrypt = require("bcrypt"); //password hashing
 const authenticateToken = require("../tokenauth/authenticateToken.js");
+const store = require("../Models/storeModel.js");
 //signup request post
 router.post("/signup", async (req, res) => {
   try {
-    if (await auth.findOne({ email: req.body.email })) {
+    const { email, password, storeSlug, ...otherData } = req.body;
+    if (await auth.findOne({ email: email })) {
       throw new Error("email already exists");
     }
-    const { email, password, ...otherData } = req.body;
     otherData.role = "user";
+    const fetchedStore = await store.findOne({ storeSlug: storeSlug });
+    storeID = fetchedStore._id;
     const saltrounds = 10; // move this into params file
     hashedPassword = await bcrypt.hash(password, saltrounds);
     const signupData = new auth({
       email,
+      storeID: storeID,
       hashedPassword,
       ...otherData,
     });
+    console.log("registering with", signupData);
     await signupData.save(); //if the file failed saving it jumps to catch cause it threw an error
     res.status(201);
     res.json({ message: "created Successfully" }); //return the object that was saved as it appears in the db

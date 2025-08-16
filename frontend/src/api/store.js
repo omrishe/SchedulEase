@@ -1,4 +1,4 @@
-const serverAddress = "https://localhost:5000";
+const serverAddress = "https://localhost:5000/api/store";
 
 const getHeaderWithCred = {
   method: "GET",
@@ -17,7 +17,7 @@ export function adminDelService() {
 
 export async function createStore(storeInfo) {
   try {
-    const response = await fetch(`${serverAddress}/api/store/new`, {
+    const response = await fetch(`${serverAddress}/new`, {
       method: "post",
       headers: {
         "Content-Type": "application/json",
@@ -60,5 +60,33 @@ export async function getStoreInfo(storeId) {
   } catch (err) {
     console.error(err);
     return err;
+  }
+}
+
+export async function setStoreOwnerAvailability(dateObjects, _id) {
+  try {
+    const response = await fetch(`${serverAddress}/new-store-time-slots`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ dates: dateObjects, _id: _id }),
+    });
+    console.log(
+      "in store.js",
+      JSON.stringify({ dates: dateObjects, _id: _id })
+    );
+    const data = await response.json();
+    if (!response.ok) {
+      //add error handling
+      console.error("no error handling set yet");
+    } else {
+      console.log(data);
+      return data;
+    }
+  } catch (error) {
+    console.log("error:", error);
+    throw error;
   }
 }

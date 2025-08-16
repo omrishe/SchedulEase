@@ -14,7 +14,6 @@ export async function signup(formData) {
       body: JSON.stringify(formData),
     });
     const data = await response.json(); //wont reach here if couldnt get to the server
-    console.log("in auth.js in frontend the returned object is:", data);
     if (!response.ok) {
       //altough in any http code that returned the return is the same,i left it for clearer code or future expension
       return data;

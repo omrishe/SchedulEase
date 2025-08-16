@@ -13,9 +13,13 @@ const authSchema = new mongoose.Schema(
     username: { type: String, required: false },
     hashedPassword: { type: String, required: true },
     role: { type: String, required: true },
+    storeID: {
+      required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Store",
+    },
   },
   { timestamps: true }
 );
 
-const users = mongoose.model("user", authSchema);
-module.exports = users;
+module.exports = mongoose.models.User || mongoose.model("User", authSchema);

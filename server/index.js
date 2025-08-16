@@ -11,12 +11,14 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const PORT = 5000;
 
+//sets to allow all origins, to add specific origin write eg:(:"http://localhost:5173")
 app.use(
   cors({
     origin: "https://localhost:5173",
     credentials: true,
   })
-); //sets to allow all origins, to add specific origin write eg:(:"http://localhost:5173")
+);
+//sets so the response is auto parse to json
 app.use(express.json());
 //cookie parser middleware
 app.use(cookieParser());

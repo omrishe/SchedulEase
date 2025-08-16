@@ -7,7 +7,6 @@ import params from "../params.json";
 import { useNavigate, useLocation,useParams, } from "react-router-dom";
 import { logout } from "../api/auth.js";
 
-const { menuItemsList, times } = params;
 function MainPage({
   menuItemsList,
   times,
@@ -16,6 +15,7 @@ function MainPage({
   updateAuthData,
   resetlocalStorage,
 }) {
+
   const navigatePage = useNavigate();
   const location = useLocation();
   const [appointmentInfo, setAppointment] = useState({
