@@ -2,16 +2,17 @@
 const express = require("express");
 const Appointment = require("../Models/appointmentModel.js");
 const authenticateToken = require("../tokenauth/authenticateToken.js");
-
+const { serilizeResponse } = require("../utils/responseHandler.js");
 const router = express.Router();
 
 router.post("/new", authenticateToken, async (req, res) => {
   try {
-    const newAppointment = new Appointment(req.body); //recieves the data sent and set it as
+    const newAppointment = new Appointment(req.body); //recieves the data sent and create an appointment schema
     const savedAppointment = await newAppointment.save(); //saves the data to database -- mongoose automatically convert string date to js date
-    console.log("saved appointment is", savedAppointment);
+    const { createdAt, updatedAt, ...appointment } = savedAppointment;
+    console.log("saved clean appointment is", appointment);
     res.status(201);
-    res.json(savedAppointment); //return the object that was saved as it appears in the db
+    res.json(appointment); //return the object that was saved as it appears in the db
   } catch (err) {
     if (err.name === "ValidationError") {
       //throw error incase db schema mismatch

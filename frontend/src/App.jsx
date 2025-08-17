@@ -2,12 +2,13 @@ import "./App.css";
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainPage from "./pages/MainPage.jsx";
-import Login from "./pages/login.jsx";
+import Login from "./pages/Login.jsx"
 import Register from "./pages/Register.jsx";
 import { validateToken } from "./api/auth.js";
 import { AdminPanel } from "./pages/AdminPanel.jsx";
 import params from "./params.json";
 import SuperAdminPanel from "./pages/SuperAdminPanel.jsx";
+
 function App() {
   const { menuItemsList, times } = params;
   const [userAuthData, setUserAuthData] = useState({
@@ -15,6 +16,7 @@ function App() {
     userName: localStorage.getItem("userName"),
     email: localStorage.getItem("userEmail"),
     role: localStorage.getItem("role"),
+    storeID : localStorage.getItem("storeID")
   });
 
   useEffect(() => setUserDataToLocalStorage(userAuthData), [userAuthData]); //sync userdata to localstorage
@@ -23,6 +25,8 @@ function App() {
     //does not work for inherited objects
     try {
       for (const key in data) {
+        console.log("key is:",key)
+        console.log("data key is:",data[key])
         localStorage.setItem(key, data[key]);
       }
     } catch (err) {
@@ -56,7 +60,6 @@ function App() {
       }
     }
     verifyTokenAndClearData();
-    console.log("on new instance load", userAuthData);
   }, []);
 
   async function updateAuthData(tempAuthData)

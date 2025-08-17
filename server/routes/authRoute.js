@@ -7,6 +7,8 @@ const jwt = require("jsonwebtoken"); //token creation and auth
 const bcrypt = require("bcrypt"); //password hashing
 const authenticateToken = require("../tokenauth/authenticateToken.js");
 const store = require("../Models/storeModel.js");
+const { serilizeResponse } = require("../utils/responseHandler.js");
+
 //signup request post
 router.post("/signup", async (req, res) => {
   try {
@@ -50,8 +52,14 @@ router.post("/signup", async (req, res) => {
 router.post("/login", async (req, res) => {
   try {
     const password = req.body.password;
-    const userData = await auth.findOne({ email: req.body.email });
-    console.log("in authroute.js", userData);
+    const storeData = await store.findOne({ storeSlug: req.body.slug });
+    if (!storeData) {
+      throw new Error("no store found");
+    }
+    const userData = await auth.findOne({
+      email: req.body.email,
+      storeID: storeData._id,
+    });
     if (!userData) {
       throw new Error("no user found");
     }
@@ -70,7 +78,8 @@ router.post("/login", async (req, res) => {
       samesite: "None", //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!change this when deploying the server!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       maxAge: 12 * 60 * 60 * 1000, //12 hours life of token cookie
     });
-    const { _id, name, ...data } = userData.toObject();
+    const { _id, name, createdAt, updatedAt, hashedPassword, ...data } =
+      userData.toObject();
     res.status(200).json({
       userId: _id,
       userName: name,
@@ -81,22 +90,17 @@ router.post("/login", async (req, res) => {
     res.status(400).json(serilizeResponse(err));
   }
 });
+
 /**
  * function for routing for validating token
  */
 router.get("/validateToken", authenticateToken, async (req, res) => {
   res.status(200).json({ message: "logged in successfully" });
 });
+
 router.post("/logout", async (req, res) => {
   res.clearCookie("loginToken", { path: "/" });
   res.status(200).json({ message: "Logged out" });
 });
-//function for returning the error in same consistant pattern
-function serilizeResponse(error) {
-  return {
-    message: error.message,
-    details: error.details,
-    stack: error.stack,
-  };
-}
+
 module.exports = router;

@@ -2,15 +2,15 @@ import { useEffect, useState } from "react";
 import { userLogIn } from "../api/auth";
 import { useNavigate,useParams} from "react-router-dom";
 
-function Login({ userAuthData, updateAuthData }) {
+export default function Login({ userAuthData, updateAuthData }) {
   const {slug}=useParams()
   const navigatePage = useNavigate();
   const [formData, setFormData] = useState({
     Username: "",
     password: "",
     email: "",
+    slug:slug
   });
-  console.log(slug)
   const [message, setMessage] = useState("");
 
   function handleChange(e) {
@@ -68,4 +68,4 @@ function Login({ userAuthData, updateAuthData }) {
     </div>
   );
 }
-export default Login;
+

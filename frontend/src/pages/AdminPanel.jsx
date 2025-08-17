@@ -15,6 +15,7 @@ export function AdminPanel({ userAuthData, allTimes, _id }) {
     servicePrice:"",
     serviceNote:""
   })
+  const [amtServices,setAmtServices]=useState(1);
   const [date,setDate]=useState(new Date());
   const maxTimeSelections=24;
   const locales = {
@@ -30,13 +31,10 @@ export function AdminPanel({ userAuthData, allTimes, _id }) {
     getDay,
     locales,
   });
-  let eventList = [];
-  const { defaultDate } = useMemo(
-    () => ({
-      defaultDate: new Date(),
-    }),
-    []
-  );
+  //runs only on component mounts and init the value for date to current date
+  const  defaultDate  = useMemo(() => new Date(),[]);
+
+  //a helper function to set date
   async function updateDate(dateClicked){
     setDate(dateClicked["date"]);
   }
@@ -78,6 +76,7 @@ function handleChange(e) {
         <input name="servicePrice" onChange={handleChange} value={formData["servicePrice"]}/>
         <button type="submit" onClick={addService}>add new service</button>
     </form>
+    <button onClick={()=>setAmtServices((prev)=>prev+1)}>Add service</button>
     </div>
   ) : (
     <p>forbidden</p>

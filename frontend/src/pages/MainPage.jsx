@@ -2,7 +2,7 @@ import MenuItems from "../components/MenuItem.jsx";
 import { useState, useEffect } from "react";
 import ChooseDateContainer from "../components/ChooseDateContainer.jsx";
 import ChooseTime from "../components/ChooseTime.jsx";
-import * as appointmentsAPI from "../api/appointments.js";
+import {createAppointment} from "../api/appointments.js";
 import params from "../params.json";
 import { useNavigate, useLocation,useParams, } from "react-router-dom";
 import { logout } from "../api/auth.js";
@@ -15,24 +15,24 @@ function MainPage({
   updateAuthData,
   resetlocalStorage,
 }) {
-
   const navigatePage = useNavigate();
-  const location = useLocation();
   const [appointmentInfo, setAppointment] = useState({
     date: new Date(),
     service: "",
     userName: localStorage.getItem("userName"),
     additionalRequests: "",
     email: localStorage.getItem("userEmail"),
+    storeID:localStorage.getItem("storeID")
   });
   const { slug } = useParams();
   const [logoutMsg, setLogoutMsg] = useState();
   const [windowChooser, setWindow] = useState("items");
-
+  console.log("in mainpage appointmentinfo is:",appointmentInfo)
+  
   //synchronize the email and userName with appointment info on change
   useEffect(()=> {
-    const updateAppointment= async ()=> await updateAppointmentInfo({email:userAuthData["email"],userName:userAuthData["userName"]})
-    updateAppointment();
+    updateAppointmentInfo({email:userAuthData["email"],userName:userAuthData["userName"]})
+    console.log("runs useeffect - updateAppointmentInfo")
   },[userAuthData.email,userAuthData.userName])
 
   function openWaze() {
@@ -52,31 +52,14 @@ function MainPage({
   }
 
   async function handleChooseTimeOnlick(timeArray) {
+    try{
     const tempDate = new Date(appointmentInfo.date);
     const [hours, minutes] = timeArray[0].split(":");
     tempDate.setHours(hours, minutes);
-    console.log(appointmentInfo)
-    updateAppointmentInfo({ date: tempDate });
-    const tempAppointmentInfo = { ...appointmentInfo, date: tempDate };
-    console.log(tempAppointmentInfo)
-    const serverResponse = await SendObjToServer(tempAppointmentInfo);
-    return serverResponse;
-  }
-
-  async function updateAppointmentInfo(newInfo) {
-    setAppointment((prev) => ({
-      ...prev, // keep all old fields
-      ...newInfo, // overwrite with new fields
-    }));
-  }
-
-  async function SendObjToServer(data) {
-    try {
-      const resolve = await appointmentsAPI.createAppointment(data); //resolve contains the appointment info
-      if (resolve) {
+      const response = await createAppointment(updateAppointmentInfo({ date: tempDate })); //response contains the appointment info
+      if (response) {
         console.log("successfully created appointment");
-        await updateAuthData({...userAuthData,userName:resolve.userName});
-        return { ...resolve, message: "successfully created appointment" };
+        return { ...response, message: "successfully created appointment" };
       }
     } catch (error) {
       console.error("failed to create appointment",error);
@@ -84,11 +67,24 @@ function MainPage({
     }
   }
 
+  //helper function that updates appointmentinfo with the new field and returns a copy of the resulting appointmentinfo
+  function updateAppointmentInfo(newInfo) {
+    setAppointment((prev) => ({
+      ...prev, // keep all old fields
+      ...newInfo, // overwrite with new fields
+    }));
+    return {...appointmentInfo,...newInfo};
+  }
+
   function handleLogout() {
     if (logout()) {
       console.log("logged out sucessfully");
       setLogoutMsg("logged out sucessfully");
       resetUserData();
+      setAppointment(
+        {date: "",service: "",
+        userName: "", additionalRequests: "",
+        email: ""})
       resetlocalStorage();
     } else {
       console.log("an error occured");
