@@ -2,7 +2,10 @@
 const express = require("express");
 const Appointment = require("../Models/appointmentModel.js");
 const authenticateToken = require("../tokenauth/authenticateToken.js");
-const { serilizeResponse } = require("../utils/responseHandler.js");
+const {
+  sendSucessResponse,
+  sendRejectedResponse,
+} = require("../utils/responseHandler.js");
 const router = express.Router();
 
 router.post("/new", authenticateToken, async (req, res) => {
@@ -11,20 +14,26 @@ router.post("/new", authenticateToken, async (req, res) => {
     const savedAppointment = await newAppointment.save(); //saves the data to database -- mongoose automatically convert string date to js date
     const { createdAt, updatedAt, ...appointment } = savedAppointment;
     console.log("saved clean appointment is", appointment);
-    res.status(201);
-    res.json(appointment); //return the object that was saved as it appears in the db
-  } catch (err) {
-    if (err.name === "ValidationError") {
-      //throw error incase db schema mismatch
-      res.status(400);
-      return res.json({ error: "Validation Error", details: err.errors });
-    } else {
-      res.status(400);
-      res.json({ error: err.message });
-    }
+    //return the object that was saved as it appears in the db and appopriate message
+    res.status(201).json(
+      sendSucessResponse({
+        msg: "created appointment successfully",
+        type: "data",
+        otherdata: appointment,
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(
+      sendRejectedResponse({
+        code: error.code,
+        msg: "an error has occured while creating appointment please try again later",
+      })
+    );
   }
 });
 
+/** 
 router.get("/getAppointment", authenticateToken, async (req, res) => {
   try {
     let query = {}; //sets it so query is any empty object
@@ -59,5 +68,5 @@ function validateData(email) {
   if (email && emailPattern.test(email)) return true;
   else return false;
 }
-
+*/
 module.exports = router;

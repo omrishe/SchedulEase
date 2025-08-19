@@ -7,7 +7,10 @@ const jwt = require("jsonwebtoken"); //token creation and auth
 const bcrypt = require("bcrypt"); //password hashing
 const authenticateToken = require("../tokenauth/authenticateToken.js");
 const store = require("../Models/storeModel.js");
-const { serilizeResponse } = require("../utils/responseHandler.js");
+const {
+  sendSucessResponse,
+  sendRejectedResponse,
+} = require("../utils/responseHandler.js");
 
 //signup request post
 router.post("/signup", async (req, res) => {
@@ -27,27 +30,28 @@ router.post("/signup", async (req, res) => {
       hashedPassword,
       ...otherData,
     });
-    console.log("registering with", signupData);
     await signupData.save(); //if the file failed saving it jumps to catch cause it threw an error
-    res.status(201);
-    res.json({ message: "created Successfully" }); //return the object that was saved as it appears in the db
-  } catch (err) {
-    if (err.name === "ValidationError") {
-      res.status(400);
-      return res.json({
-        message: "couldnt save document to database-validation error",
-        details: err.errors,
-      });
-    } else {
-      res.status(400);
-      console.log(
-        "after serilize in authRoute in signup in server:",
-        serilizeResponse(err)
+    res
+      .status(201)
+      .res.json(sendSucessResponse({ message: "created Successfully" }));
+    //return the object that was saved as it appears in the db
+  } catch (error) {
+    res.status(400);
+    console.error("an error has occured", error);
+    if (error.message === "email already exists") {
+      return res.json(
+        sendRejectedResponse({ message: "email already exists" })
       );
-      return res.json(serilizeResponse(err));
     }
+    if (error.name === "ValidationError") {
+      return res.json(
+        sendRejectedResponse({ message: "couldnt save document to database" })
+      );
+    }
+    return res.json(serilizeResponse());
   }
 });
+
 //first authenticate token then continue
 router.post("/login", async (req, res) => {
   try {
@@ -80,14 +84,29 @@ router.post("/login", async (req, res) => {
     });
     const { _id, name, createdAt, updatedAt, hashedPassword, ...data } =
       userData.toObject();
-    res.status(200).json({
-      userId: _id,
-      userName: name,
-      message: "logged in successfully",
-      ...data,
-    });
-  } catch (err) {
-    res.status(400).json(serilizeResponse(err));
+    return res.status(200).json(
+      sendSucessResponse({
+        message: "logged in successfully",
+        otherData: {
+          userId: _id,
+          userName: name,
+          ...data,
+        },
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(400);
+    if (error.message === "no store found") {
+      return res.json(sendRejectedResponse({ message: "no store found" }));
+    }
+    if (error.message === "no user found") {
+      return res.json(sendRejectedResponse({ message: "no user found" }));
+    }
+    if (error.message === "wrong password") {
+      return res.json(sendRejectedResponse({ message: "wrong password" }));
+    }
+    return res.json(sendRejectedResponse());
   }
 });
 
@@ -100,7 +119,7 @@ router.get("/validateToken", authenticateToken, async (req, res) => {
 
 router.post("/logout", async (req, res) => {
   res.clearCookie("loginToken", { path: "/" });
-  res.status(200).json({ message: "Logged out" });
+  res.status(200).json(sendSucessResponse({ message: "Logged out" }));
 });
 
 module.exports = router;
