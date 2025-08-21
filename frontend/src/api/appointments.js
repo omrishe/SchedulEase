@@ -1,3 +1,4 @@
+import { sendRejectedResponse } from "../utils/responseHandler.js";
 const serverAddress = "https://localhost:5000";
 export async function createAppointment(appointmentInfo) {
   try {
@@ -15,24 +16,14 @@ export async function createAppointment(appointmentInfo) {
       data.date = new Date(data.date);
       return data;
     } else {
-      handlePostError(data);
+      return data;
     }
   } catch (error) {
-    console.error("error:", error.errors);
-    throw error;
-  }
-}
-
-function handlePostError(data) {
-  if (data.error) {
-    console.error("Error:", data.error);
-    console.error("error details:", data.details);
-  }
-  if (data.message) {
-    console.error("Message:", data.message);
-  }
-  if (!data.message && !data.error) {
-    console.error("unknown error occured during sending appointment data");
+    console.log("error:", error);
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
   }
 }
 
@@ -56,6 +47,10 @@ export async function fetchAllAppointment() {
       throw new Error(`server  ${response.status} error occured`);
     }
   } catch (error) {
-    console.error(error);
+    console.log("error:", error);
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
   }
 }

@@ -4,9 +4,11 @@ const { sendRejectedResponse } = require("../utils/responseHandler.js");
 function authenticateToken(req, res, next) {
   const token = req.cookies.loginToken;
   if (!token) {
-    return res
-      .status(401)
-      .json(sendRejectedResponse({ message: "No token provided" }));
+    return res.status(401).json(
+      sendRejectedResponse({
+        message: "No token provided",
+      })
+    );
   }
   try {
     const secretKey = process.env.SECRET_HASH_PASSWORD;

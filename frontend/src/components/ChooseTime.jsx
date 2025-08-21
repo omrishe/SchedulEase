@@ -10,7 +10,7 @@ export default function ChooseTime({
 
   async function submitSelectedTime() {
     const serverResponse = await handleChooseTimeOnlick(timeArray);
-    setResponse(serverResponse);
+    setResponse(serverResponse.message);
   }
 
   function resetResponse(){
@@ -64,7 +64,7 @@ export default function ChooseTime({
             {(maxTimeSelections===1 && timeArray[0]) ? `at ${timeArray[0]}`:""}
           </span>
           <button onClick={submitSelectedTime}>Confirm</button>
-          {response && <p>{response.message}</p>}
+          {response && <p>{response}</p>}
         </div>
       )}
     </div>

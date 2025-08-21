@@ -4,11 +4,12 @@
  */
 function sendSucessResponse(data) {
   return {
-    code: data.code || "INTERNAL_ERROR",
+    code: data.code || "success",
     type: "successResponse",
+    isSuccess: true,
     //msg is intentional,its a custom msg that was set
-    message: data.msg || "no message was provided",
-    other: data.otherData || {},
+    message: data.message || "no message was provided",
+    otherData: data.otherData || {},
   };
 }
 /** a helper function designed to make server responses consistant incase of error
@@ -19,6 +20,7 @@ function sendRejectedResponse(data) {
   return {
     code: data.code || "INTERNAL_ERROR",
     type: data.type || "errorResponse",
+    isSuccess: false,
     //msg is intentional,its a custom msg that was set
     message: data.message || "an error occured",
     otherData: data.otherData || {},

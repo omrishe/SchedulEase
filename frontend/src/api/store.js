@@ -1,12 +1,6 @@
-const serverAddress = "https://localhost:5000/api/store";
+import { sendRejectedResponse } from "../utils/responseHandler.js";
 
-const getHeaderWithCred = {
-  method: "GET",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  credentials: "include",
-};
+const serverAddress = "https://localhost:5000/api/store";
 export function adminSetServices() {
   return;
 }
@@ -27,15 +21,17 @@ export async function createStore(storeInfo) {
     });
     const data = await response.json();
     if (!response.ok) {
-      //add error handling
-      console.error("no error handling set yet");
+      return data;
     } else {
       console.log(data);
       return data;
     }
   } catch (error) {
     console.log("error:", error);
-    throw error;
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
   }
 }
 
@@ -48,18 +44,43 @@ export async function getStoreInfo(storeId) {
       },
       credentials: "include",
     });
-    const responseBody = await response.json();
+    const data = await response.json();
     if (!response.ok) {
-      throw new Error(
-        "an error occured the server return status code",
-        response.status
-      );
+      return data;
     } else {
-      return responseBody;
+      return data;
     }
-  } catch (err) {
-    console.error(err);
-    return err;
+  } catch (error) {
+    console.log("error:", error);
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
+  }
+}
+
+export async function addServiceToStore(authData, formData) {
+  try {
+    const response = await fetch(`${serverAddress}/set-new-store-services`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ authData, formData }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      return data;
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.log("error:", error);
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
   }
 }
 
@@ -79,14 +100,15 @@ export async function setStoreOwnerAvailability(dateObjects, _id) {
     );
     const data = await response.json();
     if (!response.ok) {
-      //add error handling
-      console.error("no error handling set yet");
+      return data;
     } else {
-      console.log(data);
       return data;
     }
   } catch (error) {
     console.log("error:", error);
-    throw error;
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
   }
 }

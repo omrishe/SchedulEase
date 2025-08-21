@@ -1,9 +1,10 @@
 const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
-const storeModel = require("../Models/storeModel.js");
+const store = require("../Models/storeModel.js");
 const authenticateToken = require("../tokenauth/authenticateToken.js");
 const StoreTimeSlot = require("../Models/storeTimeSlotsModel.js");
+const user = require("../Models/userModel.js");
 const {
   sendSucessResponse,
   sendRejectedResponse,
@@ -11,7 +12,7 @@ const {
 
 router.get("/getStoreInfo", authenticateToken, async (req, res) => {
   try {
-    const StoreData = await storeModel.findById(req.body.storeID);
+    const StoreData = await store.findById(req.body.storeID);
     if (!StoreData) {
       throw new Error("no such store exists");
     }
@@ -36,7 +37,7 @@ router.get("/getStoreInfo", authenticateToken, async (req, res) => {
 
 router.post("/new", authenticateToken, async (req, res) => {
   try {
-    const newStore = new storeModel(req.body);
+    const newStore = new store(req.body);
     const savedStore = (await newStore.save()).toJSON();
     res.status(200);
     res.json(
@@ -71,6 +72,28 @@ router.post("/new-store-time-slots", authenticateToken, async (req, res) => {
         throw error;
       }
     }
+    res.status(200);
+    res.json(sendSucessResponse({ message: "added successfully" }));
+  } catch (error) {
+    console.error("error while trying to save store time slots see log", error);
+    res.status(400);
+    res.json(
+      sendRejectedResponse({
+        message: "an error have occured,see logs for more info",
+      })
+    );
+  }
+});
+router.post("/set-new-store-services", authenticateToken, async (req, res) => {
+  try {
+    const { authData, formData } = req.body;
+    const userData = user.findById(authData._id);
+    if (userData.role != "admin") {
+      throw new Error("invalid auth");
+    }
+    const adminStore = store.findById(userData.storeID);
+    adminStore.services.push(formData);
+    await adminStore.save();
     res.status(200);
     res.json(sendSucessResponse({ message: "added successfully" }));
   } catch (error) {

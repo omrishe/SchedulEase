@@ -7,14 +7,14 @@ import enUS from "date-fns/locale/en-US";
 import { useMemo, useState } from "react";
 import ChooseTime from "../components/ChooseTime";
 import ChooseDateContainer from "../components/ChooseDateContainer";
-import { setStoreOwnerAvailability } from "../api/store";
-
+import { setStoreOwnerAvailability,addServiceToStore } from "../api/store";
 export function AdminPanel({ userAuthData, allTimes, _id }) {
   const [formData,setFormaData]=useState({
     serviceName:"",
     servicePrice:"",
     serviceNote:""
   })
+  const [message,setMessage]=useState("")
   const [amtServices,setAmtServices]=useState(1);
   const [date,setDate]=useState(new Date());
   const maxTimeSelections=24;
@@ -43,7 +43,7 @@ export function AdminPanel({ userAuthData, allTimes, _id }) {
   async function handleSetMenuItemBtn(timeArray) {
     const dateObjects = timeArray.map(time => createDateWithTime(time));
     const response=await setStoreOwnerAvailability(dateObjects,userAuthData.storeID)
-    //add status label
+    return response;
   }
 
   //function to create a new date
@@ -53,11 +53,12 @@ export function AdminPanel({ userAuthData, allTimes, _id }) {
   }
 
   //function to add service to the store
-  function addService(){
+  async function addService(){
+    const response=await addServiceToStore(userAuthData,formData)
     return;
   }
 function handleChange(e) {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormaData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
   return userAuthData.role === "admin" ? (

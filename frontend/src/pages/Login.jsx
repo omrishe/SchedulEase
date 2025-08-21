@@ -20,9 +20,10 @@ export default function Login({ userAuthData, updateAuthData }) {
   async function handleLogIn(e) {
     e.preventDefault();
     const authResult = await userLogIn(formData);
-    console.log(authResult);
-    if (authResult.message === "logged in successfully") {
-      const { message, ...authData } = authResult;
+    if (authResult.isSuccess) {
+      const  message = authResult.message;//extract message recieved from server
+      const authData=authResult.otherData;//extract user Data recieved from server
+      console.log("logged in with:",authData)
       await updateAuthData(authData);
       setMessage(message + " you will be redirected soon");
       setFormData((prev) => ({ ...prev, password: "" }));
@@ -32,6 +33,7 @@ export default function Login({ userAuthData, updateAuthData }) {
     }
   }
 
+  
   function validate() {
     const errors = {};
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;

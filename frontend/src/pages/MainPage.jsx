@@ -6,6 +6,7 @@ import {createAppointment} from "../api/appointments.js";
 import params from "../params.json";
 import { useNavigate, useLocation,useParams, } from "react-router-dom";
 import { logout } from "../api/auth.js";
+import { sendRejectedResponse } from "../utils/responseHandler.js";
 
 function MainPage({
   menuItemsList,
@@ -32,7 +33,7 @@ function MainPage({
   //synchronize the email and userName with appointment info on change
   useEffect(()=> {
     updateAppointmentInfo({email:userAuthData["email"],userName:userAuthData["userName"]})
-    console.log("runs useeffect - updateAppointmentInfo")
+    console.log("runs useEffect - updateAppointmentInfo")
   },[userAuthData.email,userAuthData.userName])
 
   function openWaze() {
@@ -58,12 +59,12 @@ function MainPage({
     tempDate.setHours(hours, minutes);
       const response = await createAppointment(updateAppointmentInfo({ date: tempDate })); //response contains the appointment info
       if (response) {
-        console.log("successfully created appointment");
-        return { ...response, message: "successfully created appointment" };
+        return response;
       }
     } catch (error) {
-      console.error("failed to create appointment",error);
-      return { message: "failed to create appointment" };
+      response=sendRejectedResponse({message:"failed to create appointment",otherData:error})
+      console.error(response);
+      return response;
     }
   }
 

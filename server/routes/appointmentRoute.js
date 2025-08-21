@@ -15,19 +15,27 @@ router.post("/new", authenticateToken, async (req, res) => {
     const { createdAt, updatedAt, ...appointment } = savedAppointment;
     console.log("saved clean appointment is", appointment);
     //return the object that was saved as it appears in the db and appopriate message
-    res.status(201).json(
+    return res.status(201).json(
       sendSucessResponse({
-        msg: "created appointment successfully",
+        message: "added appointment successfully",
         type: "data",
         otherdata: appointment,
       })
     );
   } catch (error) {
     console.error(error);
-    res.status(400).json(
+    if (error.name === "E11000") {
+      return res.status(401).json(
+        sendRejectedResponse({
+          message: "invalid appointment please refresh page",
+        })
+      );
+    }
+    return res.status(400).json(
       sendRejectedResponse({
         code: error.code,
-        msg: "an error has occured while creating appointment please try again later",
+        message:
+          "an error has occured while creating appointment please try again later",
       })
     );
   }

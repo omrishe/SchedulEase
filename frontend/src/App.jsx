@@ -14,19 +14,18 @@ function App() {
   const [userAuthData, setUserAuthData] = useState({
     userId: localStorage.getItem("userId"),
     userName: localStorage.getItem("userName"),
-    email: localStorage.getItem("userEmail"),
+    email: localStorage.getItem("email"),
     role: localStorage.getItem("role"),
     storeID : localStorage.getItem("storeID")
   });
 
-  useEffect(() => setUserDataToLocalStorage(userAuthData), [userAuthData]); //sync userdata to localstorage
+  useEffect(() => {setUserDataToLocalStorage(userAuthData);
+  }, [userAuthData]); //sync userdata to localstorage
 
   function setUserDataToLocalStorage(data) {
     //does not work for inherited objects
     try {
       for (const key in data) {
-        console.log("key is:",key)
-        console.log("data key is:",data[key])
         localStorage.setItem(key, data[key]);
       }
     } catch (err) {
@@ -48,14 +47,15 @@ function App() {
   function resetlocalStorage() {
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
-    localStorage.removeItem("userEmail");
+    localStorage.removeItem("email");
     localStorage.removeItem("role");
   }
 
   useEffect(() => {
     async function verifyTokenAndClearData() {
       const isTokenValid = await validateToken();
-      if (!isTokenValid.success) {
+      if (!isTokenValid.isSuccess) {
+        console.error("invalid token,resetting data",isTokenValid)
         resetUserData();
       }
     }
@@ -64,6 +64,7 @@ function App() {
 
   async function updateAuthData(tempAuthData)
   {
+    //setUserDataToLocalStorage(tempAuthData)
     setUserAuthData({...userAuthData,...tempAuthData});
   }
   

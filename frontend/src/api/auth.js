@@ -1,3 +1,5 @@
+import { sendRejectedResponse } from "../utils/responseHandler.js";
+
 /**
  * signup api function sends data to server
  * -HTTP errors are caught if !response.ok
@@ -20,7 +22,11 @@ export async function signup(formData) {
     }
     return data;
   } catch (error) {
-    return handleError(error, "signup");
+    console.log("error:", error);
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
   }
 }
 
@@ -44,9 +50,14 @@ export async function userLogIn(formData) {
       //altough in any http code that returned the return is the same,i left it for clearer code or future expension
       return data;
     }
+    console.log("in auth.js data is:", data);
     return data;
   } catch (error) {
-    return handleError(error, "userLogIn");
+    console.log("error:", error);
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
   }
 }
 /**
@@ -62,37 +73,38 @@ export async function validateToken() {
     });
     const data = await response.json();
     if (!response.ok) {
-      return { ...data, success: false };
+      return data;
     }
-    return { ...data, success: true };
+    return data;
   } catch (error) {
-    error.success = false;
-    return handleError(error, "validateToken");
+    console.log("error:", error);
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
   }
 }
 
 export async function logout() {
-  const response = await fetch(`${serverAddress}/api/auth/logout`, {
-    method: "post",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  });
-  if (response.ok) {
-    return true;
+  try {
+    const response = await fetch(`${serverAddress}/api/auth/logout`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    const data = await response.json;
+    if (response.ok) {
+      return data;
+    } else {
+      return data;
+    }
+  } catch (error) {
+    console.log("error:", error);
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
   }
-  return false;
-}
-
-function handleError(error, location) {
-  if (!error.message) {
-    console.error(
-      `an error occured on api auth in ${location} error details:`,
-      error
-    );
-    error.message = "Something went wrong. Please try again later.";
-    return error;
-  }
-  return error;
 }

@@ -19,18 +19,15 @@ function Register({ setToken, className }) {
 
   async function handleRegister(e) {
     e.preventDefault();
-    //add show errors
-    //add validate
     console.log(formData);
     const serverResponse = await signup(formData);
-    //console.log("in compnent loging Popup status is ",serverResponse.message);
-    if (serverResponse.message) {
-      setMessage(serverResponse.message);
-    }
-    if (serverResponse.message === "created Successfully") {
-      setMessage("created successfully you will be redirected soon");
+    if (serverResponse.isSuccess) {
+      setMessage(serverResponse.message + " you will be redirected soon");
       setFormData({ userName: "", password: "", email: "" });
       setTimeout(() => navigatePage(`/store/${slug}/`), 1500);
+    }
+    else{
+      setMessage(serverResponse.message);
     }
   }
 

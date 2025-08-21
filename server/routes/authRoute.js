@@ -33,7 +33,7 @@ router.post("/signup", async (req, res) => {
     await signupData.save(); //if the file failed saving it jumps to catch cause it threw an error
     res
       .status(201)
-      .res.json(sendSucessResponse({ message: "created Successfully" }));
+      .json(sendSucessResponse({ message: "created Successfully" }));
     //return the object that was saved as it appears in the db
   } catch (error) {
     res.status(400);
@@ -48,7 +48,7 @@ router.post("/signup", async (req, res) => {
         sendRejectedResponse({ message: "couldnt save document to database" })
       );
     }
-    return res.json(serilizeResponse());
+    return res.json(sendRejectedResponse());
   }
 });
 
@@ -82,7 +82,7 @@ router.post("/login", async (req, res) => {
       samesite: "None", //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!change this when deploying the server!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       maxAge: 12 * 60 * 60 * 1000, //12 hours life of token cookie
     });
-    const { _id, name, createdAt, updatedAt, hashedPassword, ...data } =
+    const { _id, name, createdAt, updatedAt, hashedPassword, __v, ...data } =
       userData.toObject();
     return res.status(200).json(
       sendSucessResponse({
@@ -114,7 +114,9 @@ router.post("/login", async (req, res) => {
  * function for routing for validating token
  */
 router.get("/validateToken", authenticateToken, async (req, res) => {
-  res.status(200).json({ message: "logged in successfully" });
+  res
+    .status(200)
+    .json(sendSucessResponse({ message: "logged in successfully" }));
 });
 
 router.post("/logout", async (req, res) => {
