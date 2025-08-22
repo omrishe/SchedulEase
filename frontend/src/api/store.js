@@ -60,6 +60,7 @@ export async function getStoreInfo(storeId) {
 }
 
 export async function addServiceToStore(authData, formData) {
+  console.log("i call in address:");
   try {
     const response = await fetch(`${serverAddress}/set-new-store-services`, {
       method: "post",
@@ -69,8 +70,10 @@ export async function addServiceToStore(authData, formData) {
       credentials: "include",
       body: JSON.stringify({ authData, formData }),
     });
+
     const data = await response.json();
     if (!response.ok) {
+      data.message = "error";
       return data;
     } else {
       return data;

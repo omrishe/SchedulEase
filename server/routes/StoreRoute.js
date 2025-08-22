@@ -16,8 +16,7 @@ router.get("/getStoreInfo", authenticateToken, async (req, res) => {
     if (!StoreData) {
       throw new Error("no such store exists");
     }
-    res.status(200);
-    return res.json(
+    return res.status(200).json(
       sendSucessResponse({
         message: "store retrieved successfully",
         otherData: StoreData,
@@ -63,12 +62,13 @@ router.post("/new-store-time-slots", authenticateToken, async (req, res) => {
     const slotsArr = dates.map((slot) => {
       return { date: new Date(slot), storeID: _id };
     });
-    let response;
     try {
-      response = await StoreTimeSlot.insertMany(slotsArr, { ordered: false });
+      const response = await StoreTimeSlot.insertMany(slotsArr, {
+        ordered: false,
+      });
     } catch (error) {
       if (error.code !== 11000) {
-        //error code 11000 is duplicate document (it will just not save that doc),so we ignore it and let the code keep running
+        //error code 11000 is duplicate document (it will just not save that specific doc),so we ignore it and let the code keep running
         throw error;
       }
     }
@@ -87,15 +87,19 @@ router.post("/new-store-time-slots", authenticateToken, async (req, res) => {
 router.post("/set-new-store-services", authenticateToken, async (req, res) => {
   try {
     const { authData, formData } = req.body;
-    const userData = user.findById(authData._id);
+    console.log(authData.userId);
+    const userData = await user.findById(authData.userId);
+    //makes sure the user is admin
     if (userData.role != "admin") {
       throw new Error("invalid auth");
     }
-    const adminStore = store.findById(userData.storeID);
-    adminStore.services.push(formData);
-    await adminStore.save();
-    res.status(200);
-    res.json(sendSucessResponse({ message: "added successfully" }));
+    //adds services to the store service schema
+    const added = await store.updateMany(
+      { _id: userData.storeID },
+      { $push: { services: { $each: formData } } }
+    );
+    console.log(added);
+    res.status(200).json(sendSucessResponse({ message: "added successfully" }));
   } catch (error) {
     console.error("error while trying to save store time slots see log", error);
     res.status(400);

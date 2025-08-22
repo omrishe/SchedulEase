@@ -53,8 +53,10 @@ export function AdminPanel({ userAuthData, allTimes, _id }) {
   }
 
   //function to add service to the store
-  async function addService(){
-    const response=await addServiceToStore(userAuthData,formData)
+  async function addService(e){
+    e.preventDefault();
+    const response=await addServiceToStore(userAuthData,[formData])
+    setMessage(response.message)
     return;
   }
 function handleChange(e) {
@@ -68,16 +70,17 @@ function handleChange(e) {
       <ChooseDateContainer updateDate={updateDate} date={date}></ChooseDateContainer>
       <ChooseTime times={allTimes} appointmentInfo={{date : date}} maxTimeSelections={maxTimeSelections} handleChooseTimeOnlick={handleSetMenuItemBtn}></ChooseTime>
     </div>
-    <form>
+    <form onSubmit={addService}>
         <label htmlFor="serviceName">service name </label>
         <input name="serviceName" onChange={handleChange} value={formData["serviceName"]}/>
         <label htmlFor="serviceNote">service note </label>
         <input name="serviceNote" onChange={handleChange} value={formData["serviceNote"]}/>
         <label htmlFor="servicePrice">service price </label>
         <input name="servicePrice" onChange={handleChange} value={formData["servicePrice"]}/>
-        <button type="submit" onClick={addService}>add new service</button>
+        <button type="submit">add new service</button>
     </form>
     <button onClick={()=>setAmtServices((prev)=>prev+1)}>Add service</button>
+    {message?? <label>{message}</label>}
     </div>
   ) : (
     <p>forbidden</p>
