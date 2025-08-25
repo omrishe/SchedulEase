@@ -16,12 +16,12 @@ const {
 router.post("/signup", async (req, res) => {
   try {
     const { email, password, storeSlug, ...otherData } = req.body;
-    if (await auth.findOne({ email: email })) {
+    const fetchedStore = await store.findOne({ storeSlug: storeSlug });
+    storeID = fetchedStore._id;
+    if (await auth.findOne({ email: email, _id: storeID })) {
       throw new Error("email already exists");
     }
     otherData.role = "user";
-    const fetchedStore = await store.findOne({ storeSlug: storeSlug });
-    storeID = fetchedStore._id;
     const saltrounds = 10; // move this into params file
     hashedPassword = await bcrypt.hash(password, saltrounds);
     const signupData = new auth({

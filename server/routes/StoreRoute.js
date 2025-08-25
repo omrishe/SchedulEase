@@ -84,6 +84,7 @@ router.post("/new-store-time-slots", authenticateToken, async (req, res) => {
     );
   }
 });
+
 router.post("/set-new-store-services", authenticateToken, async (req, res) => {
   try {
     const { authData, formData } = req.body;
@@ -93,11 +94,30 @@ router.post("/set-new-store-services", authenticateToken, async (req, res) => {
     if (userData.role != "admin") {
       throw new Error("invalid auth");
     }
-    //adds services to the store service schema
-    const added = await store.updateMany(
-      { _id: userData.storeID },
-      { $push: { services: { $each: formData } } }
+    const storeToUpdate = await store.findById(userData.storeID);
+    if (!storeToUpdate) {
+      throw new Error("store does not exist");
+    }
+    console.log(storeToUpdate);
+    const storeExistingServices = storeToUpdate.services;
+    //filter duplicate services names that already exist in the services at the store --basically prevent duplicates
+    const nonDuplicateServices = formData.filter(
+      (formDataService) =>
+        !storeExistingServices.some(
+          (existingService) =>
+            existingService.serviceName === formDataService.serviceName
+        )
     );
+    console.log(nonDuplicateServices);
+    //console.log(storeToUpdate);
+    console.log("isArray:", Array.isArray(storeToUpdate.services));
+    console.log("constructor:", storeToUpdate.services?.constructor?.name);
+    console.log("value:", storeToUpdate.services);
+    storeToUpdate.services.push(
+      ...storeToUpdate.services.create(nonDuplicateServices)
+    );
+    //saves the new services to the store service schema
+    const added = await storeToUpdate.save();
     console.log(added);
     res.status(200).json(sendSucessResponse({ message: "added successfully" }));
   } catch (error) {

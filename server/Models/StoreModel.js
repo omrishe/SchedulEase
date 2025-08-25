@@ -33,5 +33,17 @@ const storeSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
+/** 
+servicesSchema.pre("save", function validateName(next) {
+  const document = this;
+  const parent = this.ownerDocument();
+  const duplicateDocument = parent.services.some(
+    (service) => service.name === document.name
+  );
+  if (duplicateDocument) {
+    return new Error("service already exists");
+  }
+  next();
+});
+*/
 module.exports = mongoose.models.Store || mongoose.model("Store", storeSchema);
