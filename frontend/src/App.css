@@ -143,3 +143,10 @@
 .AdminPanelMainDiv{
   align-items: center;
 }
+.AdminPanelMainDiv .form .singleForm{
+  flex-direction: row;
+}
+.AdminPanelMainDiv .form{
+  display:grid
+  
+}

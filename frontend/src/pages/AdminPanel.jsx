@@ -8,29 +8,23 @@ import { useMemo, useState } from "react";
 import ChooseTime from "../components/ChooseTime";
 import ChooseDateContainer from "../components/ChooseDateContainer";
 import { setStoreOwnerAvailability,addServiceToStore } from "../api/store";
+import { ServiceForm } from "../components/serviceForm";
+import { v4 as uuidv4 } from "uuid";
 export function AdminPanel({ userAuthData, allTimes, _id }) {
-  const [formData,setFormaData]=useState({
-    serviceName:"",
-    servicePrice:"",
+  const [formData,setFormaData]=useState([{
+    formId:uuidv4(),
+    name:"",
+    price:"",
     serviceNote:""
-  })
+  }])
+
   const [message,setMessage]=useState("")
-  const [amtServices,setAmtServices]=useState(1);
   const [date,setDate]=useState(new Date());
   const maxTimeSelections=24;
   const locales = {
     "en-US": enUS,
   };
   console.log("in admin panel",userAuthData)
-  
-  const buttons = <div>times.map()</div>;
-  const localizer = dateFnsLocalizer({
-    format,
-    parse,
-    startOfWeek,
-    getDay,
-    locales,
-  });
   //runs only on component mounts and init the value for date to current date
   const  defaultDate  = useMemo(() => new Date(),[]);
 
@@ -46,7 +40,7 @@ export function AdminPanel({ userAuthData, allTimes, _id }) {
     return response;
   }
 
-  //function to create a new date
+  //function to create a new date js object
   function createDateWithTime(time){
     const [hours, minutes] = time.split(":").map(Number);
     return new Date(date.getFullYear(),date.getMonth(),date.getDate(),hours,minutes)
@@ -55,12 +49,21 @@ export function AdminPanel({ userAuthData, allTimes, _id }) {
   //function to add service to the store
   async function addService(e){
     e.preventDefault();
-    const response=await addServiceToStore(userAuthData,[formData])
+    const response=await addServiceToStore(userAuthData,formData.map(svc=> ({price:svc.price,name:svc.name,serviceNote:svc.serviceNote})))
     setMessage(response.message)
     return;
   }
-function handleChange(e) {
-    setFormaData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  function addAnotherServiceForm(){
+    setFormaData((prev)=>[...prev,{
+    formId:uuidv4(),
+    serviceName:"",
+    servicePrice:"",
+    serviceNote:""
+  }])
+  }
+
+function handleInputChange(e,formId) {
+    setFormaData((prev) => prev.map((svc)=> svc.formId===formId ? {...svc, [e.target.name] : e.target.value} : svc));
   }
 
   return userAuthData.role === "admin" ? (
@@ -70,16 +73,12 @@ function handleChange(e) {
       <ChooseDateContainer updateDate={updateDate} date={date}></ChooseDateContainer>
       <ChooseTime times={allTimes} appointmentInfo={{date : date}} maxTimeSelections={maxTimeSelections} handleChooseTimeOnlick={handleSetMenuItemBtn}></ChooseTime>
     </div>
-    <form onSubmit={addService}>
-        <label htmlFor="serviceName">service name </label>
-        <input name="serviceName" onChange={handleChange} value={formData["serviceName"]}/>
-        <label htmlFor="serviceNote">service note </label>
-        <input name="serviceNote" onChange={handleChange} value={formData["serviceNote"]}/>
-        <label htmlFor="servicePrice">service price </label>
-        <input name="servicePrice" onChange={handleChange} value={formData["servicePrice"]}/>
+    <form className="form" onSubmit={addService}>
+      {formData.map((formValues)=>(<ServiceForm key={formValues.formId} className={"singleForm"} formValues={formValues} handleInputChange={handleInputChange}></ServiceForm>)
+        )}
         <button type="submit">add new service</button>
     </form>
-    <button onClick={()=>setAmtServices((prev)=>prev+1)}>Add service</button>
+    <button onClick={addAnotherServiceForm}>Add service</button>
     {message?? <label>{message}</label>}
     </div>
   ) : (

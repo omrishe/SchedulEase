@@ -1,0 +1,5 @@
+when we want to set a key name out of a variable we need to surround it by [] to set the key as the name
+for example:
+const key = "serviceName";
+const obj = { [key]: "Shave" };  //  works
+const obj2 = { key: "Shave" };   //  creates literal property "key"

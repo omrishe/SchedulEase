@@ -88,7 +88,6 @@ router.post("/new-store-time-slots", authenticateToken, async (req, res) => {
 router.post("/set-new-store-services", authenticateToken, async (req, res) => {
   try {
     const { authData, formData } = req.body;
-    console.log(authData.userId);
     const userData = await user.findById(authData.userId);
     //makes sure the user is admin
     if (userData.role != "admin") {
@@ -98,23 +97,17 @@ router.post("/set-new-store-services", authenticateToken, async (req, res) => {
     if (!storeToUpdate) {
       throw new Error("store does not exist");
     }
-    console.log(storeToUpdate);
     const storeExistingServices = storeToUpdate.services;
+    console.log("formData is:\n", formData);
     //filter duplicate services names that already exist in the services at the store --basically prevent duplicates
     const nonDuplicateServices = formData.filter(
       (formDataService) =>
         !storeExistingServices.some(
-          (existingService) =>
-            existingService.serviceName === formDataService.serviceName
+          (existingService) => existingService.name === formDataService.name
         )
     );
-    console.log(nonDuplicateServices);
-    //console.log(storeToUpdate);
-    console.log("isArray:", Array.isArray(storeToUpdate.services));
-    console.log("constructor:", storeToUpdate.services?.constructor?.name);
-    console.log("value:", storeToUpdate.services);
     storeToUpdate.services.push(
-      ...storeToUpdate.services.create(nonDuplicateServices)
+      ...nonDuplicateServices.map((svc) => storeToUpdate.services.create(svc))
     );
     //saves the new services to the store service schema
     const added = await storeToUpdate.save();

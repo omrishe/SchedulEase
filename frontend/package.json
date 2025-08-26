@@ -13,7 +13,8 @@
     "react-big-calendar": "^1.18.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.6.3",
-    "simple-keyboard": "^3.8.59"
+    "simple-keyboard": "^3.8.59",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",
