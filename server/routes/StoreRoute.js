@@ -5,6 +5,7 @@ const store = require("../Models/storeModel.js");
 const authenticateToken = require("../tokenauth/authenticateToken.js");
 const StoreTimeSlot = require("../Models/storeTimeSlotsModel.js");
 const user = require("../Models/userModel.js");
+
 const {
   sendSucessResponse,
   sendRejectedResponse,
@@ -58,12 +59,15 @@ router.post("/new", authenticateToken, async (req, res) => {
 
 router.post("/new-store-time-slots", authenticateToken, async (req, res) => {
   try {
-    const { dates, _id } = req.body;
-    const slotsArr = dates.map((slot) => {
-      return { date: new Date(slot), storeID: _id };
-    });
+    const userId = req.user.userId;
+    const dates = req.body.dates;
+    const storeId = req.body._id;
+    const slotsArr = dates.map((slot) => ({
+      date: new Date(slot),
+      storeID: storeId,
+    }));
     try {
-      const response = await StoreTimeSlot.insertMany(slotsArr, {
+      const savedTimeSlots = await StoreTimeSlot.insertMany(slotsArr, {
         ordered: false,
       });
     } catch (error) {
@@ -75,11 +79,14 @@ router.post("/new-store-time-slots", authenticateToken, async (req, res) => {
     res.status(200);
     res.json(sendSucessResponse({ message: "added successfully" }));
   } catch (error) {
-    console.error("error while trying to save store time slots see log", error);
+    console.error(
+      "error while trying to save store time slots see log\n",
+      error
+    );
     res.status(400);
     res.json(
       sendRejectedResponse({
-        message: "an error have occured,see logs for more info",
+        message: "an error have occured,see logs for more info\n",
       })
     );
   }
@@ -98,16 +105,22 @@ router.post("/set-new-store-services", authenticateToken, async (req, res) => {
       throw new Error("store does not exist");
     }
     const storeExistingServices = storeToUpdate.services;
-    console.log("formData is:\n", formData);
-    //filter duplicate services names that already exist in the services at the store --basically prevent duplicates
-    const nonDuplicateServices = formData.filter(
+    console.log("formData recieved:\n", formData);
+    //filter empty and duplicate services names that already exist in the services at the store --basically prevent duplicates
+    const filteredServices = formData.filter(
       (formDataService) =>
         !storeExistingServices.some(
-          (existingService) => existingService.name === formDataService.name
+          (existingService) =>
+            existingService.name === formDataService.name ||
+            formDataService.name === "" ||
+            !formDataService.name ||
+            formDataService.price === "" ||
+            !formDataService.price
         )
     );
+    console.log("filtered is:\n", filteredServices);
     storeToUpdate.services.push(
-      ...nonDuplicateServices.map((svc) => storeToUpdate.services.create(svc))
+      ...filteredServices.map((svc) => storeToUpdate.services.create(svc))
     );
     //saves the new services to the store service schema
     const added = await storeToUpdate.save();
@@ -123,4 +136,5 @@ router.post("/set-new-store-services", authenticateToken, async (req, res) => {
     );
   }
 });
+
 module.exports = router;

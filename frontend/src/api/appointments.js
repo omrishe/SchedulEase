@@ -1,6 +1,6 @@
 import { sendRejectedResponse } from "../utils/responseHandler.js";
 const serverAddress = "https://localhost:5000";
-export async function createAppointment(appointmentInfo) {
+export async function createAppointment(appointmentInfo, userAuthData) {
   try {
     const response = await fetch(`${serverAddress}/api/appointments/new`, {
       method: "post",
@@ -8,7 +8,7 @@ export async function createAppointment(appointmentInfo) {
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify(appointmentInfo),
+      body: JSON.stringify({ appointmentInfo }),
     });
     const data = await response.json();
     if (response.ok) {
@@ -17,6 +17,38 @@ export async function createAppointment(appointmentInfo) {
       return data;
     } else {
       return data;
+    }
+  } catch (error) {
+    console.log("error:", error);
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
+  }
+}
+
+export async function getAvailableAppointments(storeIdentifier) {
+  try {
+    //sets it so if already logged in send the storeId and if not we send the store Slug
+    const query = storeIdentifier.storeId
+      ? `storeId = ${storeIdentifier.storeId}`
+      : `storeUrl = ${storeIdentifier.storeSlug}`;
+    const response = await fetch(
+      `${serverAddress}/api/appointments/getAvailableAppointment${query}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
+    if (response.ok) {
+      const allAppointment = await response.json();
+      console.log(allAppointment);
+      return allAppointment;
+    } else {
+      throw new Error(`server  ${response.status} error occured`);
     }
   } catch (error) {
     console.log("error:", error);

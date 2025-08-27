@@ -2,7 +2,7 @@ import MenuItems from "../components/MenuItem.jsx";
 import { useState, useEffect } from "react";
 import ChooseDateContainer from "../components/ChooseDateContainer.jsx";
 import ChooseTime from "../components/ChooseTime.jsx";
-import {createAppointment} from "../api/appointments.js";
+import {createAppointment,getAvailableAppointments} from "../api/appointments.js";
 import params from "../params.json";
 import { useNavigate, useLocation,useParams, } from "react-router-dom";
 import { logout } from "../api/auth.js";
@@ -23,7 +23,7 @@ function MainPage({
     userName: localStorage.getItem("userName"),
     additionalRequests: "",
     email: localStorage.getItem("userEmail"),
-    storeID:localStorage.getItem("storeID")
+    storeID:localStorage.getItem("storeID"),
   });
   const { slug } = useParams();
   const [logoutMsg, setLogoutMsg] = useState();
@@ -51,7 +51,10 @@ function MainPage({
   function openPhone() {
     window.location.href = "tel:+00000000";
   }
-
+  //gets available appointments WIP
+  getAvailableAppointments(appointmentInfo.storeID ? {storeId:appointmentInfo.storeID} : {storeSlug:slug}).then((availableAppointments)=>
+  console.log("availableAppointments are:\n",availableAppointments))
+  
   async function handleChooseTimeOnlick(timeArray) {
     try{
     const tempDate = new Date(appointmentInfo.date);

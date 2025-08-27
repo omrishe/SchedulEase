@@ -46,4 +46,5 @@ servicesSchema.pre("save", function validateName(next) {
   next();
 });
 */
-module.exports = mongoose.models.Store || mongoose.model("Store", storeSchema);
+module.exports =
+  mongoose.models.Store || mongoose.model("Store", storeSchema, "stores");

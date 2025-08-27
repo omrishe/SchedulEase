@@ -22,4 +22,5 @@ const authSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.models.User || mongoose.model("User", authSchema);
+module.exports =
+  mongoose.models.User || mongoose.model("User", authSchema, "users");

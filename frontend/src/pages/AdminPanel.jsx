@@ -10,6 +10,7 @@ import ChooseDateContainer from "../components/ChooseDateContainer";
 import { setStoreOwnerAvailability,addServiceToStore } from "../api/store";
 import { ServiceForm } from "../components/serviceForm";
 import { v4 as uuidv4 } from "uuid";
+import { getAvailableAppointments } from "../api/appointments";
 export function AdminPanel({ userAuthData, allTimes, _id }) {
   const [formData,setFormaData]=useState([{
     formId:uuidv4(),
@@ -24,10 +25,9 @@ export function AdminPanel({ userAuthData, allTimes, _id }) {
   const locales = {
     "en-US": enUS,
   };
-  console.log("in admin panel",userAuthData)
+
   //runs only on component mounts and init the value for date to current date
   const  defaultDate  = useMemo(() => new Date(),[]);
-
   //a helper function to set date
   async function updateDate(dateClicked){
     setDate(dateClicked["date"]);

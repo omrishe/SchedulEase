@@ -1,6 +1,8 @@
 //server interaction
 const express = require("express");
 const Appointment = require("../Models/appointmentModel.js");
+const StoreTimeSlots = require("../Models/storeTimeSlotsModel.js");
+const User = require("../Models/userModel.js");
 const authenticateToken = require("../tokenauth/authenticateToken.js");
 const {
   sendSucessResponse,
@@ -10,16 +12,33 @@ const router = express.Router();
 
 router.post("/new", authenticateToken, async (req, res) => {
   try {
-    const newAppointment = new Appointment(req.body); //recieves the data sent and create an appointment schema
-    const savedAppointment = await newAppointment.save(); //saves the data to database -- mongoose automatically convert string date to js date
-    const { createdAt, updatedAt, ...appointment } = savedAppointment;
-    console.log("saved clean appointment is", appointment);
-    //return the object that was saved as it appears in the db and appopriate message
+    const { appointmentInfo } = req.body;
+    const userId = req.user.userId; //get the userId by the token (authenticateToken passes userId)
+    const newAppointment = new Appointment(appointmentInfo); //recieves the data sent and create an appointment doc
+    console.log("appointment is:\n", appointmentInfo);
+    const appointmentDate = new Date(appointmentInfo.date);
+    appointmentDate.setSeconds(0);
+    appointmentDate.setMilliseconds(0);
+    const storeTimeSlot = await StoreTimeSlots.findOne({
+      storeID: appointmentInfo.storeID,
+      date: appointmentDate,
+    });
+    console.log("timeslot is:\n", storeTimeSlot);
+    if (storeTimeSlot.takenBy) {
+      throw new Error("appointment already taken");
+    }
+    storeTimeSlot.takenBy = userId; //sets the timeSlot as taken by user
+    await newAppointment.save(); //saves the data to database -- mongoose automatically convert string date to js date
+    await storeTimeSlot.save(); //saves the new timeslot
+    const newStoreTimeSlot = await StoreTimeSlots.findOne({
+      storeID: appointmentInfo.storeID,
+      date: appointmentDate,
+    });
+    console.log("new time slot is is:\n", newStoreTimeSlot);
     return res.status(201).json(
       sendSucessResponse({
         message: "added appointment successfully",
         type: "data",
-        otherdata: appointment,
       })
     );
   } catch (error) {
@@ -41,6 +60,36 @@ router.post("/new", authenticateToken, async (req, res) => {
   }
 });
 
+router.get("/getAvailableAppointment", async (req, res) => {
+  const { storeId, storeSlug } = req.query;
+  let store;
+  if (storeId) {
+    store = await Store.findById(storeId);
+  } else if (storeSlug) {
+    store = await Store.findOne({ slug: storeSlug });
+  } else {
+    return res
+      .status(400)
+      .json(sendRejectedResponse({ message: "Store identifier missing" }));
+  }
+
+  if (!store)
+    return res
+      .status(403)
+      .json(sendRejectedResponse({ message: "Store not found" }));
+
+  const availableSlots = await StoreTimeSlots.find({
+    storeID: store._id,
+    takenBy: null,
+  }).sort({ date: 1 });
+
+  return res.json(
+    sendSucessResponse({
+      message: "successfully fetched appointments",
+      otherData: availableSlots,
+    })
+  );
+});
 /** 
 router.get("/getAppointment", authenticateToken, async (req, res) => {
   try {
