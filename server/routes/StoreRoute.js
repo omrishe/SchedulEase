@@ -5,7 +5,7 @@ const store = require("../Models/storeModel.js");
 const authenticateToken = require("../tokenauth/authenticateToken.js");
 const StoreTimeSlot = require("../Models/storeTimeSlotsModel.js");
 const user = require("../Models/userModel.js");
-
+const Store = require("../Models/storeModel.js");
 const {
   sendSucessResponse,
   sendRejectedResponse,
@@ -13,7 +13,7 @@ const {
 
 router.get("/getStoreInfo", authenticateToken, async (req, res) => {
   try {
-    const StoreData = await store.findById(req.body.storeID);
+    const StoreData = await store.findById(req.body.storeId);
     if (!StoreData) {
       throw new Error("no such store exists");
     }
@@ -64,7 +64,7 @@ router.post("/new-store-time-slots", authenticateToken, async (req, res) => {
     const storeId = req.body._id;
     const slotsArr = dates.map((slot) => ({
       date: new Date(slot),
-      storeID: storeId,
+      storeId: storeId,
     }));
     try {
       const savedTimeSlots = await StoreTimeSlot.insertMany(slotsArr, {
@@ -100,7 +100,7 @@ router.post("/set-new-store-services", authenticateToken, async (req, res) => {
     if (userData.role != "admin") {
       throw new Error("invalid auth");
     }
-    const storeToUpdate = await store.findById(userData.storeID);
+    const storeToUpdate = await store.findById(userData.storeId);
     if (!storeToUpdate) {
       throw new Error("store does not exist");
     }
@@ -134,6 +134,50 @@ router.post("/set-new-store-services", authenticateToken, async (req, res) => {
         message: "an error have occured,see logs for more info",
       })
     );
+  }
+});
+
+router.get("/getServices", async (req, res) => {
+  try {
+    const { storeId, storeSlug } = req.query;
+    let fetchedStore;
+    if (storeId) {
+      fetchedStore = await Store.findById(storeId, { services: 1, _id: 0 });
+    } else if (storeSlug) {
+      fetchedStore = await Store.findOne(
+        { slug: storeSlug },
+        { services: 1, _id: 0 }
+      );
+    } else {
+      throw new Error("Store identifier missing");
+    }
+    if (!fetchedStore) {
+      throw new Error("Store not found");
+    }
+    const servicesToSend = fetchedStore.services.map((service) => ({
+      name: service.name,
+      price: service.price,
+      serviceNote: service.serviceNote,
+    }));
+    return res.json(
+      sendSucessResponse({
+        message: "successfully fetched appointments",
+        otherData: servicesToSend,
+      })
+    );
+  } catch (error) {
+    console.error("an error occured see below for details:\n", error);
+    if (error === "Store not found") {
+      return res
+        .status(400)
+        .json(sendRejectedResponse({ message: "Store not found" }));
+    }
+    if (error === "Store identifier missing") {
+      return res
+        .status(400)
+        .json(sendRejectedResponse({ message: "Store identifier missing" }));
+    }
+    return res.status(400).json(sendRejectedResponse());
   }
 });
 

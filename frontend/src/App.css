@@ -90,15 +90,28 @@
   align-items: center;
   justify-self: center;
 }
-.itemBtn {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
+
+.serviceBtn {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
   flex-shrink: 0;
   background-color: beige;
   width: 100%;
   height: 25%;
   font-size: large;
+}
+.serviceName{
+  justify-self: flex-start;
+  align-self: center;
+}
+.servicePrice{
+justify-self:flex-end;
+align-self: center;
+}
+.serviceNote{
+  justify-self:start;
+  align-self: center;
 }
 .itemBtnNameText {
   margin-right: auto; /*aligns the item to the left */

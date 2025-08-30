@@ -16,7 +16,7 @@ function sendSucessResponse(data) {
  * @param data an object containing the error
  * @return a pattern object containing the pattern data to send
  */
-function sendRejectedResponse(data) {
+function sendRejectedResponse(data = {}) {
   return {
     code: data.code || "INTERNAL_ERROR",
     type: data.type || "errorResponse",

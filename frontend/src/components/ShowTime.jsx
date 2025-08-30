@@ -1,16 +1,13 @@
 import { useState } from "react";
 export default function ChooseTime({
   appointmentInfo: date={date:new Date()},
-  availableTimeSlots,
+  times,
   handleChooseTimeOnlick,
   maxTimeSelections,
 }) {
   const [response, setResponse] = useState();
   const [timeArray, setTimeArray] = useState([]);
-  //const [availableTimes,setAvailableTimes]=useState(availableTimeSlots)
-  console.log("availabletimeslot is:\n",availableTimeSlots)
   
-
   async function submitSelectedTime() {
     const serverResponse = await handleChooseTimeOnlick(timeArray);
     setResponse(serverResponse.message);
@@ -46,7 +43,7 @@ export default function ChooseTime({
     <div className="mainChooseTimeDiv">
       <span>please choose time</span>
       <div className="timeOptions">
-        {availableTimeSlots.map(
+        {times.map(
           (
             timeInput // sets the times user can choose
           ) => (

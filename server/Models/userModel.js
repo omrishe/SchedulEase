@@ -13,7 +13,7 @@ const authSchema = new mongoose.Schema(
     username: { type: String, required: false },
     hashedPassword: { type: String, required: true },
     role: { type: String, required: true },
-    storeID: {
+    storeId: {
       required: true,
       type: mongoose.Schema.Types.ObjectId,
       ref: "Store",

@@ -31,10 +31,10 @@ export async function getAvailableAppointments(storeIdentifier) {
   try {
     //sets it so if already logged in send the storeId and if not we send the store Slug
     const query = storeIdentifier.storeId
-      ? `storeId = ${storeIdentifier.storeId}`
-      : `storeUrl = ${storeIdentifier.storeSlug}`;
+      ? `storeId=${storeIdentifier.storeId}`
+      : `storeUrl=${storeIdentifier.storeSlug}`;
     const response = await fetch(
-      `${serverAddress}/api/appointments/getAvailableAppointment${query}`,
+      `${serverAddress}/api/appointments/getAvailableAppointment?${query}`,
       {
         method: "GET",
         headers: {
@@ -44,9 +44,15 @@ export async function getAvailableAppointments(storeIdentifier) {
       }
     );
     if (response.ok) {
-      const allAppointment = await response.json();
-      console.log(allAppointment);
-      return allAppointment;
+      const availableSlots = await response.json();
+      //parse from array of iso to HH:MM format
+      availableSlots.otherData = availableSlots.otherData.map((slot) => {
+        const dateSlot = new Date(slot);
+        const hours = dateSlot.getHours().toString().padStart(2, "0");
+        const minutes = dateSlot.getMinutes().toString().padStart(2, "0");
+        return `${hours}:${minutes}`;
+      });
+      return availableSlots;
     } else {
       throw new Error(`server  ${response.status} error occured`);
     }

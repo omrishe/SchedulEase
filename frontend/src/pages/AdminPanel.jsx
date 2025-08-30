@@ -5,7 +5,7 @@ import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import enUS from "date-fns/locale/en-US";
 import { useMemo, useState } from "react";
-import ChooseTime from "../components/ChooseTime";
+import ShowTime from "../components/ShowTime";
 import ChooseDateContainer from "../components/ChooseDateContainer";
 import { setStoreOwnerAvailability,addServiceToStore } from "../api/store";
 import { ServiceForm } from "../components/serviceForm";
@@ -71,7 +71,7 @@ function handleInputChange(e,formId) {
       <p>welcome Admin</p>
       <div className="calanderDiv">
       <ChooseDateContainer updateDate={updateDate} date={date}></ChooseDateContainer>
-      <ChooseTime times={allTimes} appointmentInfo={{date : date}} maxTimeSelections={maxTimeSelections} handleChooseTimeOnlick={handleSetMenuItemBtn}></ChooseTime>
+      <ShowTime times={allTimes} appointmentInfo={{date : date}} maxTimeSelections={maxTimeSelections} handleChooseTimeOnlick={handleSetMenuItemBtn}></ShowTime>
     </div>
     <form className="form" onSubmit={addService}>
       {formData.map((formValues)=>(<ServiceForm key={formValues.formId} className={"singleForm"} formValues={formValues} handleInputChange={handleInputChange}></ServiceForm>)

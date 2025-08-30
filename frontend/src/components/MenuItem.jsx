@@ -1,30 +1,34 @@
-import { Fragment, useState } from "react";
-export default function MenuItems({ menuItemsList, setWindow }) {
-  const [isClicked, setIsClicked] = useState(false);
+import {  useState } from "react";
+
+export default function MenuItems({ setWindow,services,onNextServiceBtnPress }) {
+  const [serviceSelected,setServiceSelected]=useState("")
+
+  function onSelectedServiceBtn(serviceName){
+    serviceName===serviceSelected ? setServiceSelected("") : setServiceSelected(serviceName)
+  }
+
   return (
-    <>
+    <div>
       <div className="scrollableMenu">
-        {menuItemsList.map((item) => (
-          <Fragment key={item.name}>
-            <button
-              className="itemBtn"
-              onClick={() => setIsClicked((prev) => !prev)}
-            >
-              <span>{item.name}</span>
-              <span>{item.price}</span>
+        {services.map((service) => (
+            <button key={service.name}
+              className="serviceBtn"
+              onClick={() => onSelectedServiceBtn(service.name)}>
+              <span className="serviceName">{service.name}</span>
+              <span className="servicePrice">{service.price}</span>
+              <span className="serviceNote">{service.serviceNote}</span>
             </button>
-          </Fragment>
         ))}
       </div>
       <button
-        hidden={!isClicked}
+        hidden={!serviceSelected}
         onClick={() => {
           setWindow("date");
-          setIsClicked((prev) => !prev);
-        }}
-      >
+          setServiceSelected("");
+          onNextServiceBtnPress(serviceSelected)
+        }}>
         Next
       </button>
-    </>
+    </div>
   );
 }

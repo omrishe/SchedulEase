@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const storeTimeSlotSchema = new mongoose.Schema(
   {
     date: { type: Date, required: true },
-    storeID: {
+    storeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "store",
       required: true,

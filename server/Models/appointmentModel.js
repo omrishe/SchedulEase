@@ -7,7 +7,7 @@ const appointmentSchema = new mongoose.Schema(
     email: { type: String, required: true, lowercase: true, trim: true },
     date: { type: Date, required: true },
     note: { type: String, default: "", trim: true },
-    storeID: {
+    storeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "store",
       required: true,

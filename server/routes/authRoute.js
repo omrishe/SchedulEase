@@ -17,8 +17,8 @@ router.post("/signup", async (req, res) => {
   try {
     const { email, password, storeSlug, ...otherData } = req.body;
     const fetchedStore = await store.findOne({ storeSlug: storeSlug });
-    storeID = fetchedStore._id;
-    if (await auth.findOne({ email: email, _id: storeID })) {
+    storeId = fetchedStore._id;
+    if (await auth.findOne({ email: email, _id: storeId })) {
       throw new Error("email already exists");
     }
     otherData.role = "user";
@@ -26,7 +26,7 @@ router.post("/signup", async (req, res) => {
     hashedPassword = await bcrypt.hash(password, saltrounds);
     const signupData = new auth({
       email,
-      storeID: storeID,
+      storeId: storeId,
       hashedPassword,
       ...otherData,
     });
@@ -62,7 +62,7 @@ router.post("/login", async (req, res) => {
     }
     const userData = await auth.findOne({
       email: req.body.email,
-      storeID: storeData._id,
+      storeId: storeData._id,
     });
     if (!userData) {
       throw new Error("no user found");

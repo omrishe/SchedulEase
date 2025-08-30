@@ -16,7 +16,7 @@ function App() {
     userName: localStorage.getItem("userName"),
     email: localStorage.getItem("email"),
     role: localStorage.getItem("role"),
-    storeID : localStorage.getItem("storeID")
+    storeId : localStorage.getItem("storeId")
   });
 
   useEffect(() => {setUserDataToLocalStorage(userAuthData);
@@ -41,6 +41,7 @@ function App() {
       userName: null,
       email: null,
       role: null,
+      storeId:null
     });
   }
 
@@ -49,6 +50,7 @@ function App() {
     localStorage.removeItem("userName");
     localStorage.removeItem("email");
     localStorage.removeItem("role");
+    localStorage.removeItem("storeId")
   }
 
   useEffect(() => {

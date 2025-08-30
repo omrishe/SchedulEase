@@ -85,6 +85,33 @@ export async function addServiceToStore(authData, formData) {
     });
   }
 }
+export async function getStoreServices(storeIdentifier) {
+  try {
+    //sets it so if already logged in send the storeId and if not we send the store Slug
+    const query = storeIdentifier.storeId
+      ? `storeId=${storeIdentifier.storeId}`
+      : `storeUrl=${storeIdentifier.storeSlug}`;
+    const response = await fetch(`${serverAddress}/getServices?${query}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
+    if (response.ok) {
+      const storeServices = await response.json();
+      return storeServices;
+    } else {
+      throw new Error(`server  ${response.status} error occured`);
+    }
+  } catch (error) {
+    console.log("error:", error);
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
+  }
+}
 
 export async function setStoreOwnerAvailability(dateObjects, _id) {
   try {

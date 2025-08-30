@@ -2,6 +2,7 @@
 const express = require("express");
 const Appointment = require("../Models/appointmentModel.js");
 const StoreTimeSlots = require("../Models/storeTimeSlotsModel.js");
+const Store = require("../Models/storeModel.js");
 const User = require("../Models/userModel.js");
 const authenticateToken = require("../tokenauth/authenticateToken.js");
 const {
@@ -13,6 +14,7 @@ const router = express.Router();
 router.post("/new", authenticateToken, async (req, res) => {
   try {
     const { appointmentInfo } = req.body;
+    console.log("req.body is:\n", req.body);
     const userId = req.user.userId; //get the userId by the token (authenticateToken passes userId)
     const newAppointment = new Appointment(appointmentInfo); //recieves the data sent and create an appointment doc
     console.log("appointment is:\n", appointmentInfo);
@@ -20,10 +22,10 @@ router.post("/new", authenticateToken, async (req, res) => {
     appointmentDate.setSeconds(0);
     appointmentDate.setMilliseconds(0);
     const storeTimeSlot = await StoreTimeSlots.findOne({
-      storeID: appointmentInfo.storeID,
+      storeId: appointmentInfo.storeId,
       date: appointmentDate,
     });
-    console.log("timeslot is:\n", storeTimeSlot);
+
     if (storeTimeSlot.takenBy) {
       throw new Error("appointment already taken");
     }
@@ -31,7 +33,7 @@ router.post("/new", authenticateToken, async (req, res) => {
     await newAppointment.save(); //saves the data to database -- mongoose automatically convert string date to js date
     await storeTimeSlot.save(); //saves the new timeslot
     const newStoreTimeSlot = await StoreTimeSlots.findOne({
-      storeID: appointmentInfo.storeID,
+      storeId: appointmentInfo.storeId,
       date: appointmentDate,
     });
     console.log("new time slot is is:\n", newStoreTimeSlot);
@@ -61,34 +63,48 @@ router.post("/new", authenticateToken, async (req, res) => {
 });
 
 router.get("/getAvailableAppointment", async (req, res) => {
-  const { storeId, storeSlug } = req.query;
-  let store;
-  if (storeId) {
-    store = await Store.findById(storeId);
-  } else if (storeSlug) {
-    store = await Store.findOne({ slug: storeSlug });
-  } else {
-    return res
-      .status(400)
-      .json(sendRejectedResponse({ message: "Store identifier missing" }));
+  try {
+    const { storeId, storeSlug } = req.query;
+    let store;
+    if (storeId) {
+      store = await Store.findById(storeId);
+    } else if (storeSlug) {
+      store = await Store.findOne({ slug: storeSlug });
+    } else {
+      throw new Error("Store identifier missing");
+    }
+    if (!store) {
+      throw new Error("Store not found");
+    }
+    let availableSlots = await StoreTimeSlots.find(
+      {
+        storeId: store._id,
+        takenBy: null,
+      },
+      { date: 1, _id: 0 }
+    ).sort({ date: 1 });
+    //availableSlots is an array of object containing dates,this line transforms it into array of dates
+    const availableSlotsArr = availableSlots.map((slot) => slot.date);
+    return res.json(
+      sendSucessResponse({
+        message: "successfully fetched appointments",
+        otherData: availableSlotsArr,
+      })
+    );
+  } catch (error) {
+    console.error("an error occured see below for details:\n", error);
+    if (error === "Store not found") {
+      return res
+        .status(400)
+        .json(sendRejectedResponse({ message: "Store not found" }));
+    }
+    if (error === "Store identifier missing") {
+      return res
+        .status(400)
+        .json(sendRejectedResponse({ message: "Store identifier missing" }));
+    }
+    return res.status(400).json(sendRejectedResponse());
   }
-
-  if (!store)
-    return res
-      .status(403)
-      .json(sendRejectedResponse({ message: "Store not found" }));
-
-  const availableSlots = await StoreTimeSlots.find({
-    storeID: store._id,
-    takenBy: null,
-  }).sort({ date: 1 });
-
-  return res.json(
-    sendSucessResponse({
-      message: "successfully fetched appointments",
-      otherData: availableSlots,
-    })
-  );
 });
 /** 
 router.get("/getAppointment", authenticateToken, async (req, res) => {
