@@ -10,7 +10,7 @@ import params from "./params.json";
 import SuperAdminPanel from "./pages/SuperAdminPanel.jsx";
 
 function App() {
-  const { menuItemsList, times } = params;
+  const { times } = params;
   const [userAuthData, setUserAuthData] = useState({
     userId: localStorage.getItem("userId"),
     userName: localStorage.getItem("userName"),
@@ -19,10 +19,7 @@ function App() {
     storeId : localStorage.getItem("storeId")
   });
 
-  useEffect(() => {setUserDataToLocalStorage(userAuthData);
-  }, [userAuthData]); //sync userdata to localstorage
-
-  function setUserDataToLocalStorage(data) {
+  function saveToLocalStorage(data) {
     //does not work for inherited objects
     try {
       for (const key in data) {
@@ -43,6 +40,7 @@ function App() {
       role: null,
       storeId:null
     });
+    resetlocalStorage();
   }
 
   function resetlocalStorage() {
@@ -64,10 +62,10 @@ function App() {
     verifyTokenAndClearData();
   }, []);
 
-  async function updateAuthData(tempAuthData)
+  async function updateAuthData(newAuthData)
   {
-    //setUserDataToLocalStorage(tempAuthData)
-    setUserAuthData({...userAuthData,...tempAuthData});
+    setUserAuthData({...userAuthData,...newAuthData});
+    saveToLocalStorage(newAuthData);
   }
   
   return (
@@ -79,9 +77,6 @@ function App() {
             <MainPage
               userAuthData={userAuthData}
               resetUserData={resetUserData}
-              resetlocalStorage={resetlocalStorage}
-              updateAuthData={updateAuthData}
-              menuItemsList={menuItemsList}
               times={times}
             ></MainPage>
           }
@@ -90,7 +85,6 @@ function App() {
           path="/store/:slug/login"
           element={
             <Login
-              setUserDataToLocalStorage={setUserDataToLocalStorage}
               userAuthData={userAuthData}
               updateAuthData={updateAuthData}
             ></Login>

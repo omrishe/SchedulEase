@@ -1,6 +1,6 @@
 import { sendRejectedResponse } from "../utils/responseHandler.js";
 const serverAddress = "https://localhost:5000";
-export async function createAppointment(appointmentInfo, userAuthData) {
+export async function createAppointment(appointmentInfo) {
   try {
     const response = await fetch(`${serverAddress}/api/appointments/new`, {
       method: "post",
@@ -30,9 +30,12 @@ export async function createAppointment(appointmentInfo, userAuthData) {
 export async function getAvailableAppointments(storeIdentifier, date) {
   try {
     //sets it so if already logged in send the storeId and if not we send the store Slug
+    console.log("store identifier is:\n", storeIdentifier);
+    console.log("date is:\n", date);
     const query = storeIdentifier.storeId
       ? `storeId=${storeIdentifier.storeId}&date=${date.getTime()}`
-      : `storeUrl=${storeIdentifier.storeSlug}&date=${date.getTime()}`;
+      : `storeSlug=${storeIdentifier.storeSlug}&date=${date.getTime()}`;
+    console.log("query is:\n", query);
     const response = await fetch(
       `${serverAddress}/api/appointments/getAvailableAppointment?${query}`,
       {

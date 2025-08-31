@@ -13,19 +13,26 @@ const router = express.Router();
 
 router.post("/new", authenticateToken, async (req, res) => {
   try {
-    const { appointmentInfo } = req.body;
+    const { appointmentInfo: appointmentData } = req.body;
     console.log("req.body is:\n", req.body);
     const userId = req.user.userId; //get the userId by the token (authenticateToken passes userId)
-    const newAppointment = new Appointment(appointmentInfo); //recieves the data sent and create an appointment doc
-    console.log("appointment is:\n", appointmentInfo);
-    const appointmentDate = new Date(appointmentInfo.date);
-    appointmentDate.setSeconds(0);
-    appointmentDate.setMilliseconds(0);
+    const { email, userName } =
+      (await User.findById(userId, { email: 1, userName: 1, _id: 0 })) || {};
+    if (!email || !userName) {
+      throw new Error("User does not exist");
+    }
+    appointmentData.userName = userName;
+    appointmentData.email = email;
+    appointmentData.userId = userId;
+    appointmentData.date = new Date(appointmentData.date);
+    appointmentData.date.setMilliseconds(0);
+    appointmentData.date.setSeconds(0);
+    const newAppointment = new Appointment(appointmentData); //recieves the data sent and create an appointment doc
+    console.log("appointment is:\n", appointmentData);
     const storeTimeSlot = await StoreTimeSlots.findOne({
-      storeId: appointmentInfo.storeId,
-      date: appointmentDate,
+      storeId: appointmentData.storeId,
+      date: appointmentData.date,
     });
-
     if (storeTimeSlot.takenBy) {
       throw new Error("appointment already taken");
     }
@@ -33,8 +40,8 @@ router.post("/new", authenticateToken, async (req, res) => {
     await newAppointment.save(); //saves the data to database -- mongoose automatically convert string date to js date
     await storeTimeSlot.save(); //saves the new timeslot
     const newStoreTimeSlot = await StoreTimeSlots.findOne({
-      storeId: appointmentInfo.storeId,
-      date: appointmentDate,
+      storeId: appointmentData.storeId,
+      date: appointmentData.date,
     });
     console.log("new time slot is is:\n", newStoreTimeSlot);
     return res.status(201).json(
@@ -65,6 +72,7 @@ router.post("/new", authenticateToken, async (req, res) => {
 router.get("/getAvailableAppointment", async (req, res) => {
   try {
     const { storeId, storeSlug, date: timeStamp } = req.query;
+    console.log("req query is:\n", req.query);
     const startdate = new Date(Number(timeStamp));
     //js Date automatically moves to next month if day of month<{daySet}
     const endDate = new Date(
@@ -73,10 +81,12 @@ router.get("/getAvailableAppointment", async (req, res) => {
       startdate.getDate() + 1
     );
     let store;
+    console.log("store slug is:\n", storeSlug);
+    console.log("store id is:\n", storeId);
     if (storeId) {
       store = await Store.findById(storeId);
     } else if (storeSlug) {
-      store = await Store.findOne({ slug: storeSlug });
+      store = await Store.findOne({ storeSlug: storeSlug });
     } else {
       throw new Error("Store identifier missing");
     }

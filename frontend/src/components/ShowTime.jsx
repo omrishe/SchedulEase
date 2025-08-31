@@ -1,6 +1,6 @@
 import { useState } from "react";
 export default function ChooseTime({
-  appointmentInfo: date={date:new Date()},
+  date,
   times,
   handleChooseTimeOnlick,
   maxTimeSelections,

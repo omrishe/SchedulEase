@@ -1,9 +1,8 @@
 import MenuItems from "./MenuItem.jsx";
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import ChooseDateContainer from "./ChooseDateContainer.jsx";
 import ChooseTime from "./ChooseTime.jsx";
-import {createAppointment,getAvailableAppointments} from "../api/appointments.js";
-import { getStoreServices } from "../api/store";
+import {createAppointment} from "../api/appointments.js";
 import { sendRejectedResponse } from "../utils/responseHandler.js";
 
 export function AppointmentSelection({
@@ -65,7 +64,7 @@ export function AppointmentSelection({
               {windowChooser == "setAppointment" && (
                 <>
                   <ChooseTime //display set appointment area
-                    appointmentInfo={appointmentInfo}
+                    date={appointmentInfo["date"]}
                     availableTimeSlots={availableTimeSlots}
                     maxTimeSelections={1}
                     handleChooseTimeOnlick={handleChooseTimeOnlick}

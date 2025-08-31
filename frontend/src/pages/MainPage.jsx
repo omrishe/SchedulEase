@@ -2,13 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate,useParams, } from "react-router-dom";
 import { getStoreServices } from "../api/store";
 import { logout } from "../api/auth.js";
-import { sendRejectedResponse } from "../utils/responseHandler.js";
 import { AppointmentSelection } from "../components/AppointmentSelection.jsx";
 import { getAvailableAppointments } from "../api/appointments.js";
 function MainPage({
   userAuthData,
   resetUserData,
-  resetlocalStorage,
 }) {
   const navigatePage = useNavigate();
   const [appointmentInfo, setAppointment] = useState({
@@ -26,17 +24,19 @@ function MainPage({
   //gets store available appointments
   useEffect(()=> {
   async function getAvailableSlots(date){
+    console.log("appointmentInfo.storeId is:\n",appointmentInfo.storeId)
   const serverResponse=await getAvailableAppointments(
     appointmentInfo.storeId ? {storeId:appointmentInfo.storeId} : {storeSlug:slug},
     date)
     if(serverResponse.isSuccess){
       setAvailableTimeSlots(serverResponse.otherData)
     }}
-  //create a new date only with day,month and year (no hours or seconds)
+  if(appointmentInfo.date){
+    //create a new date only with day,month and year (no hours or seconds)
   const date=new Date(appointmentInfo.date.getFullYear(),appointmentInfo.date.getMonth(),appointmentInfo.date.getDate())
   console.log("date is:",date)
   getAvailableSlots(date)
-  },[appointmentInfo.date])
+  }},[appointmentInfo.date])
 
   //gets store available services
   useEffect(()=> {
@@ -66,7 +66,6 @@ function MainPage({
 
   //helper function that updates appointmentinfo with the new field and returns a copy of the resulting appointmentinfo
   function updateAppointmentInfo(newInfo) {
-    console.log("entered update appointmentinfo with:\n",newInfo)
     setAppointment((prev) => ({
       ...prev, // keep all old fields
       ...newInfo, // overwrite with new fields
@@ -80,10 +79,7 @@ function MainPage({
       setLogoutMsg("logged out sucessfully");
       resetUserData();
       setAppointment(
-        {date: "",service: "",
-        userName: "", additionalRequests: "",
-        email: ""})
-      resetlocalStorage();
+        {date: "",service: "",storeId:null})
     } else {
       console.log("an error occured");
       setLogoutMsg("an Error occured see log for more info");
@@ -95,6 +91,18 @@ function MainPage({
       {userAuthData.userName ? `welcome ${userAuthData.userName}` : "welcome"}
     </p>
   );
+  const loginElement=<>
+      <button className="loginBtn" onClick={() => navigatePage(`/store/${slug}/login`)}>
+        login
+      </button>
+      <button onClick={() => navigatePage(`/store/${slug}/register`)}>
+        dont have a user? Register
+      </button>
+    </>
+    const logoutElement=<button className="logoutBtn" onClick={() => handleLogout()}>
+      logout
+    </button>
+
   const authControls = userAuthData["userName"] ? (
     <button className="logoutBtn" onClick={() => handleLogout()}>
       logout
@@ -115,6 +123,7 @@ function MainPage({
       <div className="mainWindow">
         {welcomeMsg}
         {/**displays welcome msg if not logged in and welcome userName if logged in */}
+        {/**userAuthData["userName"] ? logoutElement : loginElement*/}
         {authControls}
         {/**displays login/register or logout depending if logged in */}
         {logoutMsg && <p>{logoutMsg}</p>}

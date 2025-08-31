@@ -1,16 +1,10 @@
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { format, parse } from "date-fns";
-import {dateFnsLocalizer } from "react-big-calendar";
-import startOfWeek from "date-fns/startOfWeek";
-import getDay from "date-fns/getDay";
-import enUS from "date-fns/locale/en-US";
 import { useMemo, useState } from "react";
 import ShowTime from "../components/ShowTime";
 import ChooseDateContainer from "../components/ChooseDateContainer";
 import { setStoreOwnerAvailability,addServiceToStore } from "../api/store";
 import { ServiceForm } from "../components/serviceForm";
 import { v4 as uuidv4 } from "uuid";
-import { getAvailableAppointments } from "../api/appointments";
 export function AdminPanel({ userAuthData, allTimes, _id }) {
   const [formData,setFormaData]=useState([{
     formId:uuidv4(),
@@ -22,9 +16,6 @@ export function AdminPanel({ userAuthData, allTimes, _id }) {
   const [message,setMessage]=useState("")
   const [date,setDate]=useState(new Date());
   const maxTimeSelections=24;
-  const locales = {
-    "en-US": enUS,
-  };
 
   //runs only on component mounts and init the value for date to current date
   const  defaultDate  = useMemo(() => new Date(),[]);
@@ -71,7 +62,7 @@ function handleInputChange(e,formId) {
       <p>welcome Admin</p>
       <div className="calanderDiv">
       <ChooseDateContainer updateDate={updateDate} date={date}></ChooseDateContainer>
-      <ShowTime times={allTimes} appointmentInfo={{date : date}} maxTimeSelections={maxTimeSelections} handleChooseTimeOnlick={handleSetMenuItemBtn}></ShowTime>
+      <ShowTime times={allTimes} date={{date : date}} maxTimeSelections={maxTimeSelections} handleChooseTimeOnlick={handleSetMenuItemBtn}></ShowTime>
     </div>
     <form className="form" onSubmit={addService}>
       {formData.map((formValues)=>(<ServiceForm key={formValues.formId} className={"singleForm"} formValues={formValues} handleInputChange={handleInputChange}></ServiceForm>)

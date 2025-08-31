@@ -90,7 +90,7 @@ export async function getStoreServices(storeIdentifier) {
     //sets it so if already logged in send the storeId and if not we send the store Slug
     const query = storeIdentifier.storeId
       ? `storeId=${storeIdentifier.storeId}`
-      : `storeUrl=${storeIdentifier.storeSlug}`;
+      : `storeSlug=${storeIdentifier.storeSlug}`;
     const response = await fetch(`${serverAddress}/getServices?${query}`, {
       method: "GET",
       headers: {

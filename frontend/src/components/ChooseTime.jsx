@@ -1,6 +1,6 @@
 import { useState } from "react";
 export default function ChooseTime({
-  appointmentInfo: date={date:new Date()},
+  date,
   availableTimeSlots,
   handleChooseTimeOnlick,
   maxTimeSelections,
@@ -63,7 +63,7 @@ export default function ChooseTime({
       {timeArray && (
         <div style={{ display: "flex", flexDirection: "column" }}>
           <span>
-            Date Selected:{date["date"].toLocaleDateString("en-GB")}{" "}
+            Date Selected:{date.toLocaleDateString("en-GB")}{" "}
             {(maxTimeSelections===1 && timeArray[0]) ? `at ${timeArray[0]}`:""}
           </span>
           <button onClick={submitSelectedTime}>Confirm</button>

@@ -11,7 +11,7 @@ export default function MenuItems({ setWindow,services,onNextServiceBtnPress }) 
     <div>
       <div className="scrollableMenu">
         {services.map((service) => (
-            <button key={service.name}
+            <button key={`${service.name}${service.price}${service.serviceNote}`}
               className="serviceBtn"
               onClick={() => onSelectedServiceBtn(service.name)}>
               <span className="serviceName">{service.name}</span>

@@ -66,7 +66,6 @@ router.post(
   requireAdmin,
   async (req, res) => {
     try {
-      const userId = req.user.userId;
       const dates = req.body.dates;
       const storeId = req.body._id;
       const slotsArr = dates.map((slot) => ({
@@ -155,7 +154,7 @@ router.get("/getServices", async (req, res) => {
       fetchedStore = await Store.findById(storeId, { services: 1, _id: 0 });
     } else if (storeSlug) {
       fetchedStore = await Store.findOne(
-        { slug: storeSlug },
+        { storeSlug: storeSlug },
         { services: 1, _id: 0 }
       );
     } else {
