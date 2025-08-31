@@ -25,13 +25,18 @@ function MainPage({
 
   //gets store available appointments
   useEffect(()=> {
-  async function getAvailableSlots(){
-  const serverResponse=await getAvailableAppointments(appointmentInfo.storeId ? {storeId:appointmentInfo.storeId} : {storeSlug:slug})
+  async function getAvailableSlots(date){
+  const serverResponse=await getAvailableAppointments(
+    appointmentInfo.storeId ? {storeId:appointmentInfo.storeId} : {storeSlug:slug},
+    date)
     if(serverResponse.isSuccess){
       setAvailableTimeSlots(serverResponse.otherData)
     }}
-  getAvailableSlots()
-  },[])
+  //create a new date only with day,month and year (no hours or seconds)
+  const date=new Date(appointmentInfo.date.getFullYear(),appointmentInfo.date.getMonth(),appointmentInfo.date.getDate())
+  console.log("date is:",date)
+  getAvailableSlots(date)
+  },[appointmentInfo.date])
 
   //gets store available services
   useEffect(()=> {

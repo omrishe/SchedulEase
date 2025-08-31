@@ -27,12 +27,12 @@ export async function createAppointment(appointmentInfo, userAuthData) {
   }
 }
 
-export async function getAvailableAppointments(storeIdentifier) {
+export async function getAvailableAppointments(storeIdentifier, date) {
   try {
     //sets it so if already logged in send the storeId and if not we send the store Slug
     const query = storeIdentifier.storeId
-      ? `storeId=${storeIdentifier.storeId}`
-      : `storeUrl=${storeIdentifier.storeSlug}`;
+      ? `storeId=${storeIdentifier.storeId}&date=${date.getTime()}`
+      : `storeUrl=${storeIdentifier.storeSlug}&date=${date.getTime()}`;
     const response = await fetch(
       `${serverAddress}/api/appointments/getAvailableAppointment?${query}`,
       {

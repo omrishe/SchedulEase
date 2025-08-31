@@ -2,7 +2,10 @@ const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 const store = require("../Models/storeModel.js");
-const authenticateToken = require("../tokenauth/authenticateToken.js");
+const {
+  authenticateToken,
+  requireAdmin,
+} = require("../middlewares/middlewares.js");
 const StoreTimeSlot = require("../Models/storeTimeSlotsModel.js");
 const user = require("../Models/userModel.js");
 const Store = require("../Models/storeModel.js");
@@ -57,40 +60,47 @@ router.post("/new", authenticateToken, async (req, res) => {
   }
 });
 
-router.post("/new-store-time-slots", authenticateToken, async (req, res) => {
-  try {
-    const userId = req.user.userId;
-    const dates = req.body.dates;
-    const storeId = req.body._id;
-    const slotsArr = dates.map((slot) => ({
-      date: new Date(slot),
-      storeId: storeId,
-    }));
+router.post(
+  "/new-store-time-slots",
+  authenticateToken,
+  requireAdmin,
+  async (req, res) => {
     try {
-      const savedTimeSlots = await StoreTimeSlot.insertMany(slotsArr, {
-        ordered: false,
-      });
-    } catch (error) {
-      if (error.code !== 11000) {
-        //error code 11000 is duplicate document (it will just not save that specific doc),so we ignore it and let the code keep running
-        throw error;
+      const userId = req.user.userId;
+      const dates = req.body.dates;
+      const storeId = req.body._id;
+      const slotsArr = dates.map((slot) => ({
+        date: new Date(slot),
+        storeId: storeId,
+      }));
+      console.log("slotsArr is:\n", slotsArr);
+      try {
+        const savedTimeSlots = await StoreTimeSlot.insertMany(slotsArr, {
+          ordered: false,
+        });
+      } catch (error) {
+        console.error("error occured:\n", error);
+        if (error.code !== 11000) {
+          //error code 11000 is duplicate document (it will just not save that specific doc),so we ignore it and let the code keep running
+          throw error;
+        }
       }
+      res.status(200);
+      res.json(sendSucessResponse({ message: "added successfully" }));
+    } catch (error) {
+      console.error(
+        "error while trying to save store time slots see log\n",
+        error
+      );
+      res.status(400);
+      res.json(
+        sendRejectedResponse({
+          message: "an error have occured,see logs for more info\n",
+        })
+      );
     }
-    res.status(200);
-    res.json(sendSucessResponse({ message: "added successfully" }));
-  } catch (error) {
-    console.error(
-      "error while trying to save store time slots see log\n",
-      error
-    );
-    res.status(400);
-    res.json(
-      sendRejectedResponse({
-        message: "an error have occured,see logs for more info\n",
-      })
-    );
   }
-});
+);
 
 router.post("/set-new-store-services", authenticateToken, async (req, res) => {
   try {

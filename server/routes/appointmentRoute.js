@@ -4,7 +4,7 @@ const Appointment = require("../Models/appointmentModel.js");
 const StoreTimeSlots = require("../Models/storeTimeSlotsModel.js");
 const Store = require("../Models/storeModel.js");
 const User = require("../Models/userModel.js");
-const authenticateToken = require("../tokenauth/authenticateToken.js");
+const { authenticateToken } = require("../middlewares/middlewares.js");
 const {
   sendSucessResponse,
   sendRejectedResponse,
@@ -64,7 +64,14 @@ router.post("/new", authenticateToken, async (req, res) => {
 
 router.get("/getAvailableAppointment", async (req, res) => {
   try {
-    const { storeId, storeSlug } = req.query;
+    const { storeId, storeSlug, date: timeStamp } = req.query;
+    const startdate = new Date(Number(timeStamp));
+    //js Date automatically moves to next month if day of month<{daySet}
+    const endDate = new Date(
+      startdate.getFullYear(),
+      startdate.getMonth(),
+      startdate.getDate() + 1
+    );
     let store;
     if (storeId) {
       store = await Store.findById(storeId);
@@ -80,6 +87,7 @@ router.get("/getAvailableAppointment", async (req, res) => {
       {
         storeId: store._id,
         takenBy: null,
+        date: { $gte: startdate, $lt: endDate },
       },
       { date: 1, _id: 0 }
     ).sort({ date: 1 });

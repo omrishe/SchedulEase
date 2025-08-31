@@ -36,7 +36,7 @@ export function AdminPanel({ userAuthData, allTimes, _id }) {
   //handles sending store owner time available
   async function handleSetMenuItemBtn(timeArray) {
     const dateObjects = timeArray.map(time => createDateWithTime(time));
-    const response=await setStoreOwnerAvailability(dateObjects,userAuthData.storeID)
+    const response=await setStoreOwnerAvailability(dateObjects,userAuthData.storeId)
     return response;
   }
 

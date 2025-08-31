@@ -5,7 +5,7 @@ const dotenv = require("dotenv").config(); //do not remove!,loads .env and sets 
 const router = express.Router();
 const jwt = require("jsonwebtoken"); //token creation and auth
 const bcrypt = require("bcrypt"); //password hashing
-const authenticateToken = require("../tokenauth/authenticateToken.js");
+const { authenticateToken } = require("../middlewares/middlewares.js");
 const store = require("../Models/storeModel.js");
 const {
   sendSucessResponse,
