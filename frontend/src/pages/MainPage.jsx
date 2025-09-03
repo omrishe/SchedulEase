@@ -79,7 +79,7 @@ function MainPage({
       setLogoutMsg("logged out sucessfully");
       resetUserData();
       setAppointment(
-        {date: "",service: "",storeId:null})
+        {date: new Date(),service: "",storeId:null})
     } else {
       console.log("an error occured");
       setLogoutMsg("an Error occured see log for more info");
@@ -91,54 +91,37 @@ function MainPage({
       {userAuthData.userName ? `welcome ${userAuthData.userName}` : "welcome"}
     </p>
   );
-  const loginElement=<>
-      <button className="loginBtn" onClick={() => navigatePage(`/store/${slug}/login`)}>
+  const userIsNotLoggedInElement=
+  <><button className="loginBtn" onClick={() => navigatePage(`/store/${slug}/login`)}>
         login
       </button>
       <button onClick={() => navigatePage(`/store/${slug}/register`)}>
         dont have a user? Register
-      </button>
-    </>
-    const logoutElement=<button className="logoutBtn" onClick={() => handleLogout()}>
+      </button></>
+    
+    const userIsLoggedInElement=<button className="logoutBtn" onClick={() => handleLogout()}>
       logout
     </button>
-
-  const authControls = userAuthData["userName"] ? (
-    <button className="logoutBtn" onClick={() => handleLogout()}>
-      logout
-    </button>
-  ) : (
-    <>
-      <button className="loginBtn" onClick={() => navigatePage(`/store/${slug}/login`)}>
-        login
-      </button>
-      <button onClick={() => navigatePage(`/store/${slug}/register`)}>
-        dont have a user? Register
-      </button>
-    </>
-  );
 
   return (
     <>
-      <div className="mainWindow">
-        {welcomeMsg}
+      <div className="interactionContainer">
         {/**displays welcome msg if not logged in and welcome userName if logged in */}
-        {/**userAuthData["userName"] ? logoutElement : loginElement*/}
-        {authControls}
+        {welcomeMsg}
+        <div className="navigationBtns">
         {/**displays login/register or logout depending if logged in */}
-        {logoutMsg && <p>{logoutMsg}</p>}
+        {userAuthData["userName"] ? userIsLoggedInElement : userIsNotLoggedInElement}
         {/**logout msg to display after logging out */}
-        {
-          <button onClick={() => navigatePage("AdminPanel")}>
-            admin panel
-          </button>
-        }
+        {logoutMsg && <p>{logoutMsg}</p>}
+        <button onClick={() => navigatePage("AdminPanel")}>admin panel</button>
+        </div>
         <div className="ContactInfoContainer">
-          <button className="whatsappBtn" onClick={openWhatsapp}></button>
-          <button className="phoneBtn" onClick={openPhone}></button>
-          <button className="wazeBtn" onClick={openWaze}></button>
+          <button className="whatsappBtn whatsapp" onClick={openWhatsapp}></button>
+          <button className="phoneBtn phone" onClick={openPhone}></button>
+          <button className="wazeBtn waze" onClick={openWaze}></button>
         </div>
         </div>
+        <div className="appointmentMainWindow">
       <AppointmentSelection
       appointmentInfo={appointmentInfo}
       updateAppointmentInfo={updateAppointmentInfo}
@@ -146,6 +129,7 @@ function MainPage({
       services={services}
       availableTimeSlots={availableTimeSlots}
       ></AppointmentSelection>
+      </div>
     </>
   );
 }

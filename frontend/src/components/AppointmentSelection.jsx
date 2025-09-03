@@ -15,10 +15,10 @@ export function AppointmentSelection({
     const [windowChooser, setWindow] = useState("items");
     console.log("in appointmentSelection appointmentInfo is:\n",appointmentInfo)
 
-    async function handleChooseTimeOnlick(timeArray) {
+    async function handleChooseTimeOnlick(time) {
         try{
         const tempDate = new Date(appointmentInfo.date);
-        const [hours, minutes] = timeArray[0].split(":");
+        const [hours, minutes] = time.split(":");
         tempDate.setHours(hours, minutes);
           const response = await createAppointment(updateAppointmentInfo({ date: tempDate })); //response contains the appointment info
           if (response) {
@@ -32,8 +32,7 @@ export function AppointmentSelection({
       }
 
     return (
-        <>
-          <div className="mainWindow">
+          <div>
             {windowChooser == "items" && (
               <>
                 <MenuItems
@@ -46,37 +45,20 @@ export function AppointmentSelection({
             )}
     
             {windowChooser == "date" && (
-              <>
+              <div>
                 <ChooseDateContainer
-                  updateDate={updateAppointmentInfo}
-                ></ChooseDateContainer>
-                <button
-                  onClick={() => {
-                    setWindow("setAppointment");
-                  }}
-                >
-                  Next
-                </button>
-              </>
-            )}
-    
-            <div className="chooseTimeContainer">
-              {windowChooser == "setAppointment" && (
-                <>
-                  <ChooseTime //display set appointment area
+                    updateDate={updateAppointmentInfo}>
+                </ChooseDateContainer>
+                <ChooseTime //display set appointment area
                     date={appointmentInfo["date"]}
                     availableTimeSlots={availableTimeSlots}
                     maxTimeSelections={1}
                     handleChooseTimeOnlick={handleChooseTimeOnlick}
                   ></ChooseTime>
-                  <button className="backBtn" onClick={() => setWindow("date")}>
-                    Back
-                  </button>
-                </>
-              )}
+              </div>
+            )}
             </div>
-          </div>
-        </>
+          
       );
 
 }

@@ -18,7 +18,7 @@ export default function ChooseDateContainer({ updateDate,date }) {
     locales,
   });
   return (
-    <>
+    <div className="dateContainerMainWindow">
       <Calendar
       date={date}
         localizer={localizer}
@@ -32,6 +32,6 @@ export default function ChooseDateContainer({ updateDate,date }) {
         }
         selectable={true}
       />
-    </>
+    </div>
   );
 }
