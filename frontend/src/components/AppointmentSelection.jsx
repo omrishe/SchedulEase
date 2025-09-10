@@ -32,7 +32,7 @@ export function AppointmentSelection({
       }
 
     return (
-          <div>
+          <div className="appointmentMainWindow">
             {windowChooser == "items" && (
               <>
                 <MenuItems
@@ -43,10 +43,10 @@ export function AppointmentSelection({
                 ></MenuItems>
               </>
             )}
-    
             {windowChooser == "date" && (
-              <div>
+              <div className="setDateContainer">
                 <ChooseDateContainer
+                    date={appointmentInfo.date}
                     updateDate={updateAppointmentInfo}>
                 </ChooseDateContainer>
                 <ChooseTime //display set appointment area

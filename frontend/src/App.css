@@ -7,45 +7,85 @@
   font-family: "Segoe UI", Roboto, sans-serif;
 }
 
-body, html {
+html {
   background: url("/assets/defaultMainWindowBackground.jpg") no-repeat center center fixed;
   background-size: cover;
-  margin: 0;
-  padding: 0;
 }
-
-
 
 /* Main window container */
-.interactionContainer {
-  background: url("/assets/mainWindowPic.jpg") no-repeat center center fixed;
-  max-width: 900px;
-  margin: 0.5rem auto;
-  padding: 0.5rem;
-  background: rgb(219, 219, 219);
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  overflow: hidden;
+.mainPageContainer{
+display: flex;
+flex-direction: column;
+gap: 0.5rem;
+margin: 0.5rem auto;  /* centers contents horizontally */
+max-width: 900px;      /* caps width */
 }
 
-.appointmentMainWindow{
-  max-width: 900px;
-  margin: 0.5rem auto;
-  padding: 0.5rem;
-  background: rgb(219, 219, 219);
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+
+.interactionContainer  {
   display: flex;
   flex-direction: column;
+  background: rgb(219, 219, 219);
+  border-radius: 16px;
+  margin: 0.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   gap: 1.5rem;
-  overflow: hidden;
+}
+
+.appointmentMainWindow {
+  display: flex;
+  flex-direction: column;
+  background:transparent;
+  border-radius: 16px;
+  margin: 0.5rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  gap: 1.5rem;
 }
 
 .dateContainerMainWindow{
-  padding:50px;
+  border-radius: 25px;
+  margin-bottom: 5px;
+  background: rgb(219, 219, 219);
+}
+
+/* The root calendar container */
+.rbc-calendar {
+  border: none !important;
+  color: black !important;
+}
+
+.rbc-month-view .rbc-date-cell > div {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  background: transparent;
+  pointer-events: none;
+}
+
+.rbc-month-view .rbc-date-cell:hover {
+  background-color: rgba(254, 85, 1, 0.1);
+  border-radius: 19px;
+}
+
+.rbc-month-view .rbc-date-cell.daySelected {
+  background-color: rgba(52, 102, 6, 0.1);
+  border-radius: 19px;
+}
+
+/*.rbc-selected > div {
+  background-color: #111826 !important;
+  color: white !important;
+  border-radius: 12px !important;
+}
+*/
+
+.chooseTimeContainer{
+  border-radius: 25px;
+  margin-bottom: 5px;
+  background: rgb(219, 219, 219);
 }
 
 /* Welcome message */
@@ -174,9 +214,6 @@ body, html {
   color: #555;
 }
 
-.dateContainerMainWindow{
-  padding:1rem;
-}
 
 /* Time selection */
 .chooseTimeContainer {
@@ -194,6 +231,7 @@ body, html {
 
 .TimeOptionBtn {
   padding: 0.6rem;
+  margin: 5px;
   border-radius: 8px;
   background: #f87171;
   color: white;
@@ -213,5 +251,4 @@ body, html {
 .NoAvailableAppointmentLabel{
   align-self: first baseline;
   font-size: large;
-
 }

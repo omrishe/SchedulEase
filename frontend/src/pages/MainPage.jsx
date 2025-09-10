@@ -104,7 +104,7 @@ function MainPage({
     </button>
 
   return (
-    <>
+    <div className="mainPageContainer">
       <div className="interactionContainer">
         {/**displays welcome msg if not logged in and welcome userName if logged in */}
         {welcomeMsg}
@@ -121,7 +121,6 @@ function MainPage({
           <button className="wazeBtn waze" onClick={openWaze}></button>
         </div>
         </div>
-        <div className="appointmentMainWindow">
       <AppointmentSelection
       appointmentInfo={appointmentInfo}
       updateAppointmentInfo={updateAppointmentInfo}
@@ -130,7 +129,6 @@ function MainPage({
       availableTimeSlots={availableTimeSlots}
       ></AppointmentSelection>
       </div>
-    </>
   );
 }
 export default MainPage;

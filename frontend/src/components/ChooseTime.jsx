@@ -20,7 +20,7 @@ export default function ChooseTime({
     }
     
   return (
-    <div>
+    <div className="chooseTimeContainer">
     <span>
         Date Selected:{date.toLocaleDateString("en-GB")}{timeSelected && ` at ${timeSelected}`}
       </span>
