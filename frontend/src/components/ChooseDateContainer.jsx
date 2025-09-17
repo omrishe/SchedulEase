@@ -9,22 +9,35 @@ export default function ChooseDateContainer({ updateDate,date }) {
   const locales = {"en-US": enUS,};
   const localizer = dateFnsLocalizer({format,parse,startOfWeek,getDay,locales,});
 
+  function CustomToolbar({ label, onNavigate }) {
   return (
-    <div className="dateContainerMainWindow">
-      <Calendar
+    <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginBottom: "8px" ,marginTop:"8px"}}>
+      <button style={{width:"5%"}} onClick={() => onNavigate("PREV")}>←</button>
+      <span style={{ fontWeight: "bold" }}>{label}</span>
+      <button style={{width:"5%"}} onClick={() => onNavigate("NEXT")}>→</button>
+      <button style={{width:"10%"}} onClick={() => onNavigate("TODAY")}>Today</button>
+    </div>
+  );
+  }
+
+  return (
+      <Calendar className="calendarClass"
       date={date}
         localizer={localizer}
         events={[]}
         startAccessor="start"
         endAccessor="end"
         views={["month"]}
-        style={{ height: "250px", color: "black" }}
+        style={{ height: "250px",width:"100%", color: "black" }}
         selected={date}
         onSelectSlot={(slotinfo) =>{
         updateDate({date:new Date(slotinfo["start"])})}}
         dayPropGetter={(calendarDate)=>({className: calendarDate.getTime() === date.getTime() ? "rbc-date-cell daySelected": "rbc-date-cell"})}
         selectable={true}
+        /*customizes the calendar buttons */
+        components={{toolbar: CustomToolbar}}
+        /*sets so when clicking on button it also moves the calendar and saved date */
+        onNavigate={(newDate) => updateDate({ date: newDate })}
       />
-    </div>
   );
 }

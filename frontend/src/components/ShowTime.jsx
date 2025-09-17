@@ -40,25 +40,21 @@ export default function ChooseTime({
     }}
     
   return (
-    <div className="mainChooseTimeDiv">
-      <span>please choose time</span>
-      <div className="timeOptions">
+    <div className="mainShowTimeContainer">
+      <span style={{fontSize:"large"}}>please choose time</span>
+      <div className="displayTimeContainer">
         {times.map(
-          (
-            timeInput // sets the times user can choose
-          ) => (
+          // sets the times user can choose
+          (timeInput) => 
             <button
               className={`TimeOptionBtn ${timeArray.includes(timeInput) ?"clicked" : ""}`}
               key={timeInput}
               onClick={() => timeBtnSelect(timeInput)}
             >
-              {timeInput}
-            </button>
-          )
-        )}
+            {timeInput} </button>)}
       </div>
       {timeArray && (
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignContent: "flex-end"}}>
           <span>
             Date Selected:{date["date"].toLocaleDateString("en-GB")}{" "}
             {(maxTimeSelections===1 && timeArray[0]) ? `at ${timeArray[0]}`:""}

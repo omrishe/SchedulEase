@@ -1,0 +1,47 @@
+[33mdc63f12[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m worked on css
+[33m916d346[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m worked on site looks
+[33m5d4b35f[m -started general testing -minor bug fixes todo -work on site looks -deploy!
+[33m8639e3c[m -getting available slots is now done, you get the available slots of the day you chose
+[33m34e4acb[m did alot of stuff -services are now fetched from the backend -available appointments are not fetched from the backend (but only for a specific day WIP) -created a new component named appointmentSelection that will include all the chooseTime,ChooseDate and appointment related stuff -removed some obosolete appointmentinfo fields so its now only contains data about the appointment -changed storeID to storeId -cleaned up the code a bit -service chosen is now synchronized to the appointmentinfo -services are now oriented correcly, name on left,price on right and notes below it todo: -make it so each day appointment are sent from the server -continue working on SelectedAppointment component -look at set time slot from admin perspective -work on how the site looks
+[33md0f88e9[m timeslot database (where the timeslots that the owner set) now contain another field which tell if the timeslot is taken and which user uses it started working on fetching appointments from server and some other minor improvements
+[33ma9dd94c[m cumulative update bugs were occuring cause adminPanel is set to accept an array of services to add,it was not implemented to accept more than 1 service yet so it sent an array one 1 service which caused issues so this time i added a fully functioning option to add repeating services forms,atm you can add unlimited services forms in the frontend--to be limited to 10 worked on the backend to fix minor bugs (like changing existingService.serviceName to existingService.name) --atm backend accepts and adds the services to store successfully -todo validation to remove empty services if sent so the other will still be saved to db --validiation on frontend --get appointments and services in the frontend for users
+[33m87b887c[m worked a bit on the schemas
+[33m6d3b8cb[m did a little work, didnt finish started adding services todo -make frontend get appointments -make services into an array in frontend (when you add more than 1 service at the time)
+[33med0321f[m finished with frontend consistant response pattern everything works now started working on add service for admin panel todo finish the admin panel and make frontend get the available appointments
+[33m169fa4e[m added two new helper functions to make responses pattern consistant: sendSucessResponse for success responses sendRejectedResponse for rejected responses all backend responses now use those function to make consistant responses //todo-work on frontend to accept the new patterns,make available services loaded from the backend
+[33m9935e7f[m appointments are now saved in database with storeID,created a util folder containing future helper functions,cleaned a bit of the code todo: -use the new helper function serilizeResponse to make response consistant across all responses -make frontend pull the available free appointment slots
+[33mbfa67c1[m Added a new schema for saving each owner time that he is free,adding new time free is now working as intended in admin Panel added reference storeID to users and owner timeSlots that tie them to the store that they belong so now they are tied together todo:work on backend response pattern(make a global function to deal with responses) make it so the server gets the free slots from the store make appointments also tied to storeID --good day alot was done --- bugs fixed
+[33m8bd2431[m set superAdmin page(its hidden without navigation inpurpose) to create new stores,,set individual stores link so now each store has its own link (for example:https://localhost:5173/store/omris-barbershop/login),todo:finish with adminpanel
+[33m67294f2[m .
+[33me0bd93d[m choosetime and chooseDatecontainer are now standalone and are reused,fixed the issue with authdata not updating, buttons now highlight and unhighlight instead of showing which times are chosen and more
+[33m06fce08[m to do fix the name mismatch
+[33m59e2158[m worked a bit on admin Page
+[33mfda2cfc[m fixed a bug where if the token expires the userdata doesnt get deleted
+[33m006ea07[m minor changes
+[33m4bc4f3c[m readded readme.md
+[33med7e67c[m started working on store collection todo finish get storeinfo,adminsetstoreinfo and setAnnouncement
+[33m676b434[m fixed render not working after back button,started admin page where the admin can add the time he is available todo//finish it and also add view all meetings for admin
+[33m09cc3cc[m //todo make it so the ui refreshes on back brown button press
+[33m6403867[m userdata is now stored in localstorage //todo *keep working on displaying from localstorage *keep working on logout button that deletes cookies(the deletion works) just work on displaying it correctly
+[33m0b5e1ee[m added auth useState to app.jsx //todo make it stay in back button press and if that doesnt work add it to sessioncache
+[33m45ce434[m added 2 new pages,login and register and made them work,added a new default page which routes 3 pages (mainpage which was app.jsx the mainpage,register and login) finally set date with time as js object and not seperetly which works todo either uplift appointmentinfo or do this with userData
+[33m88cf882[m seperated signup component from login component and both are working,todo:works on css so only 1 works at the time in a click of a button
+[33mab9642a[m cookies now work, it will remember the user after login and also authenticate the password that in db,todo frontend
+[33mbd8d9d7[m started cookies
+[33m1a63013[m token works,registering and loggin in done, todo:work on login window to look better and combine token with appointment
+[33m7927e16[m hashing passwords done,creating users is working todo login
+[33mceb890a[m started working on login/signup window backend
+[33md5e8aad[m added a new component for login,started but not done yet
+[33m18a69ba[m added params file to clear code,succesfully connected and saved in mongodb database,server side works aswell #todo:add remove,encryption,register,login and more
+[33m1434672[m reorganized folders in project
+[33m90cc694[m continue backend,need to add db url to test
+[33m65dfa36[m started db,made successfully connection to backend
+[33mc7f088d[m started backend
+[33m59553dc[m worked on frontend more in preperation for backend,next update should be work done on backend
+[33md97d8ab[m added
+[33m7a655a1[m Merge branch 'main' of https://github.com/omrishe/SchedulEase merged for first commit
+[33mb588ab6[m Delete README.md
+[33m60ce848[m start
+[33ma98abfc[m added date component and fixed some issues
+[33m9a67414[m . commit
+[33m6171403[m Initial commit

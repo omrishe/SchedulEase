@@ -57,22 +57,19 @@ function handleInputChange(e,formId) {
     setFormaData((prev) => prev.map((svc)=> svc.formId===formId ? {...svc, [e.target.name] : e.target.value} : svc));
   }
 
-  return userAuthData.role === "admin" ? (
+  return userAuthData.role !== "admin" ? <p>forbidden</p> :
     <div className="AdminPanelMainDiv">
       <p>welcome Admin</p>
       <div className="calanderDiv">
       <ChooseDateContainer updateDate={updateDate} date={date}></ChooseDateContainer>
       <ShowTime times={allTimes} date={{date : date}} maxTimeSelections={maxTimeSelections} handleChooseTimeOnlick={handleSetMenuItemBtn}></ShowTime>
     </div>
+    <button onClick={addAnotherServiceForm}>Add new service form</button>
     <form className="form" onSubmit={addService}>
       {formData.map((formValues)=>(<ServiceForm key={formValues.formId} className={"singleForm"} formValues={formValues} handleInputChange={handleInputChange}></ServiceForm>)
         )}
         <button type="submit">add new service</button>
     </form>
-    <button onClick={addAnotherServiceForm}>Add service</button>
     {message?? <label>{message}</label>}
     </div>
-  ) : (
-    <p>forbidden</p>
-  );
 }

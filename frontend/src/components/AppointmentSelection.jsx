@@ -52,7 +52,6 @@ export function AppointmentSelection({
                 <ChooseTime //display set appointment area
                     date={appointmentInfo["date"]}
                     availableTimeSlots={availableTimeSlots}
-                    maxTimeSelections={1}
                     handleChooseTimeOnlick={handleChooseTimeOnlick}
                   ></ChooseTime>
               </div>
