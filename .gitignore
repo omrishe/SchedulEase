@@ -8,3 +8,4 @@ cert/
 *.key
 localhost*
 README.MD
+template.yaml

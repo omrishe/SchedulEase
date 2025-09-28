@@ -1,5 +1,16 @@
 {
   "dependencies": {
     "uuid": "^11.1.0"
-  }
+  },
+  "name": "schedulease",
+  "version": "1.0.0",
+  "description": "React-based web application that allows users to schedule and manage appointments",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

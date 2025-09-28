@@ -1,8 +1,10 @@
 import { sendRejectedResponse } from "../utils/responseHandler.js";
-const serverAddress = "https://localhost:5000";
+import { serverAddress as baseServerAddress } from "../params.json";
+const serverAddress = baseServerAddress + "/api/appointments";
+
 export async function createAppointment(appointmentInfo) {
   try {
-    const response = await fetch(`${serverAddress}/api/appointments/new`, {
+    const response = await fetch(`${serverAddress}/new`, {
       method: "post",
       headers: {
         "Content-Type": "application/json",
@@ -32,12 +34,12 @@ export async function getAvailableAppointments(storeIdentifier, date) {
     //sets it so if already logged in send the storeId and if not we send the store Slug
     console.log("store identifier is:\n", storeIdentifier);
     console.log("date is:\n", date);
+    console.log("date in numbers is:\n", date.getTime());
     const query = storeIdentifier.storeId
       ? `storeId=${storeIdentifier.storeId}&date=${date.getTime()}`
       : `storeSlug=${storeIdentifier.storeSlug}&date=${date.getTime()}`;
-    console.log("query is:\n", query);
     const response = await fetch(
-      `${serverAddress}/api/appointments/getAvailableAppointment?${query}`,
+      `${serverAddress}/getAvailableAppointment?${query}`,
       {
         method: "GET",
         headers: {
@@ -70,16 +72,13 @@ export async function getAvailableAppointments(storeIdentifier, date) {
 
 export async function fetchAllAppointment() {
   try {
-    const response = await fetch(
-      `${serverAddress}/api/appointments/getAllAppointments`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      }
-    );
+    const response = await fetch(`${serverAddress}/getAllAppointments`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    });
     if (response.ok) {
       const allAppointment = await response.json();
       console.log(allAppointment);

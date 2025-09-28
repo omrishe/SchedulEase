@@ -106,6 +106,10 @@ router.get("/getAvailableAppointment", async (req, res) => {
       takenBy: null,
       date: { $gte: startdate, $lt: endDate },
     });
+    console.log("availableSlots is:", availableSlots);
+    console.log("date in numbers is:", timeStamp);
+    console.log("end date is:", endDate);
+    console.log("start date is:", startdate);
     return res.json(
       sendSucessResponse({
         message: "successfully fetched appointments",

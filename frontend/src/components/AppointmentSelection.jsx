@@ -5,6 +5,7 @@ import ChooseTime from "./ChooseTime.jsx";
 import {createAppointment} from "../api/appointments.js";
 import { sendRejectedResponse } from "../utils/responseHandler.js";
 
+
 export function AppointmentSelection({
     appointmentInfo,
     updateAppointmentInfo,

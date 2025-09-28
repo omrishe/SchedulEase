@@ -1,14 +1,15 @@
 import { sendRejectedResponse } from "../utils/responseHandler.js";
+import { serverAddress as baseServerAddress } from "../params.json";
+const serverAddress = baseServerAddress + "/api/auth";
 
 /**
  * signup api function sends data to server
  * -HTTP errors are caught if !response.ok
  * -other errors like .json or network issues are caught in the catch(error)
  */
-const serverAddress = "https://localhost:5000";
 export async function signup(formData) {
   try {
-    const response = await fetch(`${serverAddress}/api/auth/signup`, {
+    const response = await fetch(`${serverAddress}/signup`, {
       method: "post",
       headers: {
         "Content-Type": "application/json",
@@ -37,7 +38,7 @@ export async function signup(formData) {
  */
 export async function userLogIn(formData) {
   try {
-    const response = await fetch(`${serverAddress}/api/auth/login`, {
+    const response = await fetch(`${serverAddress}/login`, {
       method: "post",
       headers: {
         "Content-Type": "application/json",
@@ -67,7 +68,7 @@ export async function userLogIn(formData) {
  */
 export async function validateToken() {
   try {
-    const response = await fetch(`${serverAddress}/api/auth/validateToken`, {
+    const response = await fetch(`${serverAddress}/validateToken`, {
       method: "get",
       credentials: "include",
     });
@@ -87,7 +88,7 @@ export async function validateToken() {
 
 export async function logout() {
   try {
-    const response = await fetch(`${serverAddress}/api/auth/logout`, {
+    const response = await fetch(`${serverAddress}/logout`, {
       method: "post",
       headers: {
         "Content-Type": "application/json",

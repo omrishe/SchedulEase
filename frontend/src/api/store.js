@@ -1,6 +1,7 @@
 import { sendRejectedResponse } from "../utils/responseHandler.js";
+import { serverAddress as baseServerAddress } from "../params.json";
+const serverAddress = baseServerAddress + "/api/store";
 
-const serverAddress = "https://localhost:5000/api/store";
 export function adminSetServices() {
   return;
 }
