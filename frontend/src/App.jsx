@@ -6,11 +6,9 @@ import Login from "./pages/Login.jsx"
 import Register from "./pages/Register.jsx";
 import { validateToken } from "./api/auth.js";
 import { AdminPanel } from "./pages/AdminPanel.jsx";
-import params from "./params.json";
 import SuperAdminPanel from "./pages/SuperAdminPanel.jsx";
 
 function App() {
-  const { times } = params;
   const [userAuthData, setUserAuthData] = useState({
     userId: localStorage.getItem("userId"),
     userName: localStorage.getItem("userName"),
@@ -30,7 +28,6 @@ function App() {
     }
   }
 
-  console.log("in app.jsx", userAuthData);
 
   function resetUserData() {
     setUserAuthData({
@@ -77,7 +74,6 @@ function App() {
             <MainPage
               userAuthData={userAuthData}
               resetUserData={resetUserData}
-              times={times}
             ></MainPage>
           }
         ></Route>
@@ -96,7 +92,6 @@ function App() {
           element={
             <AdminPanel
               userAuthData={userAuthData}
-              allTimes={params.allTimes}
             ></AdminPanel>
           }
         ></Route>

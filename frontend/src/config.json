@@ -24,5 +24,5 @@
     "21:30",
     "22:00"
   ],
-  "serverAddress":"https://kuchydnnhi.execute-api.eu-central-1.amazonaws.com/Prod"
+  "serverAddress":"http://127.0.0.1:3000"
 }

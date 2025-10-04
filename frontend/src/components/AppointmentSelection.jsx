@@ -10,7 +10,8 @@ export function AppointmentSelection({
     appointmentInfo,
     updateAppointmentInfo,
     availableTimeSlots,
-    services
+    services,
+    setAvailableTimeSlots
 })
 {
     const [windowChooser, setWindow] = useState("items");
@@ -22,7 +23,9 @@ export function AppointmentSelection({
         const [hours, minutes] = time.split(":");
         tempDate.setHours(hours, minutes);
           const response = await createAppointment(updateAppointmentInfo({ date: tempDate })); //response contains the appointment info
-          if (response) {
+          if (response.isSuccess) {
+            setAvailableTimeSlots(
+            availableTimeSlots.filter(slot => slot !== time));
             return response;
           }
         } catch (error) {
@@ -54,6 +57,7 @@ export function AppointmentSelection({
                     date={appointmentInfo["date"]}
                     availableTimeSlots={availableTimeSlots}
                     handleChooseTimeOnlick={handleChooseTimeOnlick}
+                    appointmentInfo={appointmentInfo}
                   ></ChooseTime>
               </div>
             )}

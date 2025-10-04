@@ -1,5 +1,5 @@
 import { sendRejectedResponse } from "../utils/responseHandler.js";
-import { serverAddress as baseServerAddress } from "../params.json";
+const baseServerAddress = import.meta.env.VITE_SERVER_ADDRESS;
 const serverAddress = baseServerAddress + "/api/appointments";
 
 export async function createAppointment(appointmentInfo) {
@@ -33,8 +33,27 @@ export async function getAvailableAppointments(storeIdentifier, date) {
   try {
     //sets it so if already logged in send the storeId and if not we send the store Slug
     console.log("store identifier is:\n", storeIdentifier);
-    console.log("date is:\n", date);
-    console.log("date in numbers is:\n", date.getTime());
+    const todaysDate = new Date();
+    //check if the date selected is today if it is send it with the time currently to show only dates that are after this hour
+    //otherwise Reset hours and minutes to show the whole day
+    if (
+      date.getFullYear() === todaysDate.getFullYear() &&
+      date.getMonth() === todaysDate.getMonth() &&
+      date.getDate() === todaysDate.getDate()
+    ) {
+      //sets it so it sends the time from now
+      date = new Date();
+      date = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        date.getHours(),
+        date.getMinutes()
+      );
+    } else {
+      //resets date hours and seconds
+      date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
     const query = storeIdentifier.storeId
       ? `storeId=${storeIdentifier.storeId}&date=${date.getTime()}`
       : `storeSlug=${storeIdentifier.storeSlug}&date=${date.getTime()}`;

@@ -67,10 +67,6 @@ max-width: 900px;      /* caps width */
   align-items: center;
   justify-items: center;
 }
-.rbc-button-link{
-  pointer-events: none;
-  
-}
 
 .chooseTimeContainer{
   border-radius: 25px;
@@ -198,6 +194,11 @@ max-width: 900px;      /* caps width */
   color: #16a34a;
 }
 
+.adminPanelServicesContainer{
+  display: grid;
+  column-gap: 50px;
+}
+
 .serviceNote {
   font-size: 14px;
   justify-self:start;
@@ -216,6 +217,7 @@ max-width: 900px;      /* caps width */
   gap: 5px;
   margin-top: 1rem; 
 }
+
 .TimeOptionBtn {
   margin: 4px;
   height: 30px;
@@ -227,8 +229,6 @@ max-width: 900px;      /* caps width */
   border: none;
   transition: background 0.2s;
 }
-
-
 
 .TimeOptionBtn:hover {
   background: #ef4444;

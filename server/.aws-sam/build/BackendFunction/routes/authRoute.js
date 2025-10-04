@@ -1,6 +1,6 @@
 //server interaction
 const express = require("express");
-const auth = require("../Models/userModel.js");
+const Users = require("../Models/userModel.js");
 const dotenv = require("dotenv").config(); //do not remove!,loads .env and sets it in process.env
 const router = express.Router();
 const jwt = require("jsonwebtoken"); //token creation and auth
@@ -16,15 +16,16 @@ const {
 router.post("/signup", async (req, res) => {
   try {
     const { email, password, storeSlug, ...otherData } = req.body;
+    //fetch storeId based on url
     const fetchedStore = await store.findOne({ storeSlug: storeSlug });
     storeId = fetchedStore._id;
-    if (await auth.findOne({ email: email, _id: storeId })) {
+    if (await Users.findOne({ email: email, _id: storeId })) {
       throw new Error("email already exists");
     }
     otherData.role = "user";
     const saltrounds = 10; // move this into params file
     hashedPassword = await bcrypt.hash(password, saltrounds);
-    const signupData = new auth({
+    const signupData = new Users({
       email,
       storeId: storeId,
       hashedPassword,
@@ -60,7 +61,7 @@ router.post("/login", async (req, res) => {
     if (!storeData) {
       throw new Error("no store found");
     }
-    const userData = await auth.findOne({
+    const userData = await Users.findOne({
       email: req.body.email,
       storeId: storeData._id,
     });
@@ -79,7 +80,7 @@ router.post("/login", async (req, res) => {
     res.cookie("loginToken", token, {
       httpOnly: true,
       secure: true,
-      samesite: "None", //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!change this when deploying the server!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      samesite: "None",
       maxAge: 12 * 60 * 60 * 1000, //12 hours life of token cookie
     });
     const { _id, name, createdAt, updatedAt, hashedPassword, __v, ...data } =

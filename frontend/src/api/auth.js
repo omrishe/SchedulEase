@@ -1,7 +1,7 @@
 import { sendRejectedResponse } from "../utils/responseHandler.js";
-import { serverAddress as baseServerAddress } from "../params.json";
+const baseServerAddress = import.meta.env.VITE_SERVER_ADDRESS;
 const serverAddress = baseServerAddress + "/api/auth";
-
+console.log("serveraddress is:", serverAddress);
 /**
  * signup api function sends data to server
  * -HTTP errors are caught if !response.ok

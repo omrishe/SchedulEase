@@ -1,13 +1,40 @@
+//handles store-related requests
 import { sendRejectedResponse } from "../utils/responseHandler.js";
-import { serverAddress as baseServerAddress } from "../params.json";
+const baseServerAddress = import.meta.env.VITE_SERVER_ADDRESS;
 const serverAddress = baseServerAddress + "/api/store";
 
 export function adminSetServices() {
   return;
 }
-export function adminDelService() {
-  //might delete
-  return;
+export async function adminDelService(serviceToDelId, storeId) {
+  try {
+    if (!(serviceToDelId && storeId)) {
+      throw new Error("service/store id  is missing");
+    }
+    const response = await fetch(
+      `${serverAddress}/delete-services?serviceId=${serviceToDelId}&storeId=${storeId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
+    const data = await response.json();
+    if (!response.ok) {
+      return data;
+    } else {
+      console.log(data);
+      return data;
+    }
+  } catch (error) {
+    console.log("error:", error);
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
+  }
 }
 
 export async function createStore(storeInfo) {
@@ -86,6 +113,7 @@ export async function addServiceToStore(authData, formData) {
     });
   }
 }
+
 export async function getStoreServices(storeIdentifier) {
   try {
     //sets it so if already logged in send the storeId and if not we send the store Slug

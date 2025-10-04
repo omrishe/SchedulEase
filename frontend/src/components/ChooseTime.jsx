@@ -3,14 +3,21 @@ export default function ChooseTime({
   date,
   availableTimeSlots,
   handleChooseTimeOnlick,
+  appointmentInfo
 }) {
   const [response, setResponse] = useState();
   console.log("availabletimeslot is:\n",availableTimeSlots)
   const [timeSelected,SetTimeSelected]=useState("")
 
   async function submitSelectedTime() {
+    if(appointmentInfo.storeId)
+    {
     const serverResponse = await handleChooseTimeOnlick(timeSelected);
     setResponse(serverResponse.message);
+    }
+    else{
+      setResponse("not logged in");
+    }
   }
 
   function timeBtnSelect(timeInput){
@@ -26,7 +33,7 @@ export default function ChooseTime({
       </span>
       {!timeSelected && <span> please choose time</span>}
       <div className="timeOptions">
-    {availableTimeSlots.length > 0 ? (
+    {availableTimeSlots?.length > 0 ? (
         <>{availableTimeSlots.map((timeInput) => (
             <button
               className={`TimeOptionBtn ${

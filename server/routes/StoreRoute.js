@@ -101,50 +101,60 @@ router.post(
   }
 );
 
-router.post("/set-new-store-services", authenticateToken, async (req, res) => {
-  try {
-    const { authData, formData } = req.body;
-    const userData = await user.findById(authData.userId);
-    //makes sure the user is admin
-    if (userData.role != "admin") {
-      throw new Error("invalid auth");
+router.post(
+  "/set-new-store-services",
+  authenticateToken,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const { authData, formData } = req.body;
+      const userData = await user.findById(authData.userId);
+      //makes sure the user is admin
+      if (userData.role != "admin") {
+        throw new Error("invalid auth");
+      }
+      const storeToUpdate = await store.findById(userData.storeId);
+      if (!storeToUpdate) {
+        throw new Error("store does not exist");
+      }
+      const storeExistingServices = storeToUpdate.services;
+      console.log("formData recieved:\n", formData);
+      //filter empty and duplicate services names that already exist in the services at the store --basically prevent duplicates
+      const filteredServices = formData.filter(
+        (formDataService) =>
+          !storeExistingServices.some(
+            (existingService) =>
+              existingService.name === formDataService.name ||
+              formDataService.name === "" ||
+              !formDataService.name ||
+              formDataService.price === "" ||
+              !formDataService.price
+          )
+      );
+      console.log("filtered is:\n", filteredServices);
+      storeToUpdate.services.push(
+        ...filteredServices.map((svc) => storeToUpdate.services.create(svc))
+      );
+      //saves the new services to the store service schema
+      const added = await storeToUpdate.save();
+      console.log(added);
+      res
+        .status(200)
+        .json(sendSucessResponse({ message: "added successfully" }));
+    } catch (error) {
+      console.error(
+        "error while trying to save store time slots see log",
+        error
+      );
+      res.status(400);
+      res.json(
+        sendRejectedResponse({
+          message: "an error have occured,see logs for more info",
+        })
+      );
     }
-    const storeToUpdate = await store.findById(userData.storeId);
-    if (!storeToUpdate) {
-      throw new Error("store does not exist");
-    }
-    const storeExistingServices = storeToUpdate.services;
-    console.log("formData recieved:\n", formData);
-    //filter empty and duplicate services names that already exist in the services at the store --basically prevent duplicates
-    const filteredServices = formData.filter(
-      (formDataService) =>
-        !storeExistingServices.some(
-          (existingService) =>
-            existingService.name === formDataService.name ||
-            formDataService.name === "" ||
-            !formDataService.name ||
-            formDataService.price === "" ||
-            !formDataService.price
-        )
-    );
-    console.log("filtered is:\n", filteredServices);
-    storeToUpdate.services.push(
-      ...filteredServices.map((svc) => storeToUpdate.services.create(svc))
-    );
-    //saves the new services to the store service schema
-    const added = await storeToUpdate.save();
-    console.log(added);
-    res.status(200).json(sendSucessResponse({ message: "added successfully" }));
-  } catch (error) {
-    console.error("error while trying to save store time slots see log", error);
-    res.status(400);
-    res.json(
-      sendRejectedResponse({
-        message: "an error have occured,see logs for more info",
-      })
-    );
   }
-});
+);
 
 router.get("/getServices", async (req, res) => {
   console.log("got in\n\n\n\n\n\n\n");
@@ -168,10 +178,11 @@ router.get("/getServices", async (req, res) => {
       name: service.name,
       price: service.price,
       serviceNote: service.serviceNote,
+      srvId: service._id,
     }));
     return res.json(
       sendSucessResponse({
-        message: "successfully fetched appointments",
+        message: "successfully fetched services",
         otherData: servicesToSend,
       })
     );
@@ -190,5 +201,44 @@ router.get("/getServices", async (req, res) => {
     return res.status(400).json(sendRejectedResponse());
   }
 });
+
+router.delete(
+  "/delete-services",
+  authenticateToken,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const { serviceId, storeId } = req.query;
+      const store = await Store.findByIdAndUpdate(
+        storeId,
+        {
+          $pull: { services: { _id: serviceId } },
+        },
+        { new: true }
+      );
+      const servicesToSend = store.services.map((service) => ({
+        name: service.name,
+        price: service.price,
+        serviceNote: service.serviceNote,
+        srvId: service._id,
+      }));
+      res.status(200);
+      res.json(
+        sendSucessResponse({
+          message: "service successfully deleted",
+          otherData: servicesToSend,
+        })
+      );
+    } catch (error) {
+      console.error("an error occured while trying to alter store data", error);
+      res.status(400);
+      res.json(
+        sendRejectedResponse({
+          message: "an error occured while trying to alter store data",
+        })
+      );
+    }
+  }
+);
 
 module.exports = router;

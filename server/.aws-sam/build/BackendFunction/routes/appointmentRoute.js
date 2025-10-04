@@ -14,7 +14,6 @@ const router = express.Router();
 router.post("/new", authenticateToken, async (req, res) => {
   try {
     const { appointmentInfo: appointmentData } = req.body;
-    console.log("req.body is:\n", req.body);
     const userId = req.user.userId; //get the userId by the token (authenticateToken passes userId)
     const { email, userName } =
       (await User.findById(userId, { email: 1, userName: 1, _id: 0 })) || {};
@@ -28,7 +27,6 @@ router.post("/new", authenticateToken, async (req, res) => {
     appointmentData.date.setMilliseconds(0);
     appointmentData.date.setSeconds(0);
     const newAppointment = new Appointment(appointmentData); //recieves the data sent and create an appointment doc
-    console.log("appointment is:\n", appointmentData);
     const storeTimeSlot = await StoreTimeSlots.findOne({
       storeId: appointmentData.storeId,
       date: appointmentData.date,
@@ -39,11 +37,10 @@ router.post("/new", authenticateToken, async (req, res) => {
     storeTimeSlot.takenBy = userId; //sets the timeSlot as taken by user
     await newAppointment.save(); //saves the data to database -- mongoose automatically convert string date to js date
     await storeTimeSlot.save(); //saves the new timeslot
-    const newStoreTimeSlot = await StoreTimeSlots.findOne({
+    const newStoreTimeSlots = await StoreTimeSlots.findOne({
       storeId: appointmentData.storeId,
       date: appointmentData.date,
     });
-    console.log("new time slot is is:\n", newStoreTimeSlot);
     return res.status(201).json(
       sendSucessResponse({
         message: "added appointment successfully",
@@ -74,10 +71,13 @@ router.get("/getAvailableAppointment", async (req, res) => {
     const { storeId, storeSlug, date: timeStamp } = req.query;
     const startdate = new Date(Number(timeStamp));
     //js Date automatically moves to next month if day of month<{daySet}
+    //sets is so its exactly 1 day
     const endDate = new Date(
       startdate.getFullYear(),
       startdate.getMonth(),
-      startdate.getDate() + 1
+      startdate.getDate() + 1,
+      startdate.getHours(),
+      startdate.getMinutes()
     );
     let store;
     if (storeId) {
@@ -101,15 +101,14 @@ router.get("/getAvailableAppointment", async (req, res) => {
     ).sort({ date: 1 });
     //availableSlots is an array of object containing dates,this line transforms it into array of dates
     const availableSlotsArr = availableSlots.map((slot) => slot.date);
-    console.log("querying is :", {
+    console.log("querying is:\n", {
       storeId: store._id,
       takenBy: null,
       date: { $gte: startdate, $lt: endDate },
     });
-    console.log("availableSlots is:", availableSlots);
-    console.log("date in numbers is:", timeStamp);
-    console.log("end date is:", endDate);
-    console.log("start date is:", startdate);
+    console.log("start day is:\n", startdate);
+    console.log("end day is:\n", endDate);
+    console.log("availableSlotsArr is:\n", availableSlotsArr);
     return res.json(
       sendSucessResponse({
         message: "successfully fetched appointments",

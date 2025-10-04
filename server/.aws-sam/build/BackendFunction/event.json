@@ -1,8 +1,0 @@
-{
-  "httpMethod": "GET",
-  "path": "/api/test",
-  "headers": {},
-  "queryStringParameters": {},
-  "body": null,
-  "isBase64Encoded": false
-}

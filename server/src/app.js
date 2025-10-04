@@ -11,10 +11,26 @@ const cookieParser = require("cookie-parser");
 const { isDatabaseConnected } = require("../middlewares/middlewares");
 
 const app = express();
-//sets to allow all origins, to add specific origin write eg:(:"http://localhost:5173")
+const allowedOrigins = [
+  "https://localhost:5173", // development npm run dev
+  "http://localhost:4173", // development npm run preview
+  "https://d4finm2krx1ce.cloudfront.net", // production -cloudfront
+];
+
 app.use(
   cors({
-    origin: "https://localhost:5173",
+    origin: (origin, callback) => {
+      // allow requests with no origin (non browser requests)
+      if (!origin) {
+        return callback(null, true);
+      }
+      if (allowedOrigins.includes(origin)) {
+        // origin is in allowed origins list
+        callback(null, true);
+      } else {
+        callback(new Error("origin not allowed in the allowed list"));
+      }
+    },
     credentials: true,
   })
 );

@@ -4,6 +4,7 @@ import { getStoreServices } from "../api/store";
 import { logout } from "../api/auth.js";
 import { AppointmentSelection } from "../components/AppointmentSelection.jsx";
 import { getAvailableAppointments } from "../api/appointments.js";
+
 function MainPage({
   userAuthData,
   resetUserData,
@@ -19,12 +20,10 @@ function MainPage({
   const [logoutMsg, setLogoutMsg] = useState();
   const [availableTimeSlots,setAvailableTimeSlots]=useState(["loading"])
   const [services,setServices]=useState(["loading"])
-  console.log("in mainpage appointmentinfo is:",appointmentInfo)
 
   //gets store available appointments
   useEffect(()=> {
   async function getAvailableSlots(date){
-    console.log("appointmentInfo.storeId is:\n",appointmentInfo.storeId)
   const serverResponse=await getAvailableAppointments(
     appointmentInfo.storeId ? {storeId:appointmentInfo.storeId} : {storeSlug:slug},
     date)
@@ -34,7 +33,6 @@ function MainPage({
   if(appointmentInfo.date){
     //create a new date only with day,month and year (no hours or seconds)
   const date=new Date(appointmentInfo.date.getFullYear(),appointmentInfo.date.getMonth(),appointmentInfo.date.getDate())
-  console.log("date is:",date)
   getAvailableSlots(date)
   }},[appointmentInfo.date])
 
@@ -113,7 +111,7 @@ function MainPage({
         {userAuthData["userName"] ? userIsLoggedInElement : userIsNotLoggedInElement}
         {/**logout msg to display after logging out */}
         {logoutMsg && <p>{logoutMsg}</p>}
-        <button onClick={() => navigatePage("AdminPanel")}>admin panel</button>
+        {userAuthData.role=="admin" && <button onClick={() => navigatePage("AdminPanel")}>admin panel</button>}
         </div>
         <div className="ContactInfoContainer">
           <button className="whatsappBtn whatsapp" onClick={openWhatsapp}></button>
@@ -127,6 +125,7 @@ function MainPage({
       slug={slug}
       services={services}
       availableTimeSlots={availableTimeSlots}
+      setAvailableTimeSlots={setAvailableTimeSlots}
       ></AppointmentSelection>
       </div>
   );

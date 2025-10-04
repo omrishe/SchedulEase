@@ -1,28 +1,42 @@
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useMemo, useState } from "react";
+import {  useState,useEffect } from "react";
 import ShowTime from "../components/ShowTime";
 import ChooseDateContainer from "../components/ChooseDateContainer";
-import { setStoreOwnerAvailability,addServiceToStore } from "../api/store";
+import { setStoreOwnerAvailability,addServiceToStore,getStoreServices,adminDelService } from "../api/store";
 import { ServiceForm } from "../components/serviceForm";
-import { v4 as uuidv4 } from "uuid";
-export function AdminPanel({ userAuthData, allTimes, _id }) {
+import { v4 as uuidv4 } from "uuid"
+import config from "../config.json"
+
+export function AdminPanel({ userAuthData }) {
   const [formData,setFormaData]=useState([{
     formId:uuidv4(),
     name:"",
     price:"",
     serviceNote:""
   }])
-
+  
+  const storeOpenHours=config.storeOpenHours;
   const [message,setMessage]=useState("")
   const [date,setDate]=useState(new Date());
+  const [storeSrv,setStoreSvc]=useState([])
+  const [serviceSelected,setServiceSelected]=useState()
+  const [serviceBtnText,setServiceBtnText]=useState("")
   const maxTimeSelections=24;
 
-  //runs only on component mounts and init the value for date to current date
-  const  defaultDate  = useMemo(() => new Date(),[]);
   //a helper function to set date
   async function updateDate(dateClicked){
     setDate(dateClicked["date"]);
   }
+
+  useEffect(()=> {
+    async function getServices(){
+      console.log("storeid is:",userAuthData.storeId)
+    const serverResponse=await getStoreServices(userAuthData)
+      if(serverResponse.isSuccess){
+        setStoreSvc(serverResponse.otherData)
+      }}
+    getServices()
+    },[])
 
   //handles sending store owner time available
   async function handleSetMenuItemBtn(timeArray) {
@@ -44,6 +58,7 @@ export function AdminPanel({ userAuthData, allTimes, _id }) {
     setMessage(response.message)
     return;
   }
+
   function addAnotherServiceForm(){
     setFormaData((prev)=>[...prev,{
     formId:uuidv4(),
@@ -53,23 +68,61 @@ export function AdminPanel({ userAuthData, allTimes, _id }) {
   }])
   }
 
+  function onServiceClicked(service){
+    if(serviceSelected?.srvId === service.srvId){
+    setServiceSelected()
+    }else{
+    setServiceSelected(service)
+    }
+  }
+
 function handleInputChange(e,formId) {
     setFormaData((prev) => prev.map((svc)=> svc.formId===formId ? {...svc, [e.target.name] : e.target.value} : svc));
   }
+async function deleteSelectedService(){
+  console.log("sending delete with: serviceId:",serviceSelected.srvId,"storeid:",userAuthData.storeId)
+  const serverResponse=await adminDelService(serviceSelected.srvId,userAuthData.storeId)
+  console.log(serverResponse)
+  if(serverResponse.isSuccess){
+    console.log("in")
+        setStoreSvc(serverResponse.otherData)
+        setMessage(serverResponse.message)
+      }}
+
 
   return userAuthData.role !== "admin" ? <p>forbidden</p> :
     <div className="AdminPanelMainDiv">
       <p>welcome Admin</p>
       <div className="calanderDiv">
       <ChooseDateContainer updateDate={updateDate} date={date}></ChooseDateContainer>
-      <ShowTime times={allTimes} date={{date : date}} maxTimeSelections={maxTimeSelections} handleChooseTimeOnlick={handleSetMenuItemBtn}></ShowTime>
+      <ShowTime times={storeOpenHours} date={{date : date}} maxTimeSelections={maxTimeSelections} handleChooseTimeOnlick={handleSetMenuItemBtn}></ShowTime>
     </div>
-    <button onClick={addAnotherServiceForm}>Add new service form</button>
+    <label>Store Services</label>
+    <div className="adminPanelServicesContainer">
+    <div className="scrollableMenu">
+        {storeSrv.map((service) => (
+            <button key={service.srvId}
+              className="serviceBtn"
+              onClick={() => onServiceClicked((service))}>
+              <span className="serviceName">{service.name}</span>
+              <span className="servicePrice">{service.price}</span>
+              <span className="serviceNote">{service.serviceNote}</span>
+            </button>
+        ))}
+      </div>
+      {serviceSelected && <button onClick={deleteSelectedService}>delete service</button>}
+      <div>
+    
     <form className="form" onSubmit={addService}>
-      {formData.map((formValues)=>(<ServiceForm key={formValues.formId} className={"singleForm"} formValues={formValues} handleInputChange={handleInputChange}></ServiceForm>)
+      {formData.map((formValues)=>(<ServiceForm key={formValues.formId} className={"singleForm"} formValues={formValues}
+       handleInputChange={handleInputChange}></ServiceForm>)
         )}
-        <button type="submit">add new service</button>
+    <button type="button" style={{display:"block"}} onClick={addAnotherServiceForm}>+</button>
+    <button type="submit">{`add new service${formData.length > 1 ? "s" :""} to store`}</button>
     </form>
-    {message?? <label>{message}</label>}
+    
+    {message?? <label style={{display:"block"}}>{message}</label>}
+    </div>
+    </div>  
     </div>
 }

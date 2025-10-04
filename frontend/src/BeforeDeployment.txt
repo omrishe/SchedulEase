@@ -1,2 +1,0 @@
-disable cors
-change samesite:"None" in authroute.js
