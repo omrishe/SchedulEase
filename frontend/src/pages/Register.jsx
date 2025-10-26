@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { signup } from "../api/auth";
-import { useNavigate,useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function Register({ setToken, className }) {
-  const {slug}=useParams()
+  const { slug } = useParams();
   const [formData, setFormData] = useState({
     userName: "",
     password: "",
     email: "",
-    storeSlug:slug
+    storeSlug: slug,
   });
   const navigatePage = useNavigate();
   const [message, setMessage] = useState("");
@@ -19,14 +19,12 @@ function Register({ setToken, className }) {
 
   async function handleRegister(e) {
     e.preventDefault();
-    console.log(formData);
     const serverResponse = await signup(formData);
     if (serverResponse.isSuccess) {
       setMessage(serverResponse.message + " you will be redirected soon");
       setFormData({ userName: "", password: "", email: "" });
       setTimeout(() => navigatePage(`/store/${slug}/`), 1500);
-    }
-    else{
+    } else {
       setMessage(serverResponse.message);
     }
   }

@@ -22,6 +22,8 @@ const storeSchema = new mongoose.Schema(
     storeName: { type: String, required: true, trim: true },
     services: [servicesSchema],
     storeNote: { type: String, required: false },
+    storePhoneNumber: { type: String, required: false },
+    storeCoordinates: { type: String, required: false },
     storeSlug: {
       type: String,
       required: true,

@@ -13,6 +13,10 @@ const storeTimeSlotSchema = new mongoose.Schema(
       ref: "user",
       default: null,
     },
+    userName: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true }
 );

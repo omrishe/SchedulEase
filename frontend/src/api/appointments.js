@@ -1,10 +1,16 @@
 import { sendRejectedResponse } from "../utils/responseHandler.js";
+import {
+  addDaysToDate,
+  resetTime,
+  ParseDateToHHMM,
+} from "../utils/dateHandlers.js";
 const baseServerAddress = import.meta.env.VITE_SERVER_ADDRESS;
 const serverAddress = baseServerAddress + "/api/appointments";
+import config from "../config.json";
 
 export async function createAppointment(appointmentInfo) {
   try {
-    const response = await fetch(`${serverAddress}/new`, {
+    const response = await fetch(`${serverAddress}/new-appointment`, {
       method: "post",
       headers: {
         "Content-Type": "application/json",
@@ -21,7 +27,7 @@ export async function createAppointment(appointmentInfo) {
       return data;
     }
   } catch (error) {
-    console.log("error:", error);
+    console.error("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,
@@ -29,36 +35,35 @@ export async function createAppointment(appointmentInfo) {
   }
 }
 
-export async function getAvailableAppointments(storeIdentifier, date) {
+//warning! this function would only work for 27 days range (since 2 dates can have the same day date in a month)
+export async function getAvailableAppointmentsDates(
+  storeIdentifier,
+  startDate,
+  endDate = new Date()
+) {
   try {
-    //sets it so if already logged in send the storeId and if not we send the store Slug
-    console.log("store identifier is:\n", storeIdentifier);
     const todaysDate = new Date();
     //check if the date selected is today if it is send it with the time currently to show only dates that are after this hour
     //otherwise Reset hours and minutes to show the whole day
+    endDate = addDaysToDate(resetTime(endDate), config.daysToFetch);
     if (
-      date.getFullYear() === todaysDate.getFullYear() &&
-      date.getMonth() === todaysDate.getMonth() &&
-      date.getDate() === todaysDate.getDate()
+      startDate.getFullYear() !== todaysDate.getFullYear() ||
+      startDate.getMonth() !== todaysDate.getMonth() ||
+      startDate.getDate() !== todaysDate.getDate()
     ) {
-      //sets it so it sends the time from now
-      date = new Date();
-      date = new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate(),
-        date.getHours(),
-        date.getMinutes()
-      );
-    } else {
       //resets date hours and seconds
-      date = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      startDate = resetTime(startDate);
     }
+    //sets it so if already logged in send the storeId and if not send the store Slug
     const query = storeIdentifier.storeId
-      ? `storeId=${storeIdentifier.storeId}&date=${date.getTime()}`
-      : `storeSlug=${storeIdentifier.storeSlug}&date=${date.getTime()}`;
+      ? `storeId=${
+          storeIdentifier.storeId
+        }&startDate=${startDate.getTime()}&endDate=${endDate.getTime()}`
+      : `storeSlug=${
+          storeIdentifier.storeSlug
+        }&startDate=${startDate.getTime()}&endDate=${endDate.getTime()}`;
     const response = await fetch(
-      `${serverAddress}/getAvailableAppointment?${query}`,
+      `${serverAddress}/getAvailableAppointmentDates?${query}`,
       {
         method: "GET",
         headers: {
@@ -69,19 +74,24 @@ export async function getAvailableAppointments(storeIdentifier, date) {
     );
     if (response.ok) {
       const availableSlots = await response.json();
-      //parse from array of iso to HH:MM format
-      availableSlots.otherData = availableSlots.otherData.map((slot) => {
-        const dateSlot = new Date(slot);
-        const hours = dateSlot.getHours().toString().padStart(2, "0");
-        const minutes = dateSlot.getMinutes().toString().padStart(2, "0");
-        return `${hours}:${minutes}`;
+      let daysObjArr = {};
+      for (let d = startDate; d < endDate; d = addDaysToDate(d, 1)) {
+        daysObjArr[resetTime(d)] = [];
+      }
+      availableSlots.otherData.forEach((date) => {
+        const tempDate = resetTime(date);
+        daysObjArr[tempDate].push(date);
       });
+      //parse from array of iso to HH:MM format
+      availableSlots.otherData = availableSlots.otherData.map((slot) =>
+        ParseDateToHHMM(slot)
+      );
       return availableSlots;
     } else {
       throw new Error(`server  ${response.status} error occured`);
     }
   } catch (error) {
-    console.log("error:", error);
+    console.error("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,
@@ -89,24 +99,56 @@ export async function getAvailableAppointments(storeIdentifier, date) {
   }
 }
 
-export async function fetchAllAppointment() {
+//fetch all store appointments between start date and end date
+export async function getAllStoreAppointments(startDate, endDate) {
   try {
-    const response = await fetch(`${serverAddress}/getAllAppointments`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
+    //reset to time in day to 00:00:00.000
+    startDate = resetTime(startDate);
+    endDate = resetTime(endDate);
+    const response = await fetch(
+      `${serverAddress}/get-All-Store-Appointments?startDate=${startDate.getTime()}&endDate=${endDate.getTime()}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
     if (response.ok) {
       const allAppointment = await response.json();
-      console.log(allAppointment);
       return allAppointment;
     } else {
       throw new Error(`server  ${response.status} error occured`);
     }
   } catch (error) {
-    console.log("error:", error);
+    console.error("error:", error);
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
+  }
+}
+
+//gets only the user Bookings
+export async function getUserBookingInfo(startDate, endDate) {
+  try {
+    startDate = resetTime(startDate);
+    endDate = resetTime(endDate);
+    const response = await fetch(
+      `${serverAddress}/getUserBookingInfo?startDate=${startDate.getTime()}&endDate=${endDate.getTime()}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      }
+    );
+    const allAppointment = await response.json();
+    return allAppointment;
+  } catch (error) {
+    console.error("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,

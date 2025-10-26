@@ -25,11 +25,9 @@ export async function adminDelService(serviceToDelId, storeId) {
     if (!response.ok) {
       return data;
     } else {
-      console.log(data);
       return data;
     }
   } catch (error) {
-    console.log("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,
@@ -51,11 +49,9 @@ export async function createStore(storeInfo) {
     if (!response.ok) {
       return data;
     } else {
-      console.log(data);
       return data;
     }
   } catch (error) {
-    console.log("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,
@@ -79,7 +75,6 @@ export async function getStoreInfo(storeId) {
       return data;
     }
   } catch (error) {
-    console.log("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,
@@ -106,7 +101,6 @@ export async function addServiceToStore(authData, formData) {
       return data;
     }
   } catch (error) {
-    console.log("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,
@@ -134,7 +128,6 @@ export async function getStoreServices(storeIdentifier) {
       throw new Error(`server  ${response.status} error occured`);
     }
   } catch (error) {
-    console.log("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,
@@ -152,10 +145,6 @@ export async function setStoreOwnerAvailability(dateObjects, _id) {
       credentials: "include",
       body: JSON.stringify({ dates: dateObjects, _id: _id }),
     });
-    console.log(
-      "in store.js",
-      JSON.stringify({ dates: dateObjects, _id: _id })
-    );
     const data = await response.json();
     if (!response.ok) {
       return data;
@@ -163,7 +152,6 @@ export async function setStoreOwnerAvailability(dateObjects, _id) {
       return data;
     }
   } catch (error) {
-    console.log("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,

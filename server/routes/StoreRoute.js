@@ -72,7 +72,6 @@ router.post(
         date: new Date(slot),
         storeId: storeId,
       }));
-      console.log("slotsArr is:\n", slotsArr);
       try {
         const savedTimeSlots = await StoreTimeSlot.insertMany(slotsArr, {
           ordered: false,
@@ -118,7 +117,6 @@ router.post(
         throw new Error("store does not exist");
       }
       const storeExistingServices = storeToUpdate.services;
-      console.log("formData recieved:\n", formData);
       //filter empty and duplicate services names that already exist in the services at the store --basically prevent duplicates
       const filteredServices = formData.filter(
         (formDataService) =>
@@ -131,13 +129,11 @@ router.post(
               !formDataService.price
           )
       );
-      console.log("filtered is:\n", filteredServices);
       storeToUpdate.services.push(
         ...filteredServices.map((svc) => storeToUpdate.services.create(svc))
       );
       //saves the new services to the store service schema
       const added = await storeToUpdate.save();
-      console.log(added);
       res
         .status(200)
         .json(sendSucessResponse({ message: "added successfully" }));
@@ -157,7 +153,6 @@ router.post(
 );
 
 router.get("/getServices", async (req, res) => {
-  console.log("got in\n\n\n\n\n\n\n");
   try {
     const { storeId, storeSlug } = req.query;
     let fetchedStore;

@@ -2,19 +2,23 @@ import "./App.css";
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainPage from "./pages/MainPage.jsx";
-import Login from "./pages/Login.jsx"
+import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import { validateToken } from "./api/auth.js";
 import { AdminPanel } from "./pages/AdminPanel.jsx";
 import SuperAdminPanel from "./pages/SuperAdminPanel.jsx";
 
+//main entery point
+//contains helper functions and define the routing
+//---uses v6 react router altough v7.6.3 is installed (no issues its backward compatible)
+//if upgrading to v7 you can use loaders to load the data in here before the page renders solving the useEffect issue
 function App() {
   const [userAuthData, setUserAuthData] = useState({
     userId: localStorage.getItem("userId"),
     userName: localStorage.getItem("userName"),
     email: localStorage.getItem("email"),
     role: localStorage.getItem("role"),
-    storeId : localStorage.getItem("storeId")
+    storeId: localStorage.getItem("storeId"),
   });
 
   function saveToLocalStorage(data) {
@@ -28,14 +32,13 @@ function App() {
     }
   }
 
-
   function resetUserData() {
     setUserAuthData({
       userId: null,
       userName: null,
       email: null,
       role: null,
-      storeId:null
+      storeId: null,
     });
     resetlocalStorage();
   }
@@ -45,26 +48,25 @@ function App() {
     localStorage.removeItem("userName");
     localStorage.removeItem("email");
     localStorage.removeItem("role");
-    localStorage.removeItem("storeId")
+    localStorage.removeItem("storeId");
   }
 
   useEffect(() => {
     async function verifyTokenAndClearData() {
       const isTokenValid = await validateToken();
       if (!isTokenValid.isSuccess) {
-        console.error("invalid token,resetting data",isTokenValid)
+        console.error("invalid token,resetting data", isTokenValid);
         resetUserData();
       }
     }
     verifyTokenAndClearData();
   }, []);
 
-  async function updateAuthData(newAuthData)
-  {
-    setUserAuthData({...userAuthData,...newAuthData});
+  async function updateAuthData(newAuthData) {
+    setUserAuthData({ ...userAuthData, ...newAuthData });
     saveToLocalStorage(newAuthData);
   }
-  
+
   return (
     <BrowserRouter>
       <Routes>
@@ -86,21 +88,17 @@ function App() {
             ></Login>
           }
         ></Route>
-        <Route path="/store/:slug/register" element={<Register></Register>}></Route>
+        <Route
+          path="/store/:slug/register"
+          element={<Register></Register>}
+        ></Route>
         <Route
           path="/store/:slug/adminPanel"
-          element={
-            <AdminPanel
-              userAuthData={userAuthData}
-            ></AdminPanel>
-          }
+          element={<AdminPanel userAuthData={userAuthData}></AdminPanel>}
         ></Route>
         <Route
           path="/superadminPanel"
-          element={
-            <SuperAdminPanel
-            ></SuperAdminPanel>
-          }
+          element={<SuperAdminPanel></SuperAdminPanel>}
         ></Route>
       </Routes>
     </BrowserRouter>

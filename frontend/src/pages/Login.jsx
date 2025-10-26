@@ -1,15 +1,15 @@
-import {  useState } from "react";
+import { useState } from "react";
 import { userLogIn } from "../api/auth";
-import { useNavigate,useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function Login({ updateAuthData }) {
-  const {slug}=useParams()
+  const { slug } = useParams();
   const navigatePage = useNavigate();
   const [formData, setFormData] = useState({
     Username: "",
     password: "",
     email: "",
-    slug:slug
+    slug: slug,
   });
   const [message, setMessage] = useState("");
 
@@ -21,9 +21,8 @@ export default function Login({ updateAuthData }) {
     e.preventDefault();
     const authResult = await userLogIn(formData);
     if (authResult.isSuccess) {
-      const  message = authResult.message;//extract message recieved from server
-      const authData=authResult.otherData;//extract user Data recieved from server
-      console.log("logged in with:",authData)
+      const message = authResult.message; //extract message recieved from server
+      const authData = authResult.otherData; //extract user Data recieved from server
       await updateAuthData(authData);
       setMessage(message + " you will be redirected soon");
       setFormData((prev) => ({ ...prev, password: "" }));
@@ -33,7 +32,6 @@ export default function Login({ updateAuthData }) {
     }
   }
 
-  
   function validate() {
     const errors = {};
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -70,4 +68,3 @@ export default function Login({ updateAuthData }) {
     </div>
   );
 }
-

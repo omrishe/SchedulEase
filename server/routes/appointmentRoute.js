@@ -4,17 +4,28 @@ const Appointment = require("../Models/appointmentModel.js");
 const StoreTimeSlots = require("../Models/storeTimeSlotsModel.js");
 const Store = require("../Models/storeModel.js");
 const User = require("../Models/userModel.js");
-const { authenticateToken } = require("../middlewares/middlewares.js");
+const {
+  authenticateToken,
+  requireAdmin,
+} = require("../middlewares/middlewares.js");
 const {
   sendSucessResponse,
   sendRejectedResponse,
 } = require("../utils/responseHandler.js");
 const router = express.Router();
 
-router.post("/new", authenticateToken, async (req, res) => {
+/*req.user is (cookies fields)
+  userId: '68b32227049037ff819e6caa',
+  role: 'admin',
+  storeId: '68b3220f049037ff819e6ca1',
+  iat: 1760361011,
+  exp: 1760404211
+  */
+
+router.post("/new-appointment", authenticateToken, async (req, res) => {
   try {
     const { appointmentInfo: appointmentData } = req.body;
-    const userId = req.user.userId; //get the userId by the token (authenticateToken passes userId)
+    const userId = req.user.userId; //get the userId by the cookies (authenticateToken passes userId)
     const { email, userName } =
       (await User.findById(userId, { email: 1, userName: 1, _id: 0 })) || {};
     if (!email || !userName) {
@@ -24,8 +35,7 @@ router.post("/new", authenticateToken, async (req, res) => {
     appointmentData.email = email;
     appointmentData.userId = userId;
     appointmentData.date = new Date(appointmentData.date);
-    appointmentData.date.setMilliseconds(0);
-    appointmentData.date.setSeconds(0);
+    appointmentData.date.setSeconds(0, 0);
     const newAppointment = new Appointment(appointmentData); //recieves the data sent and create an appointment doc
     const storeTimeSlot = await StoreTimeSlots.findOne({
       storeId: appointmentData.storeId,
@@ -34,17 +44,13 @@ router.post("/new", authenticateToken, async (req, res) => {
     if (storeTimeSlot.takenBy) {
       throw new Error("appointment already taken");
     }
-    storeTimeSlot.takenBy = userId; //sets the timeSlot as taken by user
+    storeTimeSlot.takenBy = userId;
+    storeTimeSlot.userName = userName; //sets the timeSlot as taken by user
     await newAppointment.save(); //saves the data to database -- mongoose automatically convert string date to js date
     await storeTimeSlot.save(); //saves the new timeslot
-    const newStoreTimeSlots = await StoreTimeSlots.findOne({
-      storeId: appointmentData.storeId,
-      date: appointmentData.date,
-    });
     return res.status(201).json(
       sendSucessResponse({
         message: "added appointment successfully",
-        type: "data",
       })
     );
   } catch (error) {
@@ -66,19 +72,18 @@ router.post("/new", authenticateToken, async (req, res) => {
   }
 });
 
-router.get("/getAvailableAppointment", async (req, res) => {
+router.get("/getAvailableAppointmentDates", async (req, res) => {
   try {
-    const { storeId, storeSlug, date: timeStamp } = req.query;
-    const startdate = new Date(Number(timeStamp));
+    const {
+      storeId,
+      storeSlug,
+      startDate: startTimeStamp,
+      endDate: endTimeStamp,
+    } = req.query;
+    const startDate = new Date(Number(startTimeStamp));
+    const endDate = new Date(Number(endTimeStamp));
     //js Date automatically moves to next month if day of month<{daySet}
     //sets is so its exactly 1 day
-    const endDate = new Date(
-      startdate.getFullYear(),
-      startdate.getMonth(),
-      startdate.getDate() + 1,
-      startdate.getHours(),
-      startdate.getMinutes()
-    );
     let store;
     if (storeId) {
       //reduntant database access but kept it incase in the future we'll need the store object
@@ -95,7 +100,7 @@ router.get("/getAvailableAppointment", async (req, res) => {
       {
         storeId: store._id,
         takenBy: null,
-        date: { $gte: startdate, $lt: endDate },
+        date: { $gte: startDate, $lt: endDate },
       },
       { date: 1, _id: 0 }
     ).sort({ date: 1 });
@@ -122,34 +127,113 @@ router.get("/getAvailableAppointment", async (req, res) => {
     return res.status(400).json(sendRejectedResponse());
   }
 });
-/** 
-router.get("/getAppointment", authenticateToken, async (req, res) => {
-  try {
-    let query = {}; //sets it so query is any empty object
-    const email = req.query.email; //get email from query -{} if no query is used
-    if (validateData(email)) {
-      query["email"] = email;
-    }
-    const getAppointmentByEmail = await Appointment.find(query); //get appointment data associated with the email if it exists else it returns all
-    res.status(200);
-    res.json(getAppointmentByEmail); //return appointmenet data
-  } catch (err) {
-    res.status(500);
-    res.json({ message: err.message });
-  }
-});
 
-router.get("/getAllAppointments", async (req, res) => {
+/*admin role required
+/get all appointments in specific dates
+**/
+router.get(
+  "/get-All-Store-Appointments",
+  authenticateToken,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      let { startDate, endDate } = req.query;
+      const storeId = req.user.storeId;
+      if (!(startDate && endDate)) {
+        throw new Error("invalid arguments");
+      }
+      startDate = new Date(Number(startDate));
+      endDate = new Date(Number(endDate));
+      //query db to get all appointments data
+      const allAppointmentsData = await StoreTimeSlots.find(
+        {
+          storeId: storeId,
+          date: { $gte: startDate, $lt: endDate },
+        },
+        null,
+        { lean: true } //makes mongoose return plain js object its like toobject
+      );
+      const filteredAppointmentsData = allAppointmentsData.map(
+        ({ _id, __v, createdAt, updatedAt, ...otherData }) => {
+          otherData.appointmentId = _id;
+          return otherData;
+        }
+      );
+      return res.json(
+        sendSucessResponse({
+          message: "successfully fetched appointments",
+          otherData: filteredAppointmentsData,
+        })
+      );
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
+      res.status(500);
+      res.json({ message: err });
+    }
+  }
+);
+/*
+/get all user appointments in specific dates
+**/
+
+router.get("/getUserBookingInfo", authenticateToken, async (req, res) => {
   try {
-    const getAppointmentByEmail = await Appointment.find(); //get all appointment data
-    res.status(200);
-    res.json(getAppointmentByEmail); //return appointmenet data
+    let { startDate, endDate } = req.query;
+    const storeId = req.user.storeId;
+    const userId = req.user.userId;
+    if (!(startDate && endDate)) {
+      throw new Error("invalid arguments");
+    }
+    startDate = new Date(Number(startDate));
+    endDate = new Date(Number(endDate));
+    //query db to get all appointments data
+    const allAppointmentsData = await StoreTimeSlots.find(
+      {
+        storeId: storeId,
+        takenBy: userId,
+        date: { $gte: startDate, $lt: endDate },
+      },
+      null,
+      { lean: true } //makes mongoose return plain js object its like toobject
+    );
+    const filteredAppointmentsData = allAppointmentsData.map(
+      ({ _id, __v, createdAt, updatedAt, ...otherData }) => {
+        otherData.appointmentId = _id;
+        return otherData;
+      }
+    );
+    return res.json(
+      sendSucessResponse({
+        message: "successfully fetched appointments",
+        otherData: filteredAppointmentsData,
+      })
+    );
   } catch (err) {
     console.error("Error fetching appointments:", err);
     res.status(500);
     res.json({ message: err });
   }
 });
+
+router.get(
+  "/getAppointmentsInfo",
+  authenticateToken,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      let query = {}; //sets it so query is any empty object
+      const a = req.query.email; //get email from query -{} if no query is used
+      const getAppointmentByEmail = await Appointment.find(query); //get appointment data associated with the email if it exists else it returns all
+      res.status(200);
+      res.json(getAppointmentByEmail); //return appointmenet data
+    } catch (err) {
+      res.status(500);
+      res.json({ message: err.message });
+    }
+  }
+);
+
+/** 
 
 function validateData(email) {
   //checks if email exists and valid

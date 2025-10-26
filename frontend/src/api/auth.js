@@ -1,7 +1,6 @@
 import { sendRejectedResponse } from "../utils/responseHandler.js";
 const baseServerAddress = import.meta.env.VITE_SERVER_ADDRESS;
 const serverAddress = baseServerAddress + "/api/auth";
-console.log("serveraddress is:", serverAddress);
 /**
  * signup api function sends data to server
  * -HTTP errors are caught if !response.ok
@@ -23,7 +22,6 @@ export async function signup(formData) {
     }
     return data;
   } catch (error) {
-    console.log("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,
@@ -51,10 +49,8 @@ export async function userLogIn(formData) {
       //altough in any http code that returned the return is the same,i left it for clearer code or future expension
       return data;
     }
-    console.log("in auth.js data is:", data);
     return data;
   } catch (error) {
-    console.log("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,
@@ -78,7 +74,6 @@ export async function validateToken() {
     }
     return data;
   } catch (error) {
-    console.log("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,
@@ -102,7 +97,6 @@ export async function logout() {
       return data;
     }
   } catch (error) {
-    console.log("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,

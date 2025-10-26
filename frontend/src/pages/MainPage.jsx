@@ -1,50 +1,59 @@
 import { useState, useEffect } from "react";
-import { useNavigate,useParams, } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getStoreServices } from "../api/store";
 import { logout } from "../api/auth.js";
 import { AppointmentSelection } from "../components/AppointmentSelection.jsx";
-import { getAvailableAppointments } from "../api/appointments.js";
+import { addDaysToDate, resetTime } from "../utils/dateHandlers";
+import {
+  getAvailableAppointmentsDates,
+  getUserBookingInfo,
+} from "../api/appointments.js";
+import AppointmentOverview from "../components/AppointmentOverview.jsx";
 
-function MainPage({
-  userAuthData,
-  resetUserData,
-}) {
+function MainPage({ userAuthData, resetUserData }) {
   const navigatePage = useNavigate();
   const [appointmentInfo, setAppointment] = useState({
     date: new Date(),
     service: "",
-    storeId:localStorage.getItem("storeId"),
+    storeId: localStorage.getItem("storeId"),
   });
 
   const { slug } = useParams();
   const [logoutMsg, setLogoutMsg] = useState();
-  const [availableTimeSlots,setAvailableTimeSlots]=useState(["loading"])
-  const [services,setServices]=useState(["loading"])
+  const [availableTimeSlots, setAvailableTimeSlots] = useState(["loading"]);
+  const [services, setServices] = useState(["loading"]);
 
   //gets store available appointments
-  useEffect(()=> {
-  async function getAvailableSlots(date){
-  const serverResponse=await getAvailableAppointments(
-    appointmentInfo.storeId ? {storeId:appointmentInfo.storeId} : {storeSlug:slug},
-    date)
-    if(serverResponse.isSuccess){
-      setAvailableTimeSlots(serverResponse.otherData)
-    }}
-  if(appointmentInfo.date){
+  useEffect(() => {
+    async function getAvailableSlots() {
+      const serverResponse = await getAvailableAppointmentsDates(
+        appointmentInfo.storeId
+          ? { storeId: appointmentInfo.storeId }
+          : { storeSlug: slug },
+        new Date(appointmentInfo.date)
+      );
+      if (serverResponse.isSuccess) {
+        setAvailableTimeSlots(serverResponse.otherData);
+      }
+    }
     //create a new date only with day,month and year (no hours or seconds)
-  const date=new Date(appointmentInfo.date.getFullYear(),appointmentInfo.date.getMonth(),appointmentInfo.date.getDate())
-  getAvailableSlots(date)
-  }},[appointmentInfo.date])
+    getAvailableSlots();
+  }, [appointmentInfo.date]);
 
   //gets store available services
-  useEffect(()=> {
-  async function getServices(){
-  const serverResponse=await getStoreServices(appointmentInfo.storeId ? {storeId:appointmentInfo.storeId} : {storeSlug:slug})
-    if(serverResponse.isSuccess){
-      setServices(serverResponse.otherData)
-    }}
-  getServices()
-  },[])
+  useEffect(() => {
+    async function getServices() {
+      const serverResponse = await getStoreServices(
+        appointmentInfo.storeId
+          ? { storeId: appointmentInfo.storeId }
+          : { storeSlug: slug }
+      );
+      if (serverResponse.isSuccess) {
+        setServices(serverResponse.otherData);
+      }
+    }
+    getServices();
+  }, []);
 
   function openWaze() {
     const latitude = 32.051403;
@@ -68,20 +77,26 @@ function MainPage({
       ...prev, // keep all old fields
       ...newInfo, // overwrite with new fields
     }));
-    return {...appointmentInfo,...newInfo};
+    return { ...appointmentInfo, ...newInfo };
   }
 
   function handleLogout() {
     if (logout()) {
-      console.log("logged out sucessfully");
       setLogoutMsg("logged out sucessfully");
       resetUserData();
-      setAppointment(
-        {date: new Date(),service: "",storeId:null})
+      setAppointment({ date: new Date(), service: "", storeId: null });
     } else {
-      console.log("an error occured");
       setLogoutMsg("an Error occured see log for more info");
     }
+  }
+
+  async function fetchUserAppointments(startDate, endDate) {
+    const response = await getUserBookingInfo(startDate, endDate);
+    if (!response.isSuccess) {
+      console.error(response);
+      return response;
+    }
+    return response;
   }
 
   const welcomeMsg = (
@@ -89,17 +104,25 @@ function MainPage({
       {userAuthData.userName ? `welcome ${userAuthData.userName}` : "welcome"}
     </p>
   );
-  const userIsNotLoggedInElement=
-  <><button className="loginBtn" onClick={() => navigatePage(`/store/${slug}/login`)}>
+  const userIsNotLoggedInElement = (
+    <>
+      <button
+        className="loginBtn"
+        onClick={() => navigatePage(`/store/${slug}/login`)}
+      >
         login
       </button>
       <button onClick={() => navigatePage(`/store/${slug}/register`)}>
         dont have a user? Register
-      </button></>
-    
-    const userIsLoggedInElement=<button className="logoutBtn" onClick={() => handleLogout()}>
+      </button>
+    </>
+  );
+
+  const userIsLoggedInElement = (
+    <button className="logoutBtn" onClick={() => handleLogout()}>
       logout
     </button>
+  );
 
   return (
     <div className="mainPageContainer">
@@ -107,27 +130,40 @@ function MainPage({
         {/**displays welcome msg if not logged in and welcome userName if logged in */}
         {welcomeMsg}
         <div className="navigationBtns">
-        {/**displays login/register or logout depending if logged in */}
-        {userAuthData["userName"] ? userIsLoggedInElement : userIsNotLoggedInElement}
-        {/**logout msg to display after logging out */}
-        {logoutMsg && <p>{logoutMsg}</p>}
-        {userAuthData.role=="admin" && <button onClick={() => navigatePage("AdminPanel")}>admin panel</button>}
+          {/**displays login/register or logout depending if logged in */}
+          {userAuthData["userName"]
+            ? userIsLoggedInElement
+            : userIsNotLoggedInElement}
+          {/**logout msg to display after logging out */}
+          {logoutMsg && <p>{logoutMsg}</p>}
+          {userAuthData.role == "admin" && (
+            <button onClick={() => navigatePage("AdminPanel")}>
+              admin panel
+            </button>
+          )}
         </div>
         <div className="ContactInfoContainer">
-          <button className="whatsappBtn whatsapp" onClick={openWhatsapp}></button>
+          <button
+            className="whatsappBtn whatsapp"
+            onClick={openWhatsapp}
+          ></button>
           <button className="phoneBtn phone" onClick={openPhone}></button>
           <button className="wazeBtn waze" onClick={openWaze}></button>
         </div>
-        </div>
-      <AppointmentSelection
-      appointmentInfo={appointmentInfo}
-      updateAppointmentInfo={updateAppointmentInfo}
-      slug={slug}
-      services={services}
-      availableTimeSlots={availableTimeSlots}
-      setAvailableTimeSlots={setAvailableTimeSlots}
-      ></AppointmentSelection>
       </div>
+      <AppointmentSelection
+        appointmentInfo={appointmentInfo}
+        updateAppointmentInfo={updateAppointmentInfo}
+        slug={slug}
+        services={services}
+        availableTimeSlots={availableTimeSlots}
+        setAvailableTimeSlots={setAvailableTimeSlots}
+      ></AppointmentSelection>
+      <AppointmentOverview
+        fetchAppointmentsFunc={fetchUserAppointments}
+        adminMode={false}
+      ></AppointmentOverview>
+    </div>
   );
 }
 export default MainPage;

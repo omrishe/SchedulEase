@@ -74,23 +74,26 @@ router.post("/login", async (req, res) => {
     if (!(await bcrypt.compare(password, userData.hashedPassword))) {
       throw new Error("wrong password");
     }
-    const token = jwt.sign({ userId: userData._id }, secretKey, {
-      expiresIn: "12h",
-    });
+    const token = jwt.sign(
+      { userId: userData._id, role: userData.role, storeId: userData.storeId },
+      secretKey,
+      {
+        expiresIn: "12h",
+      }
+    );
     res.cookie("loginToken", token, {
       httpOnly: true,
       secure: true,
       samesite: "None",
       maxAge: 12 * 60 * 60 * 1000, //12 hours life of token cookie
     });
-    const { _id, name, createdAt, updatedAt, hashedPassword, __v, ...data } =
+    const { _id, createdAt, updatedAt, hashedPassword, __v, ...data } =
       userData.toObject();
     return res.status(200).json(
       sendSucessResponse({
         message: "logged in successfully",
         otherData: {
           userId: _id,
-          userName: name,
           ...data,
         },
       })

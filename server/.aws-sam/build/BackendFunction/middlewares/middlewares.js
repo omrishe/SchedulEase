@@ -6,18 +6,22 @@ const User = require("../Models/userModel.js");
 function authenticateToken(req, res, next) {
   const token = req.cookies.loginToken;
   if (!token) {
+    console.error("no token provided");
     return res.status(401).json(
       sendRejectedResponse({
-        message: "No token provided",
+        type: "loginRequired",
+        message: "User is not logged in",
+        code: "AUTH_REQUIRED",
       })
     );
   }
   try {
     const secretKey = process.env.SECRET_HASH_PASSWORD;
     const decoded = jwt.verify(token, secretKey);
-    req.user = decoded; // adds user field which is the decoded token=userID
+    req.user = decoded;
     next(); // Authenticated successfully -continue
   } catch (error) {
+    console.error("user not authenticated");
     return res
       .status(403)
       .json(sendRejectedResponse({ message: "Invalid token" }));
@@ -26,13 +30,17 @@ function authenticateToken(req, res, next) {
 
 async function requireAdmin(req, res, next) {
   try {
-    const userId = req.user.userId;
+    const { userId, role, storeId } = req.user;
+    //check if role in cookie fits to prevent db lookup(for less overhead access to database and performance)
+    if (role === "user") {
+      throw new Error(sendRejectedResponse({ message: "invalid auth" }));
+    }
+    //for security(incase user gets demoted before token expires) we cross check with database
     const userData = await User.findById(userId);
     if (!userData) {
       throw new Error(sendRejectedResponse({ message: "user Does not exist" }));
     }
     const userRole = userData.role;
-    console.log("userRole is\n", userRole);
     if (userRole !== "admin" && userRole !== "superAdmin") {
       throw new Error(sendRejectedResponse({ message: "invalid auth" }));
     }
