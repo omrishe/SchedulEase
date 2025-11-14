@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../../ToggleButton.css";
+import "../App.css";
 
 export default function ToggleSwitch({ label, onToggle }) {
   const [btnIsOn, setbtnIsOn] = useState(false);
