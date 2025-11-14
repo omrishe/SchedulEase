@@ -1,19 +1,42 @@
 import MenuItems from "./MenuItem.jsx";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SingleChoiceCalendar from "./SingleChoiceCalendar.jsx";
 import ChooseTime from "./ChooseTime.jsx";
 import { createAppointment } from "../api/appointments.js";
 import { sendRejectedResponse } from "../utils/responseHandler.js";
+import { resetTime } from "../utils/dateHandlers";
+import { getAvailableAppointmentsDates } from "../api/appointments.js";
 
 export function AppointmentSelection({
   appointmentInfo,
   updateAppointmentInfo,
-  availableTimeSlots,
   services,
-  setAvailableTimeSlots,
+  slug,
 }) {
   const [windowChooser, setWindow] = useState("items");
+  const [availableTimeSlots, setAvailableTimeSlots] = useState({});
 
+  //gets store available appointments
+  useEffect(() => {
+    async function getAvailableSlots() {
+      const serverResponse = await getAvailableAppointmentsDates(
+        { storeSlug: slug },
+        new Date(appointmentInfo.date)
+      );
+      if (serverResponse.isSuccess) {
+        setAvailableTimeSlots(serverResponse.otherData);
+      }
+    }
+    const dateTimeStamp = resetTime(appointmentInfo.date, "timeStamp");
+    //create a new date only with day,month and year (no hours or seconds)
+    console.log(availableTimeSlots);
+    if (!(dateTimeStamp in availableTimeSlots)) {
+      setAvailableTimeSlots({});
+      console.log("date is", appointmentInfo.date);
+      console.log(Object.keys(availableTimeSlots));
+      getAvailableSlots();
+    }
+  }, [appointmentInfo.date]);
   async function handleChooseTimeOnlick(time) {
     try {
       const tempDate = new Date(appointmentInfo.date);

@@ -9,11 +9,19 @@ export function addDaysToDate(date = new Date(), amount = 1) {
   }
 }
 
-export function resetTime(date) {
+export function resetTime(date, mode = "jsDate") {
   try {
     const newDate = new Date(date);
     newDate.setHours(0, 0, 0, 0);
-    return newDate;
+    if (mode == "jsDate") {
+      return newDate;
+    } else if (mode == "timeStamp") {
+      return newDate.getTime();
+    } else {
+      throw new Error(
+        "error while resetting time of day - mode does not exist"
+      );
+    }
   } catch (error) {
     console.error("error while parsing date see log", error);
   }

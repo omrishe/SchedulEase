@@ -3,11 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getStoreServices } from "../api/store";
 import { logout } from "../api/auth.js";
 import { AppointmentSelection } from "../components/AppointmentSelection.jsx";
-import { addDaysToDate, resetTime } from "../utils/dateHandlers";
-import {
-  getAvailableAppointmentsDates,
-  getUserBookingInfo,
-} from "../api/appointments.js";
+import { getUserBookingInfo } from "../api/appointments.js";
 import AppointmentOverview from "../components/AppointmentOverview.jsx";
 
 function MainPage({ userAuthData, resetUserData }) {
@@ -20,25 +16,7 @@ function MainPage({ userAuthData, resetUserData }) {
 
   const { slug } = useParams();
   const [logoutMsg, setLogoutMsg] = useState();
-  const [availableTimeSlots, setAvailableTimeSlots] = useState(["loading"]);
   const [services, setServices] = useState(["loading"]);
-
-  //gets store available appointments
-  useEffect(() => {
-    async function getAvailableSlots() {
-      const serverResponse = await getAvailableAppointmentsDates(
-        appointmentInfo.storeId
-          ? { storeId: appointmentInfo.storeId }
-          : { storeSlug: slug },
-        new Date(appointmentInfo.date)
-      );
-      if (serverResponse.isSuccess) {
-        setAvailableTimeSlots(serverResponse.otherData);
-      }
-    }
-    //create a new date only with day,month and year (no hours or seconds)
-    getAvailableSlots();
-  }, [appointmentInfo.date]);
 
   //gets store available services
   useEffect(() => {
@@ -156,8 +134,6 @@ function MainPage({ userAuthData, resetUserData }) {
         updateAppointmentInfo={updateAppointmentInfo}
         slug={slug}
         services={services}
-        availableTimeSlots={availableTimeSlots}
-        setAvailableTimeSlots={setAvailableTimeSlots}
       ></AppointmentSelection>
       <AppointmentOverview
         fetchAppointmentsFunc={fetchUserAppointments}

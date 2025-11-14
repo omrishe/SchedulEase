@@ -35,33 +35,31 @@ export async function createAppointment(appointmentInfo) {
   }
 }
 
-//warning! this function would only work for 27 days range (since 2 dates can have the same day date in a month)
+//get store available appointments
 export async function getAvailableAppointmentsDates(
   storeIdentifier,
   startDate,
-  endDate = new Date()
+  endDate
 ) {
   try {
-    const todaysDate = new Date();
+    let startDateTimeStamp = startDate.getTime();
+    const startOfTodayTimeStamp = resetTime(new Date(), "timeStamp");
     //check if the date selected is today if it is send it with the time currently to show only dates that are after this hour
-    //otherwise Reset hours and minutes to show the whole day
-    endDate = addDaysToDate(resetTime(endDate), config.daysToFetch);
-    if (
-      startDate.getFullYear() !== todaysDate.getFullYear() ||
-      startDate.getMonth() !== todaysDate.getMonth() ||
-      startDate.getDate() !== todaysDate.getDate()
-    ) {
-      //resets date hours and seconds
-      startDate = resetTime(startDate);
+    if (resetTime(startDateTimeStamp, "timeStamp") === startOfTodayTimeStamp) {
+      startDateTimeStamp = startOfTodayTimeStamp;
     }
+    const amtOfDaysToFetch = config.daysToFetch;
+    //if endDate not supplied set is as the default config otherwise set it as timestamp
+    const endDateTimeStamp = endDate
+      ? endDate.getTime()
+      : resetTime(
+          addDaysToDate(startDateTimeStamp, amtOfDaysToFetch),
+          "timeStamp"
+        );
     //sets it so if already logged in send the storeId and if not send the store Slug
     const query = storeIdentifier.storeId
-      ? `storeId=${
-          storeIdentifier.storeId
-        }&startDate=${startDate.getTime()}&endDate=${endDate.getTime()}`
-      : `storeSlug=${
-          storeIdentifier.storeSlug
-        }&startDate=${startDate.getTime()}&endDate=${endDate.getTime()}`;
+      ? `storeId=${storeIdentifier.storeId}&startDate=${startDateTimeStamp}&endDate=${endDateTimeStamp}`
+      : `storeSlug=${storeIdentifier.storeSlug}&startDate=${startDateTimeStamp}&endDate=${endDateTimeStamp}`;
     const response = await fetch(
       `${serverAddress}/getAvailableAppointmentDates?${query}`,
       {
@@ -73,20 +71,22 @@ export async function getAvailableAppointmentsDates(
       }
     );
     if (response.ok) {
-      const availableSlots = await response.json();
+      const serverResponse = await response.json();
       let daysObjArr = {};
-      for (let d = startDate; d < endDate; d = addDaysToDate(d, 1)) {
-        daysObjArr[resetTime(d)] = [];
+      for (let d = 0; d < amtOfDaysToFetch; d++) {
+        const dateKey = resetTime(
+          addDaysToDate(startDateTimeStamp, d),
+          "timeStamp"
+        );
+        daysObjArr[dateKey] = [];
       }
-      availableSlots.otherData.forEach((date) => {
-        const tempDate = resetTime(date);
-        daysObjArr[tempDate].push(date);
+      //creates an obj where each day is a key with an empty array
+      serverResponse.otherData.forEach((date) => {
+        const tempDate = resetTime(date).getTime();
+        daysObjArr[tempDate].push(ParseDateToHHMM(date)); //parse from array of iso to HH:MM format
       });
-      //parse from array of iso to HH:MM format
-      availableSlots.otherData = availableSlots.otherData.map((slot) =>
-        ParseDateToHHMM(slot)
-      );
-      return availableSlots;
+      serverResponse.otherData = daysObjArr;
+      return serverResponse;
     } else {
       throw new Error(`server  ${response.status} error occured`);
     }
