@@ -5,40 +5,45 @@ export default function ChooseTime({
   handleChooseTimeOnlick,
   appointmentInfo,
 }) {
-  const [response, setResponse] = useState();
-  const [timeSelected, SetTimeSelected] = useState("");
-  let todaysAvailableSlots;
-  if (Object.keys(availableTimeSlots).length === 0) {
-    todaysAvailableSlots =
-      availableTimeSlots[appointmentInfo.date.getTime()] ?? null; //kept date.getTime() unprotected cause date should always be a date obj
-  }
+  const [response, setResponse] = useState(null);
+  const [timeSelected, setTimeSelected] = useState("");
+  const [isError, setIsError] = useState(false);
+
   async function submitSelectedTime() {
     if (appointmentInfo.storeId) {
       const serverResponse = await handleChooseTimeOnlick(timeSelected);
-      setResponse(serverResponse.message);
+      if (!serverResponse.isSuccess) {
+        setResponse(serverResponse.message);
+        setIsError(true);
+      } else {
+        setIsError(false);
+        setResponse(
+          serverResponse.message || "Appointment created successfully"
+        );
+      }
     } else {
       setResponse("not logged in");
     }
   }
 
-  function timeBtnSelect(timeInput) {
-    setResponse();
-    timeInput !== timeSelected
-      ? SetTimeSelected(timeInput)
-      : SetTimeSelected("");
+  function handleTimeSelect(timeInput) {
+    setResponse(null);
+    setTimeSelected(timeInput === timeSelected ? "" : timeInput);
   }
-
   const dateKey = date.getTime();
   const isDateLoaded = dateKey in availableTimeSlots;
   const timesForDate = isDateLoaded ? availableTimeSlots[dateKey] : [];
-  const hasTimes = timesForDate.length > 0;
-  const shouldShowConfirm = Boolean(timeSelected);
-
+  const renderNoAvailableAppointment = (
+    <label className="NoAvailableAppointmentLabel">
+      {" "}
+      no available appointments
+    </label>
+  );
   const renderTimeButtons = timesForDate.map((timeInput) => (
     <button
       className={`TimeOptionBtn ${timeSelected === timeInput ? "clicked" : ""}`}
       key={timeInput}
-      onClick={() => timeBtnSelect(timeInput)}
+      onClick={() => handleTimeSelect(timeInput)}
     >
       {timeInput}
     </button>
@@ -50,35 +55,17 @@ export default function ChooseTime({
         Date Selected:{date.toLocaleDateString("en-GB")}
         {timeSelected && ` at ${timeSelected}`}
       </span>
-
-      {date.getTime() in availableTimeSlots ? (
+      {!isError ? (
         <>
           {!timeSelected && <span> please choose time</span>}
           <div className="timeOptions">
-            {availableTimeSlots?.length > 0 ? (
-              <>
-                {availableTimeSlots.map((timeInput) => (
-                  <button
-                    className={`TimeOptionBtn ${
-                      timeSelected === timeInput ? "clicked" : ""
-                    }`}
-                    key={timeInput}
-                    onClick={() => timeBtnSelect(timeInput)}
-                  >
-                    {timeInput}
-                  </button>
-                ))}
-              </>
-            ) : (
-              <label className="NoAvailableAppointmentLabel">
-                {" "}
-                no available appointments
-              </label>
-            )}
+            {timesForDate.length > 0
+              ? renderTimeButtons
+              : renderNoAvailableAppointment}
           </div>
         </>
       ) : (
-        <span style={{ display: "block" }}>loading</span>
+        <span style={{ display: "block" }}>an error occured</span>
       )}
       {timeSelected && <button onClick={submitSelectedTime}>Confirm</button>}
       {response && <p>{response}</p>}

@@ -6,53 +6,106 @@ import { createAppointment } from "../api/appointments.js";
 import { sendRejectedResponse } from "../utils/responseHandler.js";
 import { resetTime } from "../utils/dateHandlers";
 import { getAvailableAppointmentsDates } from "../api/appointments.js";
+import { getStoreServices } from "../api/store";
 
 export function AppointmentSelection({
   appointmentInfo,
   updateAppointmentInfo,
-  services,
   slug,
 }) {
   const [windowChooser, setWindow] = useState("items");
   const [availableTimeSlots, setAvailableTimeSlots] = useState({});
+  const [services, setServices] = useState(["loading"]);
 
   //gets store available appointments
   useEffect(() => {
+    // Create a controller to abort incase multiple dates change
+    const controller = new AbortController();
+    const signal = controller.signal;
+
     async function getAvailableSlots() {
-      const serverResponse = await getAvailableAppointmentsDates(
-        { storeSlug: slug },
-        new Date(appointmentInfo.date)
-      );
-      if (serverResponse.isSuccess) {
-        setAvailableTimeSlots(serverResponse.otherData);
+      try {
+        const serverResponse = await getAvailableAppointmentsDates(
+          { storeSlug: slug },
+          new Date(appointmentInfo.date),
+          { signal }, // Pass signal,
+          undefined
+        );
+        //incase of abort signal
+        if (serverResponse.code === "AbortError") {
+          return;
+        }
+        if (serverResponse.isSuccess) {
+          setAvailableTimeSlots((prev) => ({
+            ...prev,
+            ...serverResponse.otherData,
+          }));
+        } else {
+          const response = sendRejectedResponse({
+            message: "Failed to fetch slots",
+            otherData: serverResponse.message,
+          });
+          return response;
+        }
+      } catch (error) {
+        if (error.name === "AbortError") {
+          // do nothing request was aborted
+          return;
+        }
+        console.error("Error fetching available slots:", error);
+        return sendRejectedResponse({
+          message: "Failed to fetch slots",
+          otherData: error.message || "",
+        });
       }
     }
     const dateTimeStamp = resetTime(appointmentInfo.date, "timeStamp");
-    //create a new date only with day,month and year (no hours or seconds)
-    console.log(availableTimeSlots);
     if (!(dateTimeStamp in availableTimeSlots)) {
-      setAvailableTimeSlots({});
-      console.log("date is", appointmentInfo.date);
-      console.log(Object.keys(availableTimeSlots));
       getAvailableSlots();
     }
+    /*
+    a returned function is the cleanup function that runs
+    when the component unmounts or date changes
+    so here its to cancel the request if component unmounts or date changes
+     */
+    return () => controller.abort();
   }, [appointmentInfo.date]);
-  async function handleChooseTimeOnlick(time) {
+  //gets store available services
+  useEffect(() => {
+    async function getServices() {
+      const serverResponse = await getStoreServices({ storeSlug: slug });
+      if (serverResponse.isSuccess) {
+        setServices(serverResponse.otherData);
+      }
+    }
+    getServices();
+  }, []);
+
+  async function handleChooseTimeOnClick(time) {
     try {
       const tempDate = new Date(appointmentInfo.date);
       const [hours, minutes] = time.split(":");
       tempDate.setHours(hours, minutes);
       const response = await createAppointment(
-        updateAppointmentInfo({ date: tempDate })
+        await updateAppointmentInfo({ date: tempDate })
       ); //response contains the appointment info
       if (response.isSuccess) {
-        setAvailableTimeSlots(
-          availableTimeSlots.filter((slot) => slot !== time)
-        );
+        const dateTimeStamp = resetTime(tempDate, "timeStamp");
+        //remove the time from the available time slots
+        setAvailableTimeSlots((prev) => ({
+          ...prev,
+          [dateTimeStamp]:
+            prev[dateTimeStamp]?.filter((slot) => slot !== time) || [],
+        }));
         return response;
+      } else {
+        return sendRejectedResponse({
+          message: "failed to create appointment",
+          otherData: new Error("network failed"),
+        });
       }
     } catch (error) {
-      response = sendRejectedResponse({
+      const response = sendRejectedResponse({
         message: "failed to create appointment",
         otherData: error,
       });
@@ -63,28 +116,25 @@ export function AppointmentSelection({
 
   return (
     <div className="appointmentMainWindow">
-      {windowChooser == "items" && (
-        <>
-          <MenuItems
-            services={services}
-            onNextServiceBtnPress={(serviceName) =>
-              updateAppointmentInfo({ service: serviceName })
-            }
-            onClick={() => setIsClicked((prev) => !prev)}
-            setWindow={setWindow}
-          ></MenuItems>
-        </>
+      {windowChooser === "items" && (
+        <MenuItems
+          services={services}
+          onNextServiceBtnPress={(serviceName) =>
+            updateAppointmentInfo({ service: serviceName })
+          }
+          setWindow={setWindow}
+        ></MenuItems>
       )}
-      {windowChooser == "date" && (
+      {windowChooser === "date" && (
         <div className="setDateContainer">
           <SingleChoiceCalendar
             date={appointmentInfo.date}
             updateDate={updateAppointmentInfo}
           ></SingleChoiceCalendar>
           <ChooseTime //display set appointment area
-            date={appointmentInfo["date"]}
+            date={appointmentInfo.date}
             availableTimeSlots={availableTimeSlots}
-            handleChooseTimeOnlick={handleChooseTimeOnlick}
+            handleChooseTimeOnlick={handleChooseTimeOnClick}
             appointmentInfo={appointmentInfo}
           ></ChooseTime>
         </div>

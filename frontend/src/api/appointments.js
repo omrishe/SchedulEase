@@ -39,9 +39,11 @@ export async function createAppointment(appointmentInfo) {
 export async function getAvailableAppointmentsDates(
   storeIdentifier,
   startDate,
+  options = {}, // for { signal }
   endDate
 ) {
   try {
+    const { signal } = options;
     let startDateTimeStamp = startDate.getTime();
     const startOfTodayTimeStamp = resetTime(new Date(), "timeStamp");
     //check if the date selected is today if it is send it with the time currently to show only dates that are after this hour
@@ -57,6 +59,7 @@ export async function getAvailableAppointmentsDates(
           "timeStamp"
         );
     //sets it so if already logged in send the storeId and if not send the store Slug
+    //currently disabled
     const query = storeIdentifier.storeId
       ? `storeId=${storeIdentifier.storeId}&startDate=${startDateTimeStamp}&endDate=${endDateTimeStamp}`
       : `storeSlug=${storeIdentifier.storeSlug}&startDate=${startDateTimeStamp}&endDate=${endDateTimeStamp}`;
@@ -68,11 +71,13 @@ export async function getAvailableAppointmentsDates(
           "Content-Type": "application/json",
         },
         credentials: "include",
+        signal,
       }
     );
     if (response.ok) {
       const serverResponse = await response.json();
       let daysObjArr = {};
+      //creates an obj where each day is a key with an empty array
       for (let d = 0; d < amtOfDaysToFetch; d++) {
         const dateKey = resetTime(
           addDaysToDate(startDateTimeStamp, d),
@@ -80,9 +85,9 @@ export async function getAvailableAppointmentsDates(
         );
         daysObjArr[dateKey] = [];
       }
-      //creates an obj where each day is a key with an empty array
+      //,ales ot so each day contains only the HH:MM of that day
       serverResponse.otherData.forEach((date) => {
-        const tempDate = resetTime(date).getTime();
+        const tempDate = resetTime(date, "jsDate").getTime();
         daysObjArr[tempDate].push(ParseDateToHHMM(date)); //parse from array of iso to HH:MM format
       });
       serverResponse.otherData = daysObjArr;
@@ -91,6 +96,15 @@ export async function getAvailableAppointmentsDates(
       throw new Error(`server  ${response.status} error occured`);
     }
   } catch (error) {
+    if (error.name === "AbortError") {
+      // Fetch was aborted, do nothing
+      return sendRejectedResponse({
+        isSuccess: false,
+        message: "Request aborted",
+        code: "AbortError",
+        otherData: error,
+      });
+    }
     console.error("error:", error);
     return sendRejectedResponse({
       message: "an error occured see log",

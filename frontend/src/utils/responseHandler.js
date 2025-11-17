@@ -6,8 +6,7 @@ export function sendRejectedResponse(data) {
   return {
     code: data.code || "INTERNAL_ERROR",
     type: data.type || "errorResponse",
-    isSucess: false,
-    //msg is intentional,its a custom msg that was set
+    isSuccess: false,
     message: data.message || "an error occured",
     otherData: data.otherData || {},
   };

@@ -1,5 +1,5 @@
-import { useState } from "react";
-export default function ChooseTime({
+import { useEffect, useState } from "react";
+export default function ShowTime({
   date,
   times,
   handleChooseTimeOnlick,
@@ -7,60 +7,89 @@ export default function ChooseTime({
 }) {
   const [response, setResponse] = useState();
   const [timeArray, setTimeArray] = useState([]);
-  
+
   async function submitSelectedTime() {
     const serverResponse = await handleChooseTimeOnlick(timeArray);
-    setResponse(serverResponse.message);
-  }
-
-  function resetResponse(){
-    if(response){
-    setResponse();
+    if (!serverResponse.isSuccess) {
+      setResponse(serverResponse.message);
+    } else {
+      setResponse(serverResponse.message || "failed to update available times");
     }
   }
 
-  function timeBtnSelect(timeInput){
+  useEffect(() => {
+    setResponse(null);
+  }, [date]);
+
+  function resetResponse() {
+    if (response) {
+      setResponse();
+    }
+  }
+
+  function timeBtnSelect(timeInput) {
     resetResponse();
     const index = timeArray.indexOf(timeInput);
     //time wasnt chosen yet
-    if(index === -1){
+    if (index === -1) {
       //add new time in the array if max selection set is less than amount of chosen times
-      if(timeArray.length<maxTimeSelections){
-        setTimeArray([...timeArray,timeInput]);
+      if (timeArray.length < maxTimeSelections) {
+        setTimeArray([...timeArray, timeInput]);
       }
       //amount of chosen times is greater than the allowed set in max selection
-      else{
-      setResponse({message:`maximum amount of choices ${maxTimeSelections===1 ? "is 1": ` are ${maxTimeSelections}`}`})
-      }}
+      else {
+        setResponse(
+          `maximum amount of choices ${
+            maxTimeSelections === 1 ? "is 1" : ` are ${maxTimeSelections}`
+          }`
+        );
+      }
+    }
     //time was chosen already->remove the selection
-    else{
-      const tempTimeArray=[...timeArray]
-      tempTimeArray.splice(index,1);
+    else {
+      const tempTimeArray = [...timeArray];
+      tempTimeArray.splice(index, 1);
       setTimeArray(tempTimeArray);
-    }}
-    
+    }
+  }
+
   return (
     <div className="mainShowTimeContainer">
-      <span style={{fontSize:"large"}}>please choose time</span>
+      <span style={{ fontSize: "large" }}>please choose time</span>
       <div className="displayTimeContainer">
         {times.map(
           // sets the times user can choose
-          (timeInput) => 
+          (timeInput) => (
             <button
-              className={`TimeOptionBtn ${timeArray.includes(timeInput) ?"clicked" : ""}`}
+              className={`TimeOptionBtn ${
+                timeArray.includes(timeInput) ? "clicked" : ""
+              }`}
               key={timeInput}
               onClick={() => timeBtnSelect(timeInput)}
             >
-            {timeInput} </button>)}
+              {timeInput}{" "}
+            </button>
+          )
+        )}
       </div>
       {timeArray && (
-        <div style={{ display: "flex", flexDirection: "column", alignContent: "flex-end"}}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignContent: "flex-end",
+          }}
+        >
           <span>
             Date Selected:{date["date"].toLocaleDateString("en-GB")}{" "}
-            {(maxTimeSelections===1 && timeArray[0]) ? `at ${timeArray[0]}`:""}
+            {maxTimeSelections === 1 && timeArray[0]
+              ? `at ${timeArray[0]}`
+              : ""}
           </span>
           <button onClick={submitSelectedTime}>Confirm</button>
-          {response && <p>{response}</p>}
+          <p style={{ visibility: response ? "visible" : "hidden" }}>
+            {response}
+          </p>
         </div>
       )}
     </div>

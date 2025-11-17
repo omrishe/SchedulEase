@@ -6,7 +6,7 @@ export default function PopupDatePicker({ setDate }) {
   const [selectedDate, setselectedDate] = useState();
   return (
     <DatePicker
-      selected={selectedDate ? selectedDate : ""}
+      selected={selectedDate ? selectedDate : null}
       onChange={(date) => {
         setDate(date);
         setselectedDate(date);

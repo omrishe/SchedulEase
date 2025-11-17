@@ -6,7 +6,6 @@ const User = require("../Models/userModel.js");
 function authenticateToken(req, res, next) {
   const token = req.cookies.loginToken;
   if (!token) {
-    console.error("no token provided");
     return res.status(401).json(
       sendRejectedResponse({
         type: "loginRequired",
@@ -17,6 +16,13 @@ function authenticateToken(req, res, next) {
   }
   try {
     const secretKey = process.env.SECRET_HASH_PASSWORD;
+    if (!secretKey) {
+      return res
+        .status(500)
+        .json(
+          sendRejectedResponse({ message: "JWT secret key not configured" })
+        );
+    }
     const decoded = jwt.verify(token, secretKey);
     req.user = decoded;
     next(); // Authenticated successfully -continue
@@ -33,16 +39,16 @@ async function requireAdmin(req, res, next) {
     const { userId, role, storeId } = req.user;
     //check if role in cookie fits to prevent db lookup(for less overhead access to database and performance)
     if (role === "user") {
-      throw new Error(sendRejectedResponse({ message: "invalid auth" }));
+      throw new Error("invalid auth");
     }
     //for security(incase user gets demoted before token expires) we cross check with database
     const userData = await User.findById(userId);
     if (!userData) {
-      throw new Error(sendRejectedResponse({ message: "user Does not exist" }));
+      throw new Error("user Does not exist");
     }
     const userRole = userData.role;
     if (userRole !== "admin" && userRole !== "superAdmin") {
-      throw new Error(sendRejectedResponse({ message: "invalid auth" }));
+      throw new Error("invalid auth");
     }
     next(); //user is authorized, move to next handler
   } catch (error) {

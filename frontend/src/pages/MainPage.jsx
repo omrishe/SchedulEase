@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getStoreServices } from "../api/store";
 import { logout } from "../api/auth.js";
 import { AppointmentSelection } from "../components/AppointmentSelection.jsx";
 import { getUserBookingInfo } from "../api/appointments.js";
@@ -16,22 +15,6 @@ function MainPage({ userAuthData, resetUserData }) {
 
   const { slug } = useParams();
   const [logoutMsg, setLogoutMsg] = useState();
-  const [services, setServices] = useState(["loading"]);
-
-  //gets store available services
-  useEffect(() => {
-    async function getServices() {
-      const serverResponse = await getStoreServices(
-        appointmentInfo.storeId
-          ? { storeId: appointmentInfo.storeId }
-          : { storeSlug: slug }
-      );
-      if (serverResponse.isSuccess) {
-        setServices(serverResponse.otherData);
-      }
-    }
-    getServices();
-  }, []);
 
   function openWaze() {
     const latitude = 32.051403;
@@ -51,20 +34,23 @@ function MainPage({ userAuthData, resetUserData }) {
 
   //helper function that updates appointmentinfo with the new field and returns a copy of the resulting appointmentinfo
   function updateAppointmentInfo(newInfo) {
-    setAppointment((prev) => ({
-      ...prev, // keep all old fields
-      ...newInfo, // overwrite with new fields
-    }));
-    return { ...appointmentInfo, ...newInfo };
+    return new Promise((resolve) => {
+      setAppointment((prev) => {
+        const updated = { ...prev, ...newInfo };
+        resolve(updated);
+        return updated;
+      });
+    });
   }
 
-  function handleLogout() {
-    if (logout()) {
-      setLogoutMsg("logged out sucessfully");
+  async function handleLogout() {
+    const result = await logout();
+    if (result?.isSuccess) {
+      setLogoutMsg("logged out successfully");
       resetUserData();
       setAppointment({ date: new Date(), service: "", storeId: null });
     } else {
-      setLogoutMsg("an Error occured see log for more info");
+      setLogoutMsg("an Error occurred see log for more info");
     }
   }
 
@@ -114,8 +100,8 @@ function MainPage({ userAuthData, resetUserData }) {
             : userIsNotLoggedInElement}
           {/**logout msg to display after logging out */}
           {logoutMsg && <p>{logoutMsg}</p>}
-          {userAuthData.role == "admin" && (
-            <button onClick={() => navigatePage("AdminPanel")}>
+          {userAuthData.role === "admin" && (
+            <button onClick={() => navigatePage(`/store/${slug}/adminPanel`)}>
               admin panel
             </button>
           )}
@@ -133,7 +119,6 @@ function MainPage({ userAuthData, resetUserData }) {
         appointmentInfo={appointmentInfo}
         updateAppointmentInfo={updateAppointmentInfo}
         slug={slug}
-        services={services}
       ></AppointmentSelection>
       <AppointmentOverview
         fetchAppointmentsFunc={fetchUserAppointments}

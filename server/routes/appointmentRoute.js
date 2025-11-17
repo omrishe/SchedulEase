@@ -25,6 +25,14 @@ const router = express.Router();
 router.post("/new-appointment", authenticateToken, async (req, res) => {
   try {
     const { appointmentInfo: appointmentData } = req.body;
+    if (
+      !appointmentData ||
+      !appointmentData.date ||
+      !appointmentData.storeId ||
+      !appointmentData.service
+    ) {
+      throw new Error("Missing required appointment data");
+    }
     const userId = req.user.userId; //get the userId by the cookies (authenticateToken passes userId)
     const { email, userName } =
       (await User.findById(userId, { email: 1, userName: 1, _id: 0 })) || {};
@@ -34,20 +42,28 @@ router.post("/new-appointment", authenticateToken, async (req, res) => {
     appointmentData.userName = userName;
     appointmentData.email = email;
     appointmentData.userId = userId;
+    if (
+      !appointmentData.date ||
+      isNaN(new Date(appointmentData.date).getTime())
+    ) {
+      throw new Error("Invalid appointmentData date format");
+    }
     appointmentData.date = new Date(appointmentData.date);
     appointmentData.date.setSeconds(0, 0);
     const newAppointment = new Appointment(appointmentData); //recieves the data sent and create an appointment doc
-    const storeTimeSlot = await StoreTimeSlots.findOne({
-      storeId: appointmentData.storeId,
-      date: appointmentData.date,
-    });
-    if (storeTimeSlot.takenBy) {
-      throw new Error("appointment already taken");
+    const result = await StoreTimeSlots.findOneAndUpdate(
+      {
+        storeId: appointmentData.storeId,
+        date: appointmentData.date,
+        takenBy: null,
+      },
+      { takenBy: userId, userName: userName },
+      { new: true }
+    );
+    if (!result) {
+      throw new Error("Time slot not available or already taken");
     }
-    storeTimeSlot.takenBy = userId;
-    storeTimeSlot.userName = userName; //sets the timeSlot as taken by user
-    await newAppointment.save(); //saves the data to database -- mongoose automatically convert string date to js date
-    await storeTimeSlot.save(); //saves the new timeslot
+    await newAppointment.save();
     return res.status(201).json(
       sendSucessResponse({
         message: "added appointment successfully",
@@ -55,7 +71,7 @@ router.post("/new-appointment", authenticateToken, async (req, res) => {
     );
   } catch (error) {
     console.error(error);
-    if (error.name === "E11000") {
+    if (error.code === 11000) {
       return res.status(401).json(
         sendRejectedResponse({
           message: "invalid appointment please refresh page",
@@ -80,8 +96,14 @@ router.get("/getAvailableAppointmentDates", async (req, res) => {
       startDate: startTimeStamp,
       endDate: endTimeStamp,
     } = req.query;
+    if (isNaN(Number(startTimeStamp)) || isNaN(Number(endTimeStamp))) {
+      throw new Error("Invalid date format");
+    }
     const startDate = new Date(Number(startTimeStamp));
     const endDate = new Date(Number(endTimeStamp));
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      throw new Error("Invalid date");
+    }
     //js Date automatically moves to next month if day of month<{daySet}
     //sets is so its exactly 1 day
     let store;
@@ -114,12 +136,12 @@ router.get("/getAvailableAppointmentDates", async (req, res) => {
     );
   } catch (error) {
     console.error("an error occured see below for details:\n", error);
-    if (error === "Store not found") {
+    if (error.message === "Store not found") {
       return res
         .status(400)
         .json(sendRejectedResponse({ message: "Store not found" }));
     }
-    if (error === "Store identifier missing") {
+    if (error.message === "Store identifier missing") {
       return res
         .status(400)
         .json(sendRejectedResponse({ message: "Store identifier missing" }));
@@ -144,6 +166,14 @@ router.get(
       }
       startDate = new Date(Number(startDate));
       endDate = new Date(Number(endDate));
+      if (isNaN(Number(startDate)) || isNaN(Number(endDate))) {
+        throw new Error("Invalid date format");
+      }
+      startDate = new Date(Number(startDate));
+      endDate = new Date(Number(endDate));
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        throw new Error("Invalid date");
+      }
       //query db to get all appointments data
       const allAppointmentsData = await StoreTimeSlots.find(
         {
@@ -168,7 +198,12 @@ router.get(
     } catch (err) {
       console.error("Error fetching appointments:", err);
       res.status(500);
-      res.json({ message: err });
+      res.json(
+        sendRejectedResponse({
+          message: "Error fetching appointments",
+          otherData: err.message,
+        })
+      );
     }
   }
 );
@@ -186,6 +221,14 @@ router.get("/getUserBookingInfo", authenticateToken, async (req, res) => {
     }
     startDate = new Date(Number(startDate));
     endDate = new Date(Number(endDate));
+    if (isNaN(Number(startDate)) || isNaN(Number(endDate))) {
+      throw new Error("Invalid date format");
+    }
+    startDate = new Date(Number(startDate));
+    endDate = new Date(Number(endDate));
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      throw new Error("Invalid date");
+    }
     //query db to get all appointments data
     const allAppointmentsData = await StoreTimeSlots.find(
       {
@@ -211,7 +254,12 @@ router.get("/getUserBookingInfo", authenticateToken, async (req, res) => {
   } catch (err) {
     console.error("Error fetching appointments:", err);
     res.status(500);
-    res.json({ message: err });
+    res.json(
+      sendRejectedResponse({
+        message: "Error fetching appointments",
+        otherData: err.message,
+      })
+    );
   }
 });
 
@@ -222,13 +270,22 @@ router.get(
   async (req, res) => {
     try {
       let query = {}; //sets it so query is any empty object
-      const a = req.query.email; //get email from query -{} if no query is used
       const getAppointmentByEmail = await Appointment.find(query); //get appointment data associated with the email if it exists else it returns all
       res.status(200);
-      res.json(getAppointmentByEmail); //return appointmenet data
+      res.json(
+        sendSucessResponse({
+          message: "successfully fetched appointments",
+          otherData: getAppointmentByEmail,
+        })
+      ); //return appointmenet data
     } catch (err) {
       res.status(500);
-      res.json({ message: err.message });
+      res.json(
+        sendRejectedResponse({
+          message: "Error fetching appointments",
+          otherData: err.message,
+        })
+      );
     }
   }
 );

@@ -90,7 +90,7 @@ export async function logout() {
       },
       credentials: "include",
     });
-    const data = await response.json;
+    const data = await response.json();
     if (response.ok) {
       return data;
     } else {

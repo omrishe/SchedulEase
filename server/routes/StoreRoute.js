@@ -16,7 +16,7 @@ const {
 
 router.get("/getStoreInfo", authenticateToken, async (req, res) => {
   try {
-    const StoreData = await store.findById(req.body.storeId);
+    const StoreData = await store.findById(req.user.storeId);
     if (!StoreData) {
       throw new Error("no such store exists");
     }
@@ -67,11 +67,21 @@ router.post(
   async (req, res) => {
     try {
       const dates = req.body.dates;
-      const storeId = req.body._id;
-      const slotsArr = dates.map((slot) => ({
-        date: new Date(slot),
-        storeId: storeId,
-      }));
+      if (!Array.isArray(dates) || dates.length === 0) {
+        throw new Error("Invalid dates array");
+      }
+      dates.forEach((date) => {
+        if (isNaN(new Date(date).getTime())) {
+          throw new Error("Invalid date format");
+        }
+      });
+      const storeId = req.user.storeId;
+      const slotsArr = dates
+        .filter((slot) => !isNaN(new Date(slot).getTime()))
+        .map((slot) => ({
+          date: new Date(slot),
+          storeId: storeId,
+        }));
       try {
         const savedTimeSlots = await StoreTimeSlot.insertMany(slotsArr, {
           ordered: false,
@@ -86,14 +96,11 @@ router.post(
       res.status(200);
       res.json(sendSucessResponse({ message: "added successfully" }));
     } catch (error) {
-      console.error(
-        "error while trying to save store time slots see log\n",
-        error
-      );
+      console.error("an error has occured,see logs for more info", error);
       res.status(400);
       res.json(
         sendRejectedResponse({
-          message: "an error have occured,see logs for more info\n",
+          message: "an error has occured,see logs for more info\n",
         })
       );
     }
@@ -109,7 +116,10 @@ router.post(
       const { authData, formData } = req.body;
       const userData = await user.findById(authData.userId);
       //makes sure the user is admin
-      if (userData.role != "admin") {
+      if (!userData) {
+        throw new Error("User not found");
+      }
+      if (userData.role !== "admin") {
         throw new Error("invalid auth");
       }
       const storeToUpdate = await store.findById(userData.storeId);
@@ -133,7 +143,7 @@ router.post(
         ...filteredServices.map((svc) => storeToUpdate.services.create(svc))
       );
       //saves the new services to the store service schema
-      const added = await storeToUpdate.save();
+      await storeToUpdate.save();
       res
         .status(200)
         .json(sendSucessResponse({ message: "added successfully" }));
@@ -145,7 +155,7 @@ router.post(
       res.status(400);
       res.json(
         sendRejectedResponse({
-          message: "an error have occured,see logs for more info",
+          message: "an error has occured,see logs for more info",
         })
       );
     }
@@ -183,12 +193,12 @@ router.get("/getServices", async (req, res) => {
     );
   } catch (error) {
     console.error("an error occured see below for details:\n", error);
-    if (error === "Store not found") {
+    if (error.message === "Store not found") {
       return res
         .status(400)
         .json(sendRejectedResponse({ message: "Store not found" }));
     }
-    if (error === "Store identifier missing") {
+    if (error.message === "Store identifier missing") {
       return res
         .status(400)
         .json(sendRejectedResponse({ message: "Store identifier missing" }));
@@ -211,6 +221,9 @@ router.delete(
         },
         { new: true }
       );
+      if (!store) {
+        throw new Error("Store not found");
+      }
       const servicesToSend = store.services.map((service) => ({
         name: service.name,
         price: service.price,

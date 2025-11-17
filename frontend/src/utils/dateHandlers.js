@@ -6,16 +6,17 @@ export function addDaysToDate(date = new Date(), amount = 1) {
     return tmrwsDate;
   } catch (error) {
     console.error("error while parsing date see log", error);
+    return new Date(); // Return default date on error
   }
 }
 
-export function resetTime(date, mode = "jsDate") {
+export function resetTime(dateOrTimeStamp, mode = "jsDate") {
   try {
-    const newDate = new Date(date);
+    const newDate = new Date(dateOrTimeStamp);
     newDate.setHours(0, 0, 0, 0);
-    if (mode == "jsDate") {
+    if (mode === "jsDate") {
       return newDate;
-    } else if (mode == "timeStamp") {
+    } else if (mode === "timeStamp") {
       return newDate.getTime();
     } else {
       throw new Error(
@@ -24,6 +25,7 @@ export function resetTime(date, mode = "jsDate") {
     }
   } catch (error) {
     console.error("error while parsing date see log", error);
+    return mode === "timeStamp" ? 0 : new Date(); // Return default value
   }
 }
 

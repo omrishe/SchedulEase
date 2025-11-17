@@ -304,7 +304,6 @@ max-width: 900px;      /* caps width */
 .toggle-btn.on {
   background-color: #4caf50;
 }
-
 .toggle-btn.on .toggle-thumb {
   transform: translateX(24px);
 }

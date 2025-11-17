@@ -1,6 +1,6 @@
 import ToggleSwitch from "./ToggleSwitch";
 import ShowAppointmentsInfo from "./ShowAppointmentsInfo";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import PopupDatePicker from "./PopupDatePicker";
 import { addDaysToDate } from "../utils/dateHandlers";
 
@@ -30,11 +30,11 @@ export default function AppointmentOverview({
     if (data.isSuccess) {
       setRenderAppointments(true);
       setAppointments(data.otherData);
-    } else if (data.type == "loginRequired") {
+    } else if (data.type === "loginRequired") {
       setRenderAppointments(false);
       setErrorText("please log in");
     }
-  }, [startDate, endDate, renderAppointments]);
+  }, [startDate, endDate, fetchAppointmentsFunc]);
 
   return (
     <div>

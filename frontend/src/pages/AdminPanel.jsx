@@ -33,7 +33,7 @@ export function AdminPanel({ userAuthData }) {
   const maxTimeSelections = 24;
 
   //a helper function to set date
-  async function updateDate(dateClicked) {
+  function updateDate(dateClicked) {
     setDate(dateClicked["date"]);
   }
 
@@ -46,12 +46,6 @@ export function AdminPanel({ userAuthData }) {
       }
     }
     getServices();
-  }, []);
-
-  //function for fetching services
-  useEffect(() => {
-    async function filterFreeAppointments() {}
-    filterFreeAppointments();
   }, []);
 
   //handles sending store owner time available
@@ -97,8 +91,8 @@ export function AdminPanel({ userAuthData }) {
       ...prev,
       {
         formId: uuidv4(),
-        serviceName: "",
-        servicePrice: "",
+        name: "",
+        price: "",
         serviceNote: "",
       },
     ]);
@@ -200,7 +194,16 @@ export function AdminPanel({ userAuthData }) {
                 formData.length > 1 ? "s" : ""
               } to store`}</button>
             </form>
-            {message ?? <label style={{ display: "block" }}>{message}</label>}
+            {message && (
+              <label
+                style={{
+                  display: "block",
+                  visibility: message ? "visible" : "hidden",
+                }}
+              >
+                {message}
+              </label>
+            )}
           </div>
         </div>
         <div>

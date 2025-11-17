@@ -63,8 +63,14 @@ function App() {
   }, []);
 
   async function updateAuthData(newAuthData) {
-    setUserAuthData({ ...userAuthData, ...newAuthData });
-    saveToLocalStorage(newAuthData);
+    return new Promise((resolve) => {
+      setUserAuthData((prev) => {
+        const updated = { ...prev, ...newAuthData };
+        resolve(updated);
+        saveToLocalStorage(updated);
+        return updated;
+      });
+    });
   }
 
   return (
