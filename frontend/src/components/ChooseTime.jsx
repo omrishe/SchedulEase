@@ -9,7 +9,6 @@ export default function ChooseTime({
   const [response, setResponse] = useState(null);
   const [timeSelected, setTimeSelected] = useState("");
   const [isError, setIsError] = useState(false);
-  console.log("availableTimeSlots is", availableTimeSlots);
   async function submitSelectedTime() {
     if (appointmentInfo.storeId) {
       const serverResponse = await handleChooseTimeOnlick(timeSelected);
@@ -35,7 +34,6 @@ export default function ChooseTime({
   }
   const dateKey = resetTime(date, "timeStamp");
   const isDateLoaded = dateKey in availableTimeSlots;
-  console.log("dateKey is", dateKey);
   const timesForDate = isDateLoaded ? availableTimeSlots[dateKey] : [];
   const renderNoAvailableAppointment = (
     <label className="NoAvailableAppointmentLabel">

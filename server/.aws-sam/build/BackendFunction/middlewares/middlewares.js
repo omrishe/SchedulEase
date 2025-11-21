@@ -15,7 +15,7 @@ function authenticateToken(req, res, next) {
     );
   }
   try {
-    const secretKey = process.env.SECRET_HASH_PASSWORD;
+    const secretKey = process.env.SECRET_HASH_PASSWORD_PARAM;
     if (!secretKey) {
       return res
         .status(500)

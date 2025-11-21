@@ -35,7 +35,7 @@ router.post("/signup", async (req, res) => {
       throw new Error("email already exists");
     }
     otherData.role = "user";
-    const saltrounds = 10; // move this into params file
+    const saltrounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltrounds);
     const signupData = new Users({
       email,
@@ -81,7 +81,7 @@ router.post("/login", async (req, res) => {
       throw new Error("no user found");
     }
     //generate a new token for that specific user
-    const secretKey = process.env.SECRET_HASH_PASSWORD;
+    const secretKey = process.env.SECRET_HASH_PASSWORD_PARAM;
     //checking correct password
     if (!(await bcrypt.compare(password, userData.hashedPassword))) {
       throw new Error("wrong password");

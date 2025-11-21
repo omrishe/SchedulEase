@@ -44,6 +44,5 @@ app.use(isDatabaseConnected);
 app.use("/api/appointments", appointmentRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/store", storeRoute);
-console.log("done loading container \n");
 
 module.exports = app;
