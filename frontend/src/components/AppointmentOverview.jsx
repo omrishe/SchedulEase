@@ -38,6 +38,7 @@ export default function AppointmentOverview({
 
   return (
     <div>
+      <label style={{ display: "block" }}>view your appointments</label>
       <label>start date </label>
       <PopupDatePicker setDate={setStartDate}></PopupDatePicker>
       <label>end date </label>

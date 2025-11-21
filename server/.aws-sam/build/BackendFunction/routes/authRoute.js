@@ -16,15 +16,27 @@ const {
 router.post("/signup", async (req, res) => {
   try {
     const { email, password, storeSlug, ...otherData } = req.body;
+    if (!email || !password || !storeSlug) {
+      throw new Error("Missing required fields");
+    }
+    if (!email.includes("@") || email.length < 5) {
+      throw new Error("Invalid email format");
+    }
+    if (password.length < 8) {
+      throw new Error("Password must be at least 8 characters");
+    }
     //fetch storeId based on url
     const fetchedStore = await store.findOne({ storeSlug: storeSlug });
-    storeId = fetchedStore._id;
-    if (await Users.findOne({ email: email, _id: storeId })) {
+    if (!fetchedStore) {
+      throw new Error("Store not found");
+    }
+    const storeId = fetchedStore._id;
+    if (await Users.findOne({ email: email, storeId: storeId })) {
       throw new Error("email already exists");
     }
     otherData.role = "user";
     const saltrounds = 10; // move this into params file
-    hashedPassword = await bcrypt.hash(password, saltrounds);
+    const hashedPassword = await bcrypt.hash(password, saltrounds);
     const signupData = new Users({
       email,
       storeId: storeId,
@@ -84,7 +96,8 @@ router.post("/login", async (req, res) => {
     res.cookie("loginToken", token, {
       httpOnly: true,
       secure: true,
-      samesite: "None",
+      sameSite: "none",
+      partitioned: true,
       maxAge: 12 * 60 * 60 * 1000, //12 hours life of token cookie
     });
     const { _id, createdAt, updatedAt, hashedPassword, __v, ...data } =

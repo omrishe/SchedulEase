@@ -21,7 +21,7 @@ const storeTimeSlotSchema = new mongoose.Schema(
   { timestamps: true }
 );
 //sets indexes for faster searches and makes them unique --cant have the same storeID and date the same values
-storeTimeSlotSchema.index({ storeID: 1, date: 1 }, { unique: true });
+storeTimeSlotSchema.index({ storeId: 1, date: 1 }, { unique: true });
 
 module.exports =
   mongoose.models.StoreTimeSlot ||

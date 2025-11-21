@@ -21,7 +21,7 @@ const appointmentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 //sets indexes for faster searches
-appointmentSchema.index({ storeID: 1, date: 1 }, { unique: true });
+appointmentSchema.index({ storeId: 1, date: 1 }, { unique: true });
 module.exports =
   mongoose.models.Appointment ||
   mongoose.model("Appointment", appointmentSchema, "appointments");

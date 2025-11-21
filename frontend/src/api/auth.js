@@ -64,18 +64,37 @@ export async function userLogIn(formData) {
  */
 export async function validateToken() {
   try {
-    const response = await fetch(`${serverAddress}/validateToken`, {
-      method: "get",
-      credentials: "include",
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      return data;
+    let response;
+    for (let i = 0; i < 2; i++) {
+      response = await fetch(`${serverAddress}/validateToken`, {
+        method: "get",
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        return data;
+      }
+      await (async (ms) => new Promise((resolve) => setTimeout(resolve, ms)))(
+        5000
+      );
     }
-    return data;
+    if (response.status === 401) {
+      return sendRejectedResponse({
+        message: "token is invalid",
+        code: "TOKEN_INVALID",
+        isSuccess: false,
+      });
+    } else {
+      return sendRejectedResponse({
+        message: "an error occured see log",
+        code: "VALIDATE_TOKEN_ERROR",
+        otherData: await response.json(),
+      });
+    }
   } catch (error) {
     return sendRejectedResponse({
-      message: "an error occured see log",
+      message: "an error occured during token validation see log",
+      code: "VALIDATE_TOKEN_ERROR",
       otherData: error,
     });
   }

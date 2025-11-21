@@ -54,9 +54,11 @@ function App() {
   useEffect(() => {
     async function verifyTokenAndClearData() {
       const isTokenValid = await validateToken();
-      if (!isTokenValid.isSuccess) {
+      if (isTokenValid.code === "TOKEN_INVALID") {
         console.error("invalid token,resetting data", isTokenValid);
         resetUserData();
+      } else if (isTokenValid.code === "VALIDATE_TOKEN_ERROR") {
+        console.warn(isTokenValid.otherData.message);
       }
     }
     verifyTokenAndClearData();

@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
-
-const mongoUri = process.env.MONGO_URI;
+const { getSecretParm } = require("../utils/awsCmd");
 async function connectToMongo() {
   try {
+    const mongoUri = process.env.MONGO_URI_PARAM;
     await mongoose.connect(mongoUri, {
       // dbName is not a must but makes code look better
       dbName: "appointmentManagement",

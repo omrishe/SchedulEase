@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { resetTime } from "../utils/dateHandlers";
 export default function ChooseTime({
   date,
   availableTimeSlots,
@@ -8,12 +9,14 @@ export default function ChooseTime({
   const [response, setResponse] = useState(null);
   const [timeSelected, setTimeSelected] = useState("");
   const [isError, setIsError] = useState(false);
-
+  console.log("availableTimeSlots is", availableTimeSlots);
   async function submitSelectedTime() {
     if (appointmentInfo.storeId) {
       const serverResponse = await handleChooseTimeOnlick(timeSelected);
       if (!serverResponse.isSuccess) {
-        setResponse(serverResponse.message);
+        setResponse(
+          serverResponse.message || "an error occured while setting appointment"
+        );
         setIsError(true);
       } else {
         setIsError(false);
@@ -30,8 +33,9 @@ export default function ChooseTime({
     setResponse(null);
     setTimeSelected(timeInput === timeSelected ? "" : timeInput);
   }
-  const dateKey = date.getTime();
+  const dateKey = resetTime(date, "timeStamp");
   const isDateLoaded = dateKey in availableTimeSlots;
+  console.log("dateKey is", dateKey);
   const timesForDate = isDateLoaded ? availableTimeSlots[dateKey] : [];
   const renderNoAvailableAppointment = (
     <label className="NoAvailableAppointmentLabel">

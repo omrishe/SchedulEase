@@ -96,7 +96,8 @@ router.post("/login", async (req, res) => {
     res.cookie("loginToken", token, {
       httpOnly: true,
       secure: true,
-      samesite: "None",
+      sameSite: "none",
+      partitioned: true,
       maxAge: 12 * 60 * 60 * 1000, //12 hours life of token cookie
     });
     const { _id, createdAt, updatedAt, hashedPassword, __v, ...data } =

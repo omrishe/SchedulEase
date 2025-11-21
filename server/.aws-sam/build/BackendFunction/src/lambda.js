@@ -8,14 +8,24 @@
  which forwards it to your Express app and returns the response back to API Gateway.
 */
 const connectToMongo = require("../database/db");
-const serverlessExpress = require("@codegenie/serverless-express");
+const serverlessExpress = require("@vendia/serverless-express");
 const app = require("./app");
-
+const { getSecretParm } = require("../utils/awsCmd");
 //instance of the serverless
 let serverlessExpressInstance;
 
+async function getParmsFromAws() {
+  process.env.MONGO_URI_PARAM = await getSecretParm(
+    process.env.MONGO_URI_PARAM
+  );
+  process.env.SECRET_HASH_PASSWORD_PARAM = await getSecretParm(
+    process.env.SECRET_HASH_PASSWORD_PARAM
+  );
+}
+
 //first setup/coldStart when creating a new instance
 async function firstSetup(event, context) {
+  await getParmsFromAws();
   await connectToMongo();
   serverlessExpressInstance = serverlessExpress({ app });
   return serverlessExpressInstance(event, context);

@@ -5,7 +5,7 @@ codeuri = "C:\\Users\\omri\\Desktop\\SchedulEase\\SchedulEase\\server"
 runtime = "nodejs18.x"
 architecture = "x86_64"
 handler = "src/lambda.handler"
-manifest_hash = ""
+manifest_hash = "50ff638c81e8d5c004783907ffe17187"
 packagetype = "Zip"
 functions = ["BackendFunction"]
 
