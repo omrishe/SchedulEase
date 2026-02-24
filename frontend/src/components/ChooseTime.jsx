@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { resetTime } from "../utils/dateHandlers";
+import TimeSlotSkeleton from "./TimeSlotSkeleton";
 export default function ChooseTime({
   date,
   availableTimeSlots,
@@ -61,9 +62,13 @@ export default function ChooseTime({
         <>
           {!timeSelected && <span> please choose time</span>}
           <div className="timeOptions">
-            {timesForDate.length > 0
-              ? renderTimeButtons
-              : renderNoAvailableAppointment}
+            {!isDateLoaded ? (
+              <TimeSlotSkeleton count={8} />
+            ) : timesForDate.length > 0 ? (
+              renderTimeButtons
+            ) : (
+              renderNoAvailableAppointment
+            )}
           </div>
         </>
       ) : (

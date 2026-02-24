@@ -21,6 +21,7 @@ export async function createAppointment(appointmentInfo) {
     const data = await response.json();
     if (response.ok) {
       //convert back from ISO string to a date object
+      
       data.date = new Date(data.date);
       return data;
     } else {

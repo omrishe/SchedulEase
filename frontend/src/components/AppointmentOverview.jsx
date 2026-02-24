@@ -37,16 +37,18 @@ export default function AppointmentOverview({
   }, [startDate, endDate, fetchAppointmentsFunc]);
 
   return (
-    <div>
-      <label style={{ display: "block" }}>view your appointments</label>
-      <label>start date </label>
-      <PopupDatePicker setDate={setStartDate}></PopupDatePicker>
-      <label>end date </label>
-      <PopupDatePicker setDate={(date) => setEndDate(date)}></PopupDatePicker>
-      <button onClick={() => loadAppointments()}>confirm</button>
+    <div className="appointmentOverviewContainer">
+      <label>View Your Appointments</label>
+      <div className="datePickerRow">
+        <label>Start Date</label>
+        <PopupDatePicker setDate={setStartDate}></PopupDatePicker>
+        <label>End Date</label>
+        <PopupDatePicker setDate={(date) => setEndDate(date)}></PopupDatePicker>
+        <button className="loadAppointmentsBtn" onClick={() => loadAppointments()}>Confirm</button>
+      </div>
       {adminMode && (
         <ToggleSwitch
-          label={"show free appointments?"}
+          label={"Show free appointments?"}
           onToggle={(state) => setIncludeFreeAppointments(state)}
         ></ToggleSwitch>
       )}
@@ -57,7 +59,7 @@ export default function AppointmentOverview({
           appointments={appointments}
         ></ShowAppointmentsInfo>
       ) : (
-        <span style={{ display: "block" }}>{errorText}</span>
+        <span>{errorText}</span>
       )}
     </div>
   );

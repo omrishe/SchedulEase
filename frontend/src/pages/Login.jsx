@@ -46,23 +46,23 @@ export default function Login({ updateAuthData }) {
 
   return (
     <div className="mainWindow">
-      <p className="welcomeParagraph">login to your account</p>
+      <p className="welcomeParagraph">Login to Your Account</p>
       <form onSubmit={handleLogIn}>
-        <label htmlFor="emailInput">email</label>
+        <label htmlFor="emailInput">Email</label>
         <input
           id="emailInput"
           type="text"
           name="email"
           onChange={handleChange}
         />
-        <label htmlFor="password">password</label>
+        <label htmlFor="password">Password</label>
         <input
           id="password"
           type="password"
           name="password"
           onChange={handleChange}
         />
-        <button type="submit">login</button>
+        <button type="submit">Login</button>
       </form>
       {message && <p>{message}</p>}
     </div>

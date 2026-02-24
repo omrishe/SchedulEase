@@ -36,15 +36,16 @@ function handleChange(e) {
   }
 
 return(
-    <div>
+    <div className="superAdminContainer">
+    <p className="superAdminHeading">Create New Store</p>
     <form>
-        <label htmlFor="storeName">store name</label>
+        <label htmlFor="storeName">Store Name</label>
         <input name="storeName" onChange={handleChange} value={formData["storeName"]}/>
-        <label htmlFor="storeNote">store note</label>
+        <label htmlFor="storeNote">Store Note</label>
         <input name="storeNote" onChange={handleChange} value={formData["storeNote"]}/>
-        <label htmlFor="storeAnnouncement">store announcement</label>
+        <label htmlFor="storeAnnouncement">Store Announcement</label>
         <input name="storeAnnouncement" onChange={handleChange} value={formData["storeAnnouncement"]}/>
-        <button type="submit" onClick={createNewStore}>create a new store</button>
+        <button type="submit" onClick={createNewStore}>Create New Store</button>
     </form>
     
     <label>{message}</label>

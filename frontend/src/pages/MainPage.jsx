@@ -74,17 +74,17 @@ function MainPage({ userAuthData, resetUserData }) {
         className="loginBtn"
         onClick={() => navigatePage(`/store/${slug}/login`)}
       >
-        login
+        Login
       </button>
-      <button onClick={() => navigatePage(`/store/${slug}/register`)}>
-        dont have a user? Register
+      <button className="registerBtn" onClick={() => navigatePage(`/store/${slug}/register`)}>
+        Don't have an account? Register
       </button>
     </>
   );
 
   const userIsLoggedInElement = (
     <button className="logoutBtn" onClick={() => handleLogout()}>
-      logout
+      Logout
     </button>
   );
 
@@ -101,8 +101,8 @@ function MainPage({ userAuthData, resetUserData }) {
           {/**logout msg to display after logging out */}
           {logoutMsg && <p>{logoutMsg}</p>}
           {userAuthData.role === "admin" && (
-            <button onClick={() => navigatePage(`/store/${slug}/adminPanel`)}>
-              admin panel
+            <button className="adminPanelBtn" onClick={() => navigatePage(`/store/${slug}/adminPanel`)}>
+              Admin Panel
             </button>
           )}
         </div>

@@ -18,23 +18,11 @@ export default function SingleChoiceCalendar({ updateDate, date }) {
   //sets a custom toolbar to the calendar
   function CustomToolbar({ label, onNavigate }) {
     return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "8px",
-          marginBottom: "8px",
-          marginTop: "8px",
-        }}
-      >
-        <button style={{ width: "5%" }} onClick={() => onNavigate("PREV")}>
-          ←
-        </button>
-        <span style={{ fontWeight: "bold" }}>{label}</span>
-        <button style={{ width: "5%" }} onClick={() => onNavigate("NEXT")}>
-          →
-        </button>
-        <button style={{ width: "10%" }} onClick={() => onNavigate("TODAY")}>
+      <div className="calendarToolbar">
+        <button onClick={() => onNavigate("PREV")}>←</button>
+        <span>{label}</span>
+        <button onClick={() => onNavigate("NEXT")}>→</button>
+        <button className="calendarTodayBtn" onClick={() => onNavigate("TODAY")}>
           Today
         </button>
       </div>
