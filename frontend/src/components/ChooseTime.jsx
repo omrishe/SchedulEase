@@ -25,7 +25,7 @@ export default function ChooseTime({
         );
       }
     } else {
-      setResponse("not logged in");
+      setResponse("Please log in to book an appointment");
     }
   }
 
@@ -55,7 +55,6 @@ export default function ChooseTime({
   return (
     <div className="chooseTimeContainer">
       <span>
-        Date Selected:{date.toLocaleDateString("en-GB")}
         {timeSelected && ` at ${timeSelected}`}
       </span>
       {!isError ? (

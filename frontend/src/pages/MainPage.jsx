@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { logout } from "../api/auth.js";
 import { AppointmentSelection } from "../components/AppointmentSelection.jsx";
 import { getUserBookingInfo } from "../api/appointments.js";
-import AppointmentOverview from "../components/AppointmentOverview.jsx";
+import AppointmentViewer from "../components/AppointmentViewer.jsx";
 
 function MainPage({ userAuthData, resetUserData }) {
   const navigatePage = useNavigate();
@@ -120,10 +120,10 @@ function MainPage({ userAuthData, resetUserData }) {
         updateAppointmentInfo={updateAppointmentInfo}
         slug={slug}
       ></AppointmentSelection>
-      <AppointmentOverview
+      {userAuthData.userName ? <AppointmentViewer
         fetchAppointmentsFunc={fetchUserAppointments}
         adminMode={false}
-      ></AppointmentOverview>
+      ></AppointmentViewer> : <label>Please log in to view your appointments</label>}
     </div>
   );
 }

@@ -14,7 +14,6 @@ export default function SingleChoiceCalendar({ updateDate, date }) {
     getDay,
     locales,
   });
-
   //sets a custom toolbar to the calendar
   function CustomToolbar({ label, onNavigate }) {
     return (
@@ -29,7 +28,13 @@ export default function SingleChoiceCalendar({ updateDate, date }) {
     );
   }
 
+    function onSelectSlot(slotinfo) {
+
+    }
+
   return (
+    <>
+    <label>Choose Date</label>
     <Calendar
       className="calendarClass"
       date={date}
@@ -41,8 +46,12 @@ export default function SingleChoiceCalendar({ updateDate, date }) {
       style={{ height: "250px", width: "100%", color: "black" }}
       selected={date}
       onSelectSlot={(slotinfo) => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (slotinfo["start"] >= today) {
         updateDate({ date: new Date(slotinfo["start"]) });
-      }}
+      }}}
+      //highlights the selected day
       dayPropGetter={(calendarDate) => ({
         className:
           calendarDate.getTime() === date.getTime()
@@ -53,7 +62,14 @@ export default function SingleChoiceCalendar({ updateDate, date }) {
       /*customizes the calendar buttons */
       components={{ toolbar: CustomToolbar }}
       /*sets so when clicking on button it also moves the calendar and saved date */
-      onNavigate={(newDate) => updateDate({ date: newDate })}
+      onNavigate={(newDate) => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (newDate >= today) {
+          updateDate({ date: newDate });
+        }
+      }}
     />
+    </>
   );
 }

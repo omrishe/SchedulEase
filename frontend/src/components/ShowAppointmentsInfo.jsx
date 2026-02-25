@@ -1,10 +1,12 @@
 import { format } from "date-fns";
 
+//a component to show appointments
 export default function ShowAppointmentsInfo({
   adminMode,
   appointments,
   includeFreeAppointments,
 }) {
+  //show only appointments that are not free if includeFreeAppointments is false
   const visibleAppointments =
     appointments?.filter(
       (appointment) => includeFreeAppointments || appointment.userName

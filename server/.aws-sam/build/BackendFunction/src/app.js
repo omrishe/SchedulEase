@@ -28,6 +28,7 @@ app.use(
         // origin is in allowed origins list
         callback(null, true);
       } else {
+        console.warn(`[CORS Error] Origin rejected: ${origin}`);
         callback(new Error("origin not allowed in the allowed list"));
       }
     },

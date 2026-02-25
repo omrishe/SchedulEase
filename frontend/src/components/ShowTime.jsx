@@ -81,7 +81,6 @@ export default function ShowTime({
           }}
         >
           <span>
-            Date Selected:{date["date"].toLocaleDateString("en-GB")}{" "}
             {maxTimeSelections === 1 && timeArray[0]
               ? `at ${timeArray[0]}`
               : ""}

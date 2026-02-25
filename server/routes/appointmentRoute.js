@@ -88,7 +88,7 @@ router.post("/new-appointment", authenticateToken, async (req, res) => {
   }
 });
 
-router.get("/getAvailableAppointmentDates", async (req, res) => {
+router.get("/getAvailableAppointmentDates", authenticateToken, async (req, res) => {
   try {
     const {
       storeId,
@@ -99,10 +99,18 @@ router.get("/getAvailableAppointmentDates", async (req, res) => {
     if (isNaN(Number(startTimeStamp)) || isNaN(Number(endTimeStamp))) {
       throw new Error("Invalid date format");
     }
-    const startDate = new Date(Number(startTimeStamp));
+    let startDate = new Date(Number(startTimeStamp));
     const endDate = new Date(Number(endTimeStamp));
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
       throw new Error("Invalid date");
+    }
+    // Non-admins cannot query past slots — clamp startDate to today's midnight
+    if (!req.user || req.user.role !== "admin") {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (startDate < today) {
+        throw new Error("Cannot query past dates");
+      }
     }
     //js Date automatically moves to next month if day of month<{daySet}
     //sets is so its exactly 1 day
@@ -145,6 +153,11 @@ router.get("/getAvailableAppointmentDates", async (req, res) => {
       return res
         .status(400)
         .json(sendRejectedResponse({ message: "Store identifier missing" }));
+    }
+    if (error.message === "Cannot query past dates") {
+      return res
+        .status(403)
+        .json(sendRejectedResponse({ message: "Cannot query past dates" }));
     }
     return res.status(400).json(sendRejectedResponse());
   }

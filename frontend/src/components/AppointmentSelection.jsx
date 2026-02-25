@@ -113,11 +113,11 @@ export function AppointmentSelection({
       return response;
     }
   }
-
   return (
     <div className="appointmentMainWindow">
       {windowChooser === "items" && (
         <MenuItems
+          appointmentInfo={appointmentInfo}
           services={services}
           onNextServiceBtnPress={(serviceName) =>
             updateAppointmentInfo({ service: serviceName })
@@ -137,8 +137,7 @@ export function AppointmentSelection({
             handleChooseTimeOnlick={handleChooseTimeOnClick}
             appointmentInfo={appointmentInfo}
           ></ChooseTime>
-        </div>
-      )}
+        </div>)}
     </div>
   );
 }
