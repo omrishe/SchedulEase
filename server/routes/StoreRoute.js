@@ -14,7 +14,7 @@ const {
   sendRejectedResponse,
 } = require("../utils/responseHandler.js");
 
-router.get("/getStoreInfo", authenticateToken, async (req, res) => {
+router.get("/get-store-info", authenticateToken, async (req, res) => {
   try {
     const StoreData = await store.findById(req.user.storeId);
     if (!StoreData) {
@@ -24,14 +24,14 @@ router.get("/getStoreInfo", authenticateToken, async (req, res) => {
       sendSucessResponse({
         message: "store retrieved successfully",
         otherData: StoreData,
-      })
+      }),
     );
   } catch (error) {
     console.error("error while trying to handle store data see log", error);
     res.status(400);
     if (error.message === "no such store exists") {
       return res.json(
-        sendRejectedResponse({ message: "no such store exists" })
+        sendRejectedResponse({ message: "no such store exists" }),
       );
     }
     return res.json(sendRejectedResponse({}));
@@ -47,7 +47,7 @@ router.post("/new", authenticateToken, async (req, res) => {
       sendSucessResponse({
         message: "store successfully saved",
         otherData: savedStore,
-      })
+      }),
     );
   } catch (error) {
     console.error("an error occured while trying to save store data", error);
@@ -55,7 +55,7 @@ router.post("/new", authenticateToken, async (req, res) => {
     res.json(
       sendRejectedResponse({
         message: "an error occured while trying to save store data",
-      })
+      }),
     );
   }
 });
@@ -101,10 +101,10 @@ router.post(
       res.json(
         sendRejectedResponse({
           message: "an error has occured,see logs for more info\n",
-        })
+        }),
       );
     }
-  }
+  },
 );
 
 router.post(
@@ -136,11 +136,11 @@ router.post(
               formDataService.name === "" ||
               !formDataService.name ||
               formDataService.price === "" ||
-              !formDataService.price
-          )
+              !formDataService.price,
+          ),
       );
       storeToUpdate.services.push(
-        ...filteredServices.map((svc) => storeToUpdate.services.create(svc))
+        ...filteredServices.map((svc) => storeToUpdate.services.create(svc)),
       );
       //saves the new services to the store service schema
       await storeToUpdate.save();
@@ -150,19 +150,19 @@ router.post(
     } catch (error) {
       console.error(
         "error while trying to save store time slots see log",
-        error
+        error,
       );
       res.status(400);
       res.json(
         sendRejectedResponse({
           message: "an error has occured,see logs for more info",
-        })
+        }),
       );
     }
-  }
+  },
 );
 
-router.get("/getServices", async (req, res) => {
+router.get("/get-services", async (req, res) => {
   try {
     const { storeId, storeSlug } = req.query;
     let fetchedStore;
@@ -171,7 +171,7 @@ router.get("/getServices", async (req, res) => {
     } else if (storeSlug) {
       fetchedStore = await Store.findOne(
         { storeSlug: storeSlug },
-        { services: 1, _id: 0 }
+        { services: 1, _id: 0 },
       );
     } else {
       throw new Error("Store identifier missing");
@@ -189,7 +189,7 @@ router.get("/getServices", async (req, res) => {
       sendSucessResponse({
         message: "successfully fetched services",
         otherData: servicesToSend,
-      })
+      }),
     );
   } catch (error) {
     console.error("an error occured see below for details:\n", error);
@@ -219,7 +219,7 @@ router.delete(
         {
           $pull: { services: { _id: serviceId } },
         },
-        { new: true }
+        { new: true },
       );
       if (!store) {
         throw new Error("Store not found");
@@ -235,7 +235,7 @@ router.delete(
         sendSucessResponse({
           message: "service successfully deleted",
           otherData: servicesToSend,
-        })
+        }),
       );
     } catch (error) {
       console.error("an error occured while trying to alter store data", error);
@@ -243,10 +243,58 @@ router.delete(
       res.json(
         sendRejectedResponse({
           message: "an error occured while trying to alter store data",
-        })
+        }),
       );
     }
-  }
+  },
+);
+
+router.patch(
+  "/updateService",
+  authenticateToken,
+  requireAdmin,
+  async (req, res) => {
+    try {
+      const { serviceId, storeId, name, price, serviceNote } = req.body;
+      if (!serviceId || !storeId) {
+        throw new Error("serviceId and storeId are required");
+      }
+      const storeToUpdate = await Store.findById(storeId);
+      if (!storeToUpdate) {
+        throw new Error("Store not found");
+      }
+      const serviceToEdit = storeToUpdate.services.id(serviceId);
+      if (!serviceToEdit) {
+        throw new Error("Service not found");
+      }
+      // makes sure only update fields that were actually provided
+      serviceToEdit.name ? (serviceToEdit.name = name) : null;
+      serviceToEdit.price ? (serviceToEdit.price = price) : null;
+      serviceToEdit.serviceNote
+        ? (serviceToEdit.serviceNote = serviceNote)
+        : null;
+      await storeToUpdate.save();
+      const servicesToSend = storeToUpdate.services.map((service) => ({
+        name: service.name,
+        price: service.price,
+        serviceNote: service.serviceNote,
+        srvId: service._id,
+      }));
+      res.status(200).json(
+        sendSucessResponse({
+          message: "service updated successfully",
+          otherData: servicesToSend,
+        }),
+      );
+    } catch (error) {
+      console.error("error while trying to update service", error);
+      res.status(400).json(
+        sendRejectedResponse({
+          message: "an error occurred while updating the service",
+        }),
+      );
+    }
+  },
 );
 
 module.exports = router;

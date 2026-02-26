@@ -58,7 +58,7 @@ router.post("/new-appointment", authenticateToken, async (req, res) => {
         takenBy: null,
       },
       { takenBy: userId, userName: userName },
-      { new: true }
+      { new: true },
     );
     if (!result) {
       throw new Error("Time slot not available or already taken");
@@ -67,7 +67,7 @@ router.post("/new-appointment", authenticateToken, async (req, res) => {
     return res.status(201).json(
       sendSucessResponse({
         message: "added appointment successfully",
-      })
+      }),
     );
   } catch (error) {
     console.error(error);
@@ -75,7 +75,7 @@ router.post("/new-appointment", authenticateToken, async (req, res) => {
       return res.status(401).json(
         sendRejectedResponse({
           message: "invalid appointment please refresh page",
-        })
+        }),
       );
     }
     return res.status(400).json(
@@ -83,91 +83,95 @@ router.post("/new-appointment", authenticateToken, async (req, res) => {
         code: error.code,
         message:
           "an error has occured while creating appointment please try again later",
-      })
+      }),
     );
   }
 });
 
-router.get("/getAvailableAppointmentDates", authenticateToken, async (req, res) => {
-  try {
-    const {
-      storeId,
-      storeSlug,
-      startDate: startTimeStamp,
-      endDate: endTimeStamp,
-    } = req.query;
-    if (isNaN(Number(startTimeStamp)) || isNaN(Number(endTimeStamp))) {
-      throw new Error("Invalid date format");
-    }
-    let startDate = new Date(Number(startTimeStamp));
-    const endDate = new Date(Number(endTimeStamp));
-    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-      throw new Error("Invalid date");
-    }
-    // Non-admins cannot query past slots — clamp startDate to today's midnight
-    if (!req.user || req.user.role !== "admin") {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (startDate < today) {
-        throw new Error("Cannot query past dates");
+router.get(
+  "/get-available-appointment-dates",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const {
+        storeId,
+        storeSlug,
+        startDate: startTimeStamp,
+        endDate: endTimeStamp,
+      } = req.query;
+      if (isNaN(Number(startTimeStamp)) || isNaN(Number(endTimeStamp))) {
+        throw new Error("Invalid date format");
       }
+      let startDate = new Date(Number(startTimeStamp));
+      const endDate = new Date(Number(endTimeStamp));
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        throw new Error("Invalid date");
+      }
+      // Non-admins cannot query past slots — clamp startDate to today's midnight
+      if (!req.user || req.user.role !== "admin") {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (startDate < today) {
+          throw new Error("Cannot query past dates");
+        }
+      }
+      //js Date automatically moves to next month if day of month<{daySet}
+      //sets is so its exactly 1 day
+      let store;
+      if (storeId) {
+        //reduntant database access but kept it incase in the future we'll need the store object
+        store = await Store.findById(storeId);
+      } else if (storeSlug) {
+        store = await Store.findOne({ storeSlug: storeSlug });
+      } else {
+        throw new Error("Store identifier missing");
+      }
+      if (!store) {
+        throw new Error("Store not found");
+      }
+      let availableSlots = await StoreTimeSlots.find(
+        {
+          storeId: store._id,
+          takenBy: null,
+          date: { $gte: startDate, $lt: endDate },
+        },
+        { date: 1, _id: 0 },
+      ).sort({ date: 1 });
+      //availableSlots is an array of object containing dates,this line transforms it into array of dates
+      const availableSlotsArr = availableSlots.map((slot) => slot.date);
+      return res.json(
+        sendSucessResponse({
+          message: "successfully fetched appointments",
+          otherData: availableSlotsArr,
+        }),
+      );
+    } catch (error) {
+      console.error("an error occured see below for details:\n", error);
+      if (error.message === "Store not found") {
+        return res
+          .status(400)
+          .json(sendRejectedResponse({ message: "Store not found" }));
+      }
+      if (error.message === "Store identifier missing") {
+        return res
+          .status(400)
+          .json(sendRejectedResponse({ message: "Store identifier missing" }));
+      }
+      if (error.message === "Cannot query past dates") {
+        return res
+          .status(403)
+          .json(sendRejectedResponse({ message: "Cannot query past dates" }));
+      }
+      return res.status(400).json(sendRejectedResponse());
     }
-    //js Date automatically moves to next month if day of month<{daySet}
-    //sets is so its exactly 1 day
-    let store;
-    if (storeId) {
-      //reduntant database access but kept it incase in the future we'll need the store object
-      store = await Store.findById(storeId);
-    } else if (storeSlug) {
-      store = await Store.findOne({ storeSlug: storeSlug });
-    } else {
-      throw new Error("Store identifier missing");
-    }
-    if (!store) {
-      throw new Error("Store not found");
-    }
-    let availableSlots = await StoreTimeSlots.find(
-      {
-        storeId: store._id,
-        takenBy: null,
-        date: { $gte: startDate, $lt: endDate },
-      },
-      { date: 1, _id: 0 }
-    ).sort({ date: 1 });
-    //availableSlots is an array of object containing dates,this line transforms it into array of dates
-    const availableSlotsArr = availableSlots.map((slot) => slot.date);
-    return res.json(
-      sendSucessResponse({
-        message: "successfully fetched appointments",
-        otherData: availableSlotsArr,
-      })
-    );
-  } catch (error) {
-    console.error("an error occured see below for details:\n", error);
-    if (error.message === "Store not found") {
-      return res
-        .status(400)
-        .json(sendRejectedResponse({ message: "Store not found" }));
-    }
-    if (error.message === "Store identifier missing") {
-      return res
-        .status(400)
-        .json(sendRejectedResponse({ message: "Store identifier missing" }));
-    }
-    if (error.message === "Cannot query past dates") {
-      return res
-        .status(403)
-        .json(sendRejectedResponse({ message: "Cannot query past dates" }));
-    }
-    return res.status(400).json(sendRejectedResponse());
-  }
-});
+  },
+);
 
 /*admin role required
 /get all appointments in specific dates
 **/
 router.get(
-  "/get-All-Store-Appointments",
+  "/get-all-store-appointments",
   authenticateToken,
   requireAdmin,
   async (req, res) => {
@@ -194,19 +198,19 @@ router.get(
           date: { $gte: startDate, $lt: endDate },
         },
         null,
-        { lean: true } //makes mongoose return plain js object its like toobject
+        { lean: true }, //makes mongoose return plain js object its like toobject
       );
       const filteredAppointmentsData = allAppointmentsData.map(
         ({ _id, __v, createdAt, updatedAt, ...otherData }) => {
           otherData.appointmentId = _id;
           return otherData;
-        }
+        },
       );
       return res.json(
         sendSucessResponse({
           message: "successfully fetched appointments",
           otherData: filteredAppointmentsData,
-        })
+        }),
       );
     } catch (err) {
       console.error("Error fetching appointments:", err);
@@ -215,16 +219,16 @@ router.get(
         sendRejectedResponse({
           message: "Error fetching appointments",
           otherData: err.message,
-        })
+        }),
       );
     }
-  }
+  },
 );
 /*
 /get all user appointments in specific dates
 **/
 
-router.get("/getUserBookingInfo", authenticateToken, async (req, res) => {
+router.get("/get-user-booking-info", authenticateToken, async (req, res) => {
   try {
     let { startDate, endDate } = req.query;
     const storeId = req.user.storeId;
@@ -250,19 +254,19 @@ router.get("/getUserBookingInfo", authenticateToken, async (req, res) => {
         date: { $gte: startDate, $lt: endDate },
       },
       null,
-      { lean: true } //makes mongoose return plain js object its like toobject
+      { lean: true }, //makes mongoose return plain js object its like toobject
     );
     const filteredAppointmentsData = allAppointmentsData.map(
       ({ _id, __v, createdAt, updatedAt, ...otherData }) => {
         otherData.appointmentId = _id;
         return otherData;
-      }
+      },
     );
     return res.json(
       sendSucessResponse({
         message: "successfully fetched appointments",
         otherData: filteredAppointmentsData,
-      })
+      }),
     );
   } catch (err) {
     console.error("Error fetching appointments:", err);
@@ -271,13 +275,13 @@ router.get("/getUserBookingInfo", authenticateToken, async (req, res) => {
       sendRejectedResponse({
         message: "Error fetching appointments",
         otherData: err.message,
-      })
+      }),
     );
   }
 });
 
 router.get(
-  "/getAppointmentsInfo",
+  "/get-appointments-info",
   authenticateToken,
   requireAdmin,
   async (req, res) => {
@@ -289,7 +293,7 @@ router.get(
         sendSucessResponse({
           message: "successfully fetched appointments",
           otherData: getAppointmentByEmail,
-        })
+        }),
       ); //return appointmenet data
     } catch (err) {
       res.status(500);
@@ -297,10 +301,10 @@ router.get(
         sendRejectedResponse({
           message: "Error fetching appointments",
           otherData: err.message,
-        })
+        }),
       );
     }
-  }
+  },
 );
 
 /** 

@@ -21,7 +21,7 @@ export async function createAppointment(appointmentInfo) {
     const data = await response.json();
     if (response.ok) {
       //convert back from ISO string to a date object
-      
+
       data.date = new Date(data.date);
       return data;
     } else {
@@ -41,7 +41,7 @@ export async function getAvailableAppointmentsDates(
   storeIdentifier,
   startDate,
   options = {}, // for { signal }
-  endDate
+  endDate,
 ) {
   try {
     const { signal } = options;
@@ -57,7 +57,7 @@ export async function getAvailableAppointmentsDates(
       ? endDate.getTime()
       : resetTime(
           addDaysToDate(startDateTimeStamp, amtOfDaysToFetch),
-          "timeStamp"
+          "timeStamp",
         );
     //sets it so if already logged in send the storeId and if not send the store Slug
     //currently disabled
@@ -65,7 +65,7 @@ export async function getAvailableAppointmentsDates(
       ? `storeId=${storeIdentifier.storeId}&startDate=${startDateTimeStamp}&endDate=${endDateTimeStamp}`
       : `storeSlug=${storeIdentifier.storeSlug}&startDate=${startDateTimeStamp}&endDate=${endDateTimeStamp}`;
     const response = await fetch(
-      `${serverAddress}/getAvailableAppointmentDates?${query}`,
+      `${serverAddress}/get-available-appointment-dates?${query}`,
       {
         method: "GET",
         headers: {
@@ -73,7 +73,7 @@ export async function getAvailableAppointmentsDates(
         },
         credentials: "include",
         signal,
-      }
+      },
     );
     if (response.ok) {
       const serverResponse = await response.json();
@@ -82,7 +82,7 @@ export async function getAvailableAppointmentsDates(
       for (let d = 0; d < amtOfDaysToFetch; d++) {
         const dateKey = resetTime(
           addDaysToDate(startDateTimeStamp, d),
-          "timeStamp"
+          "timeStamp",
         );
         daysObjArr[dateKey] = [];
       }
@@ -121,14 +121,14 @@ export async function getAllStoreAppointments(startDate, endDate) {
     startDate = resetTime(startDate);
     endDate = resetTime(endDate);
     const response = await fetch(
-      `${serverAddress}/get-All-Store-Appointments?startDate=${startDate.getTime()}&endDate=${endDate.getTime()}`,
+      `${serverAddress}/get-all-store-appointments?startDate=${startDate.getTime()}&endDate=${endDate.getTime()}`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-      }
+      },
     );
     if (response.ok) {
       const allAppointment = await response.json();
@@ -151,14 +151,14 @@ export async function getUserBookingInfo(startDate, endDate) {
     startDate = resetTime(startDate);
     endDate = resetTime(endDate);
     const response = await fetch(
-      `${serverAddress}/getUserBookingInfo?startDate=${startDate.getTime()}&endDate=${endDate.getTime()}`,
+      `${serverAddress}/get-user-booking-info?startDate=${startDate.getTime()}&endDate=${endDate.getTime()}`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-      }
+      },
     );
     const allAppointment = await response.json();
     return allAppointment;

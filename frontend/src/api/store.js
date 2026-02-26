@@ -19,7 +19,7 @@ export async function adminDelService(serviceToDelId, storeId) {
           "Content-Type": "application/json",
         },
         credentials: "include",
-      }
+      },
     );
     const data = await response.json();
     if (!response.ok) {
@@ -61,7 +61,7 @@ export async function createStore(storeInfo) {
 
 export async function getStoreInfo(storeId) {
   try {
-    const response = await fetch(`${serverAddress}/getStoreInfo`, {
+    const response = await fetch(`${serverAddress}/get-store-info`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -114,7 +114,7 @@ export async function getStoreServices(storeIdentifier) {
     const query = storeIdentifier.storeId
       ? `storeId=${storeIdentifier.storeId}`
       : `storeSlug=${storeIdentifier.storeSlug}`;
-    const response = await fetch(`${serverAddress}/getServices?${query}`, {
+    const response = await fetch(`${serverAddress}/get-services?${query}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -151,6 +151,26 @@ export async function setStoreOwnerAvailability(dateObjects, _id) {
     } else {
       return data;
     }
+  } catch (error) {
+    return sendRejectedResponse({
+      message: "an error occured see log",
+      otherData: error,
+    });
+  }
+}
+
+export async function adminEditService(storeId, serviceId, updatedFields) {
+  try {
+    const response = await fetch(`${serverAddress}/updateService`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({ storeId, serviceId, ...updatedFields }),
+    });
+    const data = await response.json();
+    return data;
   } catch (error) {
     return sendRejectedResponse({
       message: "an error occured see log",
