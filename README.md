@@ -85,7 +85,7 @@ Here’s how to get a working local version running. You can adapt for staging/p
 - Node.js (v16 + recommended)
 - npm or yarn
 - MongoDB instance (local or remote)
-- (Optional) `.env` file with config values
+- (Optional) `.env` file with config values (see .env.example)
 
 ---
 
