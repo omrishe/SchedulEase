@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { logout } from "../api/auth.js";
 import { AppointmentSelection } from "../components/AppointmentSelection.jsx";
 import { getUserBookingInfo } from "../api/appointments.js";
-import AppointmentOverview from "../components/AppointmentOverview.jsx";
+import AppointmentViewer from "../components/AppointmentViewer.jsx";
 
 function MainPage({ userAuthData, resetUserData }) {
   const navigatePage = useNavigate();
@@ -74,17 +74,17 @@ function MainPage({ userAuthData, resetUserData }) {
         className="loginBtn"
         onClick={() => navigatePage(`/store/${slug}/login`)}
       >
-        login
+        Login
       </button>
-      <button onClick={() => navigatePage(`/store/${slug}/register`)}>
-        dont have a user? Register
+      <button className="registerBtn" onClick={() => navigatePage(`/store/${slug}/register`)}>
+        Don't have an account? Register
       </button>
     </>
   );
 
   const userIsLoggedInElement = (
     <button className="logoutBtn" onClick={() => handleLogout()}>
-      logout
+      Logout
     </button>
   );
 
@@ -101,8 +101,8 @@ function MainPage({ userAuthData, resetUserData }) {
           {/**logout msg to display after logging out */}
           {logoutMsg && <p>{logoutMsg}</p>}
           {userAuthData.role === "admin" && (
-            <button onClick={() => navigatePage(`/store/${slug}/adminPanel`)}>
-              admin panel
+            <button className="adminPanelBtn" onClick={() => navigatePage(`/store/${slug}/adminPanel`)}>
+              Admin Panel
             </button>
           )}
         </div>
@@ -120,10 +120,10 @@ function MainPage({ userAuthData, resetUserData }) {
         updateAppointmentInfo={updateAppointmentInfo}
         slug={slug}
       ></AppointmentSelection>
-      <AppointmentOverview
+      {userAuthData.userName ? <AppointmentViewer
         fetchAppointmentsFunc={fetchUserAppointments}
         adminMode={false}
-      ></AppointmentOverview>
+      ></AppointmentViewer> : <label>Please log in to view your appointments</label>}
     </div>
   );
 }

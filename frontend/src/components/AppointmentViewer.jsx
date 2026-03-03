@@ -5,7 +5,7 @@ import PopupDatePicker from "./PopupDatePicker";
 import { addDaysToDate } from "../utils/dateHandlers";
 
 //a component to overview all appointments
-export default function AppointmentOverview({
+export default function AppointmentViewer({
   fetchAppointmentsFunc,
   adminMode,
 }) {
@@ -14,8 +14,8 @@ export default function AppointmentOverview({
   const [endDate, setEndDate] = useState(addDaysToDate(new Date(), 1));
   const [includeFreeAppointments, setIncludeFreeAppointments] = useState(false);
   const [appointments, setAppointments] = useState([]);
-  const [renderAppointments, setRenderAppointments] = useState(false);
   const [errorText, setErrorText] = useState("");
+  const [pageState, setPageState] = useState("");
 
   /*
   this fetches the data using the parent given fetching function and saves it
@@ -23,28 +23,45 @@ export default function AppointmentOverview({
   also we send the next day of endDate to show booking of the same day also
   */
   const loadAppointments = useCallback(async () => {
+    if(startDate >= endDate){
+      setPageState("error");
+      setErrorText("start date must be equal or before end date");
+      return;
+    }
+    else{
+    setPageState("loading");
     const data = await fetchAppointmentsFunc(
       startDate,
       addDaysToDate(endDate, 1)
     );
     if (data.isSuccess) {
-      setRenderAppointments(true);
+      setPageState("success");
       setAppointments(data.otherData);
     } else if (data.type === "loginRequired") {
-      setRenderAppointments(false);
+      setPageState("error");
       setErrorText("please log in");
     }
-  }, [startDate, endDate, fetchAppointmentsFunc]);
+    else{
+      setPageState("error");
+      setErrorText(data.message || "an error occurred please try again");
+    }
+  }}, [startDate, endDate, fetchAppointmentsFunc]);
 
   return (
-    <div className="appointmentOverviewContainer">
+    <div className="appointmentViewerContainer">
       <label>View Your Appointments</label>
       <div className="datePickerRow">
-        <label>Start Date</label>
-        <PopupDatePicker setDate={setStartDate}></PopupDatePicker>
-        <label>End Date</label>
-        <PopupDatePicker setDate={(date) => setEndDate(date)}></PopupDatePicker>
-        <button className="loadAppointmentsBtn" onClick={() => loadAppointments()}>Confirm</button>
+        <div className="dateGroup">
+          <label>Start Date</label>
+          <PopupDatePicker setDate={(date) => {setPageState(""); setStartDate(date)}}></PopupDatePicker>
+        </div>
+        <div className="dateGroup">
+          <label>End Date</label> 
+          <PopupDatePicker setDate={(date) => {setPageState(""); setEndDate(date)}}></PopupDatePicker>
+        </div>
+        <div className="dateGroup">
+          <button className="loadAppointmentsBtn" onClick={() => loadAppointments()}>Confirm</button>
+        </div>
       </div>
       {adminMode && (
         <ToggleSwitch
@@ -52,14 +69,21 @@ export default function AppointmentOverview({
           onToggle={(state) => setIncludeFreeAppointments(state)}
         ></ToggleSwitch>
       )}
-      {renderAppointments ? (
+      {pageState === "loading" ? (
+        <div className="loadingSpinner">
+          <div className="loadingSpinnerInner"></div>
+          <span>Loading appointments...</span>
+        </div>
+      ) : pageState === "error" ? (
+        <div className="viewerErrorMsg"> {errorText}</div>
+      ) : pageState === "success" ? (
         <ShowAppointmentsInfo
           adminMode={adminMode}
           includeFreeAppointments={includeFreeAppointments}
           appointments={appointments}
         ></ShowAppointmentsInfo>
       ) : (
-        <span>{errorText}</span>
+        <></>
       )}
     </div>
   );

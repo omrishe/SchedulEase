@@ -10,6 +10,7 @@ function Register({ setToken, className }) {
     email: "",
     storeSlug: slug,
   });
+  
   const navigatePage = useNavigate();
   const [message, setMessage] = useState("");
 
@@ -43,12 +44,12 @@ function Register({ setToken, className }) {
 
   return (
     <div className="mainWindow">
-      <p className="welcomeParagraph">register new account</p>
+      <p className="welcomeParagraph">Create Your Account</p>
       <form
         onSubmit={handleRegister}
         style={{ flexDirection: "column", display: "flex" }}
       >
-        <label htmlFor="userNameInput">name</label>
+        <label htmlFor="userNameInput">Name</label>
         <input
           id="userNameInput"
           type="text"
@@ -56,7 +57,7 @@ function Register({ setToken, className }) {
           value={formData.userName}
           onChange={handleChange}
         />
-        <label htmlFor="emailInput">email</label>
+        <label htmlFor="emailInput">Email</label>
         <input
           id="emailInput"
           type="text"
@@ -64,7 +65,7 @@ function Register({ setToken, className }) {
           onChange={handleChange}
           value={formData.email}
         />
-        <label htmlFor="password">password</label>
+        <label htmlFor="password">Password</label>
         <input
           id="password"
           type="password"
@@ -72,7 +73,7 @@ function Register({ setToken, className }) {
           onChange={handleChange}
           value={formData.password}
         />
-        <button type="submit"> submit</button>
+        <button type="submit">Create Account</button>
       </form>
       {message && <p>{message}</p>}
     </div>

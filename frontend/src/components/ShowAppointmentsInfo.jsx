@@ -1,10 +1,12 @@
 import { format } from "date-fns";
 
+//a component to show appointments
 export default function ShowAppointmentsInfo({
   adminMode,
   appointments,
   includeFreeAppointments,
 }) {
+  //show only appointments that are not free if includeFreeAppointments is false
   const visibleAppointments =
     appointments?.filter(
       (appointment) => includeFreeAppointments || appointment.userName
@@ -13,24 +15,24 @@ export default function ShowAppointmentsInfo({
     <div>
       {visibleAppointments.length > 0 ? (
         visibleAppointments.map((appointment) => (
-          <button key={appointment.appointmentId} className="serviceBtn">
-            <span className="">
-              date: {format(new Date(appointment.date), "dd/MM/yy")}
+          <button key={appointment.appointmentId} className="appointmentCard">
+            <span>
+              Date: {format(new Date(appointment.date), "dd/MM/yy")}
             </span>
-            <span className="">
-              time: {format(new Date(appointment.date), "HH:mm")}
+            <span>
+              Time: {format(new Date(appointment.date), "HH:mm")}
             </span>
             {adminMode && (
-              <span className="">
+              <span>
                 {appointment.userName
-                  ? `taken by: ${appointment.userName}`
-                  : "not taken"}
+                  ? `Taken by: ${appointment.userName}`
+                  : "Not taken"}
               </span>
             )}
           </button>
         ))
       ) : (
-        <span>no appointment to display</span>
+        <span>No appointments to display</span>
       )}
     </div>
   );

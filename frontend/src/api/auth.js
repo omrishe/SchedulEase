@@ -66,7 +66,7 @@ export async function validateToken() {
   try {
     let response;
     for (let i = 0; i < 2; i++) {
-      response = await fetch(`${serverAddress}/validateToken`, {
+      response = await fetch(`${serverAddress}/validate-token`, {
         method: "get",
         credentials: "include",
       });
@@ -75,7 +75,7 @@ export async function validateToken() {
         return data;
       }
       await (async (ms) => new Promise((resolve) => setTimeout(resolve, ms)))(
-        5000
+        5000,
       );
     }
     if (response.status === 401) {

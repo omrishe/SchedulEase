@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { resetTime } from "../utils/dateHandlers";
+import TimeSlotSkeleton from "./TimeSlotSkeleton";
 export default function ChooseTime({
   date,
   availableTimeSlots,
@@ -24,7 +25,7 @@ export default function ChooseTime({
         );
       }
     } else {
-      setResponse("not logged in");
+      setResponse("Please log in to book an appointment");
     }
   }
 
@@ -54,16 +55,19 @@ export default function ChooseTime({
   return (
     <div className="chooseTimeContainer">
       <span>
-        Date Selected:{date.toLocaleDateString("en-GB")}
         {timeSelected && ` at ${timeSelected}`}
       </span>
       {!isError ? (
         <>
           {!timeSelected && <span> please choose time</span>}
           <div className="timeOptions">
-            {timesForDate.length > 0
-              ? renderTimeButtons
-              : renderNoAvailableAppointment}
+            {!isDateLoaded ? (
+              <TimeSlotSkeleton count={8} />
+            ) : timesForDate.length > 0 ? (
+              renderTimeButtons
+            ) : (
+              renderNoAvailableAppointment
+            )}
           </div>
         </>
       ) : (

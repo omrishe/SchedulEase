@@ -53,12 +53,12 @@ router.post("/signup", async (req, res) => {
     console.error("an error has occured", error);
     if (error.message === "email already exists") {
       return res.json(
-        sendRejectedResponse({ message: "email already exists" })
+        sendRejectedResponse({ message: "email already exists" }),
       );
     }
     if (error.name === "ValidationError") {
       return res.json(
-        sendRejectedResponse({ message: "couldnt save document to database" })
+        sendRejectedResponse({ message: "couldnt save document to database" }),
       );
     }
     return res.json(sendRejectedResponse());
@@ -91,7 +91,7 @@ router.post("/login", async (req, res) => {
       secretKey,
       {
         expiresIn: "12h",
-      }
+      },
     );
     res.cookie("loginToken", token, {
       httpOnly: true,
@@ -109,7 +109,7 @@ router.post("/login", async (req, res) => {
           userId: _id,
           ...data,
         },
-      })
+      }),
     );
   } catch (error) {
     console.error(error);
@@ -130,7 +130,7 @@ router.post("/login", async (req, res) => {
 /**
  * function for routing for validating token
  */
-router.get("/validateToken", authenticateToken, async (req, res) => {
+router.get("/validate-token", authenticateToken, async (req, res) => {
   res
     .status(200)
     .json(sendSucessResponse({ message: "logged in successfully" }));
