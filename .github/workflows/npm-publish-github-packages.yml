@@ -37,15 +37,17 @@ jobs:
 
       # Package backend and upload to S3
       - name: SAM Package
-        run: sam package \
-              --s3-bucket schedule-ease-backend-bucket \
-              --output-template-file packaged.yaml
+        run: |
+          sam package \
+            --s3-bucket schedule-ease-backend-bucket \
+            --output-template-file packaged.yaml
         working-directory: ./server
 
       # Deploy backend with CloudFormation
       - name: SAM Deploy
-        run: sam deploy \
-              --template-file packaged.yaml \
-              --stack-name schedule-ease-backend-stack \
-              --capabilities CAPABILITY_IAM
+        run: |
+          sam deploy \
+            --template-file packaged.yaml \
+            --stack-name schedule-ease-backend-stack \
+            --capabilities CAPABILITY_IAM
         working-directory: ./server
