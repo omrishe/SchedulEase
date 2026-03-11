@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: ScheduleEase Backend
+
+Globals:
+  Function:
+    Timeout: 600
+    Runtime: nodejs18.x
+    MemorySize: 2048
+
+Resources:
+  BackendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: src/lambda.handler
+      CodeUri: ./
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+      Environment:
+        Variables:
+          MONGO_URI_PARAM: "/schedulease/mongo-uri"
+          SECRET_HASH_PASSWORD_PARAM: "/schedulease/passwordHash"
