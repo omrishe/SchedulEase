@@ -1,17 +1,41 @@
 const mongoose = require("mongoose");
-const { getSecretParm } = require("../utils/awsCmd");
-async function connectToMongo() {
+
+let connectionPromise = null;
+
+async function connectToMongo(retries = 3) {
   try {
     const mongoUri = process.env.MONGO_URI_PARAM;
-    await mongoose.connect(mongoUri, {
-      // dbName is not a must but makes code look better
-      dbName: "appointmentManagement",
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 5000,
-    });
+    if (mongoose.connection.readyState === 1) {
+      return mongoose.connection;
+    }
+    // If in process of connecting, sleep and retry
+    if (mongoose.connection.readyState === 2) {
+      if (retries <= 0) {
+        console.error("Database connection taking too long");
+        throw new Error("Database connection taking too long");
+      }
+      await new Promise((res) => setTimeout(res, 500));
+      return connectToMongo(retries - 1);
+    }
+    // incase readyState is 0 (disconnected) and 2 calls are made to try to connect to the db
+    // basically prevents multiple parallel connects
+    if (connectionPromise) return connectionPromise;
+
+    connectionPromise = mongoose
+      .connect(mongoUri, {
+        dbName: "appointmentManagement",
+        serverSelectionTimeoutMS: 5000,
+        connectTimeoutMS: 5000,
+      })
+      .finally(() => {
+        connectionPromise = null;
+      });
+
+    await connectionPromise;
     console.log("Connected to database");
+    return mongoose.connection;
   } catch (error) {
-    console.log(" Failed to connect to MongoDB:", error);
+    console.error("Failed to connect to MongoDB:", error);
     throw error;
   }
 }

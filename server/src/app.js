@@ -33,7 +33,7 @@ app.use(
       }
     },
     credentials: true,
-  })
+  }),
 );
 //sets so the response is auto parse to json
 app.use(express.json());
