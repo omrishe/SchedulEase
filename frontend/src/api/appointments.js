@@ -40,11 +40,10 @@ export async function createAppointment(appointmentInfo) {
 export async function getAvailableAppointmentsDates(
   storeIdentifier,
   startDate,
-  options = {}, // for { signal }
-  endDate,
+  signal = undefined,
+  endDate = undefined,
 ) {
   try {
-    const { signal } = options;
     let startDateTimeStamp = startDate.getTime();
     const startOfTodayTimeStamp = resetTime(new Date(), "timeStamp");
     //check if the date selected is today if it is send it with the time currently to show only dates that are after this hour
@@ -72,7 +71,7 @@ export async function getAvailableAppointmentsDates(
           "Content-Type": "application/json",
         },
         credentials: "include",
-        signal,
+        signal: signal,
       },
     );
     if (response.ok) {
@@ -86,27 +85,26 @@ export async function getAvailableAppointmentsDates(
         );
         daysObjArr[dateKey] = [];
       }
-      //,ales ot so each day contains only the HH:MM of that day
+      //makes it so each day contains only the HH:MM of that day
       serverResponse.otherData.forEach((date) => {
         const tempDate = resetTime(date, "jsDate").getTime();
         daysObjArr[tempDate].push(ParseDateToHHMM(date)); //parse from array of iso to HH:MM format
       });
       serverResponse.otherData = daysObjArr;
       return serverResponse;
-    } else {
-      throw new Error(`server  ${response.status} error occured`);
+    }
+    if (!response.ok) {
+      const response = await response.json();
+      return response;
     }
   } catch (error) {
     if (error.name === "AbortError") {
-      // Fetch was aborted, do nothing
-      return sendRejectedResponse({
-        isSuccess: false,
-        message: "Request aborted",
-        code: "AbortError",
-        otherData: error,
-      });
+      // Fetch was aborted, propegade it up and do nothing
+      throw error;
     }
-    console.error("error:", error);
+    if (process.env.NODE_ENV === "development") {
+      console.error("error:", error);
+    }
     return sendRejectedResponse({
       message: "an error occured see log",
       otherData: error,
@@ -133,8 +131,6 @@ export async function getAllStoreAppointments(startDate, endDate) {
     if (response.ok) {
       const allAppointment = await response.json();
       return allAppointment;
-    } else {
-      throw new Error(`server  ${response.status} error occured`);
     }
   } catch (error) {
     console.error("error:", error);

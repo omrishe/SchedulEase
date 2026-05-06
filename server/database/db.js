@@ -33,7 +33,8 @@ async function connectToMongo(retries = 3) {
 
     await connectionPromise;
     console.log("Connected to database");
-    return mongoose.connection;
+    //makes sure 100% that the connection is ready (instead of return mongoose.connection;)
+    return await mongoose.connection.asPromise();
   } catch (error) {
     console.error("Failed to connect to MongoDB:", error);
     throw error;

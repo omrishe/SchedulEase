@@ -14,28 +14,25 @@ const { getSecretParm } = require("../utils/awsCmd");
 //instance of the serverless
 let serverlessExpressInstance;
 
+//get secret params from aws
+//todo:add throw error if params are not found
 async function getParmsFromAws() {
   process.env.MONGO_URI_PARAM = await getSecretParm(
-    process.env.MONGO_URI_PARAM
+    process.env.MONGO_URI_PARAM,
   );
   process.env.SECRET_HASH_PASSWORD_PARAM = await getSecretParm(
-    process.env.SECRET_HASH_PASSWORD_PARAM
+    process.env.SECRET_HASH_PASSWORD_PARAM,
   );
 }
 
-//first setup/coldStart when creating a new instance
-async function firstSetup(event, context) {
-  await getParmsFromAws();
+async function handler(event, context) {
+  //if instance exists return that instance else setup a new one
+  if (!serverlessExpressInstance) {
+    await getParmsFromAws();
+    serverlessExpressInstance = serverlessExpress({ app });
+  }
   await connectToMongo();
-  serverlessExpressInstance = serverlessExpress({ app });
   return serverlessExpressInstance(event, context);
-}
-
-function handler(event, context) {
-  //if instance exists returns that instance and setup a new one if it doesnt exists
-  return serverlessExpressInstance
-    ? serverlessExpressInstance(event, context)
-    : firstSetup(event, context);
 }
 
 exports.handler = handler;

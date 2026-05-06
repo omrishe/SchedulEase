@@ -7,11 +7,10 @@ import Register from "./pages/Register.jsx";
 import { validateToken } from "./api/auth.js";
 import { AdminPanel } from "./pages/AdminPanel.jsx";
 import SuperAdminPanel from "./pages/SuperAdminPanel.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 //main entery point
 //contains helper functions and define the routing
-//---uses v6 react router altough v7.6.3 is installed (no issues its backward compatible)
-//if upgrading to v7 you can use loaders to load the data in here before the page renders solving the useEffect issue
 function App() {
   const [userAuthData, setUserAuthData] = useState({
     userId: localStorage.getItem("userId"),
@@ -55,7 +54,6 @@ function App() {
     async function verifyTokenAndClearData() {
       const isTokenValid = await validateToken();
       if (isTokenValid.code === "TOKEN_INVALID") {
-        console.error("invalid token,resetting data", isTokenValid);
         resetUserData();
       } else if (isTokenValid.code === "VALIDATE_TOKEN_ERROR") {
         console.warn(isTokenValid.otherData.message);
@@ -108,6 +106,7 @@ function App() {
           path="/superadminPanel"
           element={<SuperAdminPanel></SuperAdminPanel>}
         ></Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

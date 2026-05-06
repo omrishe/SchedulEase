@@ -28,11 +28,11 @@ export function AppointmentSelection({
         const serverResponse = await getAvailableAppointmentsDates(
           { storeSlug: slug },
           new Date(appointmentInfo.date),
-          { signal }, // Pass signal,
-          undefined
+          signal, // Pass signal,
+          undefined,
         );
         //incase of abort signal
-        if (serverResponse.code === "AbortError") {
+        if (serverResponse?.code === "AbortError") {
           return;
         }
         if (serverResponse.isSuccess) {
@@ -87,7 +87,7 @@ export function AppointmentSelection({
       const [hours, minutes] = time.split(":");
       tempDate.setHours(hours, minutes);
       const response = await createAppointment(
-        await updateAppointmentInfo({ date: tempDate })
+        await updateAppointmentInfo({ date: tempDate }),
       ); //response contains the appointment info
       if (response.isSuccess) {
         const dateTimeStamp = resetTime(tempDate, "timeStamp");
@@ -137,7 +137,8 @@ export function AppointmentSelection({
             handleChooseTimeOnlick={handleChooseTimeOnClick}
             appointmentInfo={appointmentInfo}
           ></ChooseTime>
-        </div>)}
+        </div>
+      )}
     </div>
   );
 }
