@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { resetTime } from "../utils/dateHandlers";
+import { formatSelectedDate, resetTime } from "../utils/dateHandlers";
 import TimeSlotSkeleton from "./TimeSlotSkeleton";
 export default function ChooseTime({
   date,
@@ -15,13 +15,14 @@ export default function ChooseTime({
       const serverResponse = await handleChooseTimeOnlick(timeSelected);
       if (!serverResponse.isSuccess) {
         setResponse(
-          serverResponse.message || "an error occured while setting appointment"
+          serverResponse.message ||
+            "an error occured while setting appointment",
         );
         setIsError(true);
       } else {
         setIsError(false);
         setResponse(
-          serverResponse.message || "Appointment created successfully"
+          serverResponse.message || "Appointment created successfully",
         );
       }
     } else {
@@ -55,7 +56,8 @@ export default function ChooseTime({
   return (
     <div className="chooseTimeContainer">
       <span>
-        {timeSelected && ` at ${timeSelected}`}
+        {timeSelected &&
+          `Selected: ${formatSelectedDate(appointmentInfo.date)} at ${timeSelected}`}
       </span>
       {!isError ? (
         <>

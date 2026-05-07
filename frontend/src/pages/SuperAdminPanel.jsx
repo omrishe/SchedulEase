@@ -1,5 +1,5 @@
   import { useState } from "react";
-  import { createStore } from "../api/store";
+  import { createStore } from "../services/storeService.js";
 
   function SuperAdminPanel(){
     const [message,setMessage]=useState();

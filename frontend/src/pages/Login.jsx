@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { userLogIn } from "../api/auth";
+import { userLogIn } from "../services/authService.js";
 import { useNavigate, useParams } from "react-router-dom";
 
 export default function Login({ updateAuthData }) {

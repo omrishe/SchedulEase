@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { logout } from "../api/auth.js";
+import { logout } from "../services/authService.js";
 import { AppointmentSelection } from "../components/AppointmentSelection.jsx";
-import { getUserBookingInfo } from "../api/appointments.js";
+import { getUserBookingInfo } from "../services/appointmentsService.js";
 import AppointmentViewer from "../components/AppointmentViewer.jsx";
 
 function MainPage({ userAuthData, resetUserData }) {
@@ -44,20 +44,18 @@ function MainPage({ userAuthData, resetUserData }) {
   }
 
   async function handleLogout() {
-    const result = await logout();
-    if (result?.isSuccess) {
-      setLogoutMsg("logged out successfully");
-      resetUserData();
-      setAppointment({ date: new Date(), service: "", storeId: null });
-    } else {
-      setLogoutMsg("an Error occurred see log for more info");
-    }
+    setLogoutMsg("logged out successfully");
+    resetUserData();
+    setAppointment({ date: new Date(), service: "", storeId: null });
+    await logout();
   }
 
   async function fetchUserAppointments(startDate, endDate) {
     const response = await getUserBookingInfo(startDate, endDate);
     if (!response.isSuccess) {
-      console.error(response);
+      if (import.meta.env.DEV) {
+        console.error(response);
+      }
       return response;
     }
     return response;
@@ -76,7 +74,10 @@ function MainPage({ userAuthData, resetUserData }) {
       >
         Login
       </button>
-      <button className="registerBtn" onClick={() => navigatePage(`/store/${slug}/register`)}>
+      <button
+        className="registerBtn"
+        onClick={() => navigatePage(`/store/${slug}/register`)}
+      >
         Don't have an account? Register
       </button>
     </>
@@ -101,7 +102,10 @@ function MainPage({ userAuthData, resetUserData }) {
           {/**logout msg to display after logging out */}
           {logoutMsg && <p>{logoutMsg}</p>}
           {userAuthData.role === "admin" && (
-            <button className="adminPanelBtn" onClick={() => navigatePage(`/store/${slug}/adminPanel`)}>
+            <button
+              className="adminPanelBtn"
+              onClick={() => navigatePage(`/store/${slug}/adminPanel`)}
+            >
               Admin Panel
             </button>
           )}
@@ -116,14 +120,19 @@ function MainPage({ userAuthData, resetUserData }) {
         </div>
       </div>
       <AppointmentSelection
+        userName={userAuthData.userName}
         appointmentInfo={appointmentInfo}
         updateAppointmentInfo={updateAppointmentInfo}
         slug={slug}
       ></AppointmentSelection>
-      {userAuthData.userName ? <AppointmentViewer
-        fetchAppointmentsFunc={fetchUserAppointments}
-        adminMode={false}
-      ></AppointmentViewer> : <label>Please log in to view your appointments</label>}
+      {userAuthData.userName ? (
+        <AppointmentViewer
+          fetchAppointmentsFunc={fetchUserAppointments}
+          adminMode={false}
+        ></AppointmentViewer>
+      ) : (
+        <label>Please log in to view your appointments</label>
+      )}
     </div>
   );
 }

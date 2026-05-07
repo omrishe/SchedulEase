@@ -4,7 +4,7 @@ import {
   getStoreServices,
   adminDelService,
   adminEditService,
-} from "../api/store";
+} from "../services/storeService.js";
 import { ServiceForm } from "./ServiceForm";
 import ServiceCardSkeleton from "./ServiceCardSkeleton";
 import { v4 as uuidv4 } from "uuid";

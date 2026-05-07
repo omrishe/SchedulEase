@@ -2,15 +2,16 @@ import MenuItems from "./MenuItem.jsx";
 import { useState, useEffect } from "react";
 import SingleChoiceCalendar from "./SingleChoiceCalendar.jsx";
 import ChooseTime from "./ChooseTime.jsx";
-import { createAppointment } from "../api/appointments.js";
+import { createAppointment } from "../services/appointmentsService.js";
 import { sendRejectedResponse } from "../utils/responseHandler.js";
 import { resetTime } from "../utils/dateHandlers";
-import { getAvailableAppointmentsDates } from "../api/appointments.js";
-import { getStoreServices } from "../api/store";
+import { getAvailableAppointmentsDates } from "../services/appointmentsService.js";
+import { getStoreServices } from "../services/storeService.js";
 
 export function AppointmentSelection({
   appointmentInfo,
   updateAppointmentInfo,
+  userName,
   slug,
 }) {
   const [windowChooser, setWindow] = useState("items");
@@ -25,34 +26,34 @@ export function AppointmentSelection({
 
     async function getAvailableSlots() {
       try {
-        const serverResponse = await getAvailableAppointmentsDates(
-          { storeSlug: slug },
-          new Date(appointmentInfo.date),
-          signal, // Pass signal,
-          undefined,
-        );
-        //incase of abort signal
-        if (serverResponse?.code === "AbortError") {
-          return;
-        }
-        if (serverResponse.isSuccess) {
-          setAvailableTimeSlots((prev) => ({
-            ...prev,
-            ...serverResponse.otherData,
-          }));
-        } else {
-          const response = sendRejectedResponse({
-            message: "Failed to fetch slots",
-            otherData: serverResponse.message,
-          });
-          return response;
+        if (userName) {
+          const serverResponse = await getAvailableAppointmentsDates(
+            { storeSlug: slug },
+            new Date(appointmentInfo.date),
+            signal, // Pass signal,
+            undefined,
+          );
+          if (serverResponse.isSuccess) {
+            setAvailableTimeSlots((prev) => ({
+              ...prev,
+              ...serverResponse.otherData,
+            }));
+          } else {
+            const response = sendRejectedResponse({
+              message: "Failed to fetch slots",
+              otherData: serverResponse.message,
+            });
+            return response;
+          }
         }
       } catch (error) {
         if (error.name === "AbortError") {
           // do nothing request was aborted
           return;
         }
-        console.error("Error fetching available slots:", error);
+        if (import.meta.env.DEV) {
+          console.error("Error fetching available slots:", error);
+        }
         return sendRejectedResponse({
           message: "Failed to fetch slots",
           otherData: error.message || "",
@@ -109,7 +110,9 @@ export function AppointmentSelection({
         message: "failed to create appointment",
         otherData: error,
       });
-      console.error(response);
+      if (import.meta.env.DEV) {
+        console.error(response);
+      }
       return response;
     }
   }

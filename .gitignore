@@ -10,3 +10,4 @@ localhost*
 README.MD
 .aws-sam
 server/.aws-sam
+.env.*

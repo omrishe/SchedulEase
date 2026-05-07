@@ -3,9 +3,9 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ShowTime from "../components/ShowTime";
 import SingleChoiceCalendar from "../components/SingleChoiceCalendar";
-import { getAllStoreAppointments } from "../api/appointments";
+import { getAllStoreAppointments } from "../services/appointmentsService.js";
 import AppointmentViewer from "../components/AppointmentViewer";
-import { setStoreOwnerAvailability } from "../api/store";
+import { setStoreOwnerAvailability } from "../services/storeService.js";
 import ServicesSection from "../components/ServicesSection";
 import config from "../config.json";
 

@@ -1,26 +1,25 @@
-//handles store-related requests
 import { sendRejectedResponse } from "../utils/responseHandler.js";
-const baseServerAddress = import.meta.env.VITE_SERVER_ADDRESS;
-const serverAddress = baseServerAddress + "/api/store";
+import {
+  adminSetServicesApi,
+  adminDelServiceApi,
+  createStoreApi,
+  getStoreInfoApi,
+  addServiceToStoreApi,
+  getStoreServicesApi,
+  setStoreOwnerAvailabilityApi,
+  adminEditServiceApi
+} from "../api/storeApi.js";
 
 export function adminSetServices() {
-  return;
+  return adminSetServicesApi();
 }
+
 export async function adminDelService(serviceToDelId, storeId) {
   try {
     if (!(serviceToDelId && storeId)) {
       throw new Error("service/store id  is missing");
     }
-    const response = await fetch(
-      `${serverAddress}/delete-services?serviceId=${serviceToDelId}&storeId=${storeId}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      },
-    );
+    const response = await adminDelServiceApi(serviceToDelId, storeId);
     const data = await response.json();
     if (!response.ok) {
       return data;
@@ -37,14 +36,7 @@ export async function adminDelService(serviceToDelId, storeId) {
 
 export async function createStore(storeInfo) {
   try {
-    const response = await fetch(`${serverAddress}/new`, {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(storeInfo),
-    });
+    const response = await createStoreApi(storeInfo);
     const data = await response.json();
     if (!response.ok) {
       return data;
@@ -61,13 +53,7 @@ export async function createStore(storeInfo) {
 
 export async function getStoreInfo(storeId) {
   try {
-    const response = await fetch(`${serverAddress}/get-store-info`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
+    const response = await getStoreInfoApi(storeId);
     const data = await response.json();
     if (!response.ok) {
       return data;
@@ -84,15 +70,7 @@ export async function getStoreInfo(storeId) {
 
 export async function addServiceToStore(authData, formData) {
   try {
-    const response = await fetch(`${serverAddress}/set-new-store-services`, {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({ authData, formData }),
-    });
-
+    const response = await addServiceToStoreApi(authData, formData);
     const data = await response.json();
     if (!response.ok) {
       data.message = "error";
@@ -110,17 +88,10 @@ export async function addServiceToStore(authData, formData) {
 
 export async function getStoreServices(storeIdentifier) {
   try {
-    //sets it so if already logged in send the storeId and if not we send the store Slug
     const query = storeIdentifier.storeId
       ? `storeId=${storeIdentifier.storeId}`
       : `storeSlug=${storeIdentifier.storeSlug}`;
-    const response = await fetch(`${serverAddress}/get-services?${query}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-    });
+    const response = await getStoreServicesApi(query);
     if (response.ok) {
       const storeServices = await response.json();
       return storeServices;
@@ -137,14 +108,7 @@ export async function getStoreServices(storeIdentifier) {
 
 export async function setStoreOwnerAvailability(dateObjects, _id) {
   try {
-    const response = await fetch(`${serverAddress}/new-store-time-slots`, {
-      method: "post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({ dates: dateObjects, _id: _id }),
-    });
+    const response = await setStoreOwnerAvailabilityApi(dateObjects, _id);
     const data = await response.json();
     if (!response.ok) {
       return data;
@@ -161,14 +125,7 @@ export async function setStoreOwnerAvailability(dateObjects, _id) {
 
 export async function adminEditService(storeId, serviceId, updatedFields) {
   try {
-    const response = await fetch(`${serverAddress}/updateService`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({ storeId, serviceId, ...updatedFields }),
-    });
+    const response = await adminEditServiceApi(storeId, serviceId, updatedFields);
     const data = await response.json();
     return data;
   } catch (error) {

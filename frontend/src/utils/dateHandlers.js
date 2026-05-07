@@ -5,7 +5,9 @@ export function addDaysToDate(date = new Date(), amount = 1) {
     tmrwsDate.setDate(tmrwsDate.getDate() + Number(amount));
     return tmrwsDate;
   } catch (error) {
-    console.error("error while parsing date see log", error);
+    if (import.meta.env.DEV) {
+      console.error("error while parsing date see log", error);
+    }
     return new Date(); // Return default date on error
   }
 }
@@ -20,18 +22,40 @@ export function resetTime(dateOrTimeStamp, mode = "jsDate") {
       return newDate.getTime();
     } else {
       throw new Error(
-        "error while resetting time of day - mode does not exist"
+        "error while resetting time of day - mode does not exist",
       );
     }
   } catch (error) {
-    console.error("error while parsing date see log", error);
+    if (import.meta.env.DEV) {
+      console.error("error while parsing date see log", error);
+    }
     return mode === "timeStamp" ? 0 : new Date(); // Return default value
   }
 }
 
-export function ParseDateToHHMM(date) {
+export function parseDateToHHMM(date) {
   const dateSlot = new Date(date);
   const hours = dateSlot.getHours().toString().padStart(2, "0");
   const minutes = dateSlot.getMinutes().toString().padStart(2, "0");
   return `${hours}:${minutes}`;
+}
+
+export function formatSelectedDate(date) {
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const month = monthNames[date.getMonth()];
+  const day = date.getDate();
+  return ` ${month} ${day}`;
 }

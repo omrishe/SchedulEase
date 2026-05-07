@@ -19,7 +19,9 @@ async function connectToMongo(retries = 3) {
     }
     // incase readyState is 0 (disconnected) and 2 calls are made to try to connect to the db
     // basically prevents multiple parallel connects
-    if (connectionPromise) return connectionPromise;
+    if (connectionPromise) {
+      return connectionPromise;
+    }
 
     connectionPromise = mongoose
       .connect(mongoUri, {

@@ -5,13 +5,15 @@ const User = require("../Models/userModel.js");
 
 function authenticateToken(req, res, next) {
   const token = req.cookies.loginToken;
+  console.log("token is:", token);
   if (!token) {
+    console.log("got invalid token and he is:", token);
     return res.status(401).json(
       sendRejectedResponse({
         type: "loginRequired",
         message: "User is not logged in",
         code: "AUTH_REQUIRED",
-      })
+      }),
     );
   }
   try {
@@ -20,7 +22,7 @@ function authenticateToken(req, res, next) {
       return res
         .status(500)
         .json(
-          sendRejectedResponse({ message: "JWT secret key not configured" })
+          sendRejectedResponse({ message: "JWT secret key not configured" }),
         );
     }
     const decoded = jwt.verify(token, secretKey);
@@ -56,7 +58,7 @@ async function requireAdmin(req, res, next) {
     res
       .status(500)
       .json(
-        sendRejectedResponse({ message: "Server error in auth middleware" })
+        sendRejectedResponse({ message: "Server error in auth middleware" }),
       );
   }
 }
@@ -64,11 +66,15 @@ async function requireAdmin(req, res, next) {
 //function to handle requests made when db isnt connected
 //this function is very lightweight... it might run on every event but its negligible
 function isDatabaseConnected(req, res, next) {
-  if (mongoose.connection.readyState !== 1) {
-    // 1 = connected
-    return res
-      .status(503)
-      .json(sendRejectedResponse({ message: "Database not ready yet" }));
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      // 1 = connected
+      return res
+        .status(503)
+        .json(sendRejectedResponse({ message: "Database not ready yet" }));
+    }
+  } catch (e) {
+    console.error("an error occured in database middleware:", e);
   }
   next();
 }

@@ -1,3 +1,5 @@
 params.json
 .env
 config.json
+*.pem
+.aws-sam/

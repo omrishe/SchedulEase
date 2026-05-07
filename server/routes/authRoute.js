@@ -19,11 +19,16 @@ router.post("/signup", async (req, res) => {
     if (!email || !password || !storeSlug) {
       throw new Error("Missing required fields");
     }
-    if (!email.includes("@") || email.length < 5) {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
       throw new Error("Invalid email format");
     }
-    if (password.length < 8) {
-      throw new Error("Password must be at least 8 characters");
+    if (
+      password.length < 7 ||
+      !/[A-Z]/.test(password) ||
+      !/\d/.test(password)
+    ) {
+      throw new Error("invalid password format");
     }
     //fetch storeId based on url
     const fetchedStore = await store.findOne({ storeSlug: storeSlug });
@@ -50,15 +55,27 @@ router.post("/signup", async (req, res) => {
     //return the object that was saved as it appears in the db
   } catch (error) {
     res.status(400);
-    console.error("an error has occured", error);
     if (error.message === "email already exists") {
       return res.json(
-        sendRejectedResponse({ message: "email already exists" }),
+        sendRejectedResponse({
+          code: "INVALID_EMAIL",
+          message: "email already exists",
+        }),
+      );
+    }
+    if (error.message === "invalid password format") {
+      return res.json(
+        sendRejectedResponse({
+          code: "INVALID_PASSWORD",
+          message: "Password validation failed",
+        }),
       );
     }
     if (error.name === "ValidationError") {
       return res.json(
-        sendRejectedResponse({ message: "couldnt save document to database" }),
+        sendRejectedResponse({
+          message: "couldnt save document to database",
+        }),
       );
     }
     return res.json(sendRejectedResponse());
@@ -97,8 +114,8 @@ router.post("/login", async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: "none",
-      partitioned: true,
       maxAge: 12 * 60 * 60 * 1000, //12 hours life of token cookie
+      partitioned: true,
     });
     const { _id, createdAt, updatedAt, hashedPassword, __v, ...data } =
       userData.toObject();
@@ -117,11 +134,17 @@ router.post("/login", async (req, res) => {
     if (error.message === "no store found") {
       return res.json(sendRejectedResponse({ message: "no store found" }));
     }
-    if (error.message === "no user found") {
-      return res.json(sendRejectedResponse({ message: "no user found" }));
-    }
-    if (error.message === "wrong password") {
-      return res.json(sendRejectedResponse({ message: "wrong password" }));
+    if (
+      error.message === "no user found" ||
+      error.message === "wrong password"
+    ) {
+      return res.json(
+        sendRejectedResponse({
+          code: "INVALID_INPUT",
+          message:
+            "The email or password you entered is incorrect. Please try again.",
+        }),
+      );
     }
     return res.json(sendRejectedResponse());
   }
@@ -133,7 +156,7 @@ router.post("/login", async (req, res) => {
 router.get("/validate-token", authenticateToken, async (req, res) => {
   res
     .status(200)
-    .json(sendSucessResponse({ message: "logged in successfully" }));
+    .json(sendSucessResponse({ message: "validated token successfully" }));
 });
 
 router.post("/logout", async (req, res) => {

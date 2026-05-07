@@ -12,6 +12,7 @@ const {
   sendSucessResponse,
   sendRejectedResponse,
 } = require("../utils/responseHandler.js");
+const { normalizeDate } = require("../utils/dateHandlers.js");
 const router = express.Router();
 
 /*req.user is (cookies fields)
@@ -111,8 +112,11 @@ router.get(
       if (!req.user || req.user.role !== "admin") {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        if (startDate < today) {
-          throw new Error("Cannot query past dates");
+        const normalizeStartDate = normalizeDate(startDate);
+        if (normalizeStartDate < today) {
+          throw new Error(
+            `Cannot query past dates start Date is:${normalizeStartDate} today is:${today}`,
+          );
         }
       }
       //js Date automatically moves to next month if day of month<{daySet}

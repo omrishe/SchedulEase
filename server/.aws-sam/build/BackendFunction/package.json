@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sam:dev": "sam build && sam local start-api",
+    "sam:deploy" : "sam deploy --parameter-overrides Stage=production"
   },
   "keywords": [],
   "author": "",

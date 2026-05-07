@@ -1,11 +1,15 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: ScheduleEase Backend
+Parameters:
+  Stage: #sets the stage (production,test or development)
+    Type: String
+    Default: development
 
 Globals:
   Function:
     Timeout: 600
-    Runtime: nodejs18.x
+    Runtime: nodejs22.x
     MemorySize: 2048
 
 Resources:
@@ -24,3 +28,4 @@ Resources:
         Variables:
           MONGO_URI_PARAM: "/schedulease/mongo-uri"
           SECRET_HASH_PASSWORD_PARAM: "/schedulease/passwordHash"
+          NODE_ENV: !Ref Stage

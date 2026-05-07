@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainPage from "./pages/MainPage.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
-import { validateToken } from "./api/auth.js";
+import { validateToken } from "./services/authService.js";
 import { AdminPanel } from "./pages/AdminPanel.jsx";
 import SuperAdminPanel from "./pages/SuperAdminPanel.jsx";
 import NotFound from "./pages/NotFound.jsx";
@@ -21,13 +21,14 @@ function App() {
   });
 
   function saveToLocalStorage(data) {
-    //does not work for inherited objects
     try {
       for (const key in data) {
         localStorage.setItem(key, data[key]);
       }
     } catch (err) {
-      console.error("failed to save to local storage see log ", err);
+      if (import.meta.env.DEV) {
+        console.error("failed to save to local storage see log ", err);
+      }
     }
   }
 
@@ -51,15 +52,25 @@ function App() {
   }
 
   useEffect(() => {
+    const controller = new AbortController();
     async function verifyTokenAndClearData() {
-      const isTokenValid = await validateToken();
+      const isTokenValid = await validateToken(controller.signal);
+      if (!isTokenValid) return;
       if (isTokenValid.code === "TOKEN_INVALID") {
         resetUserData();
       } else if (isTokenValid.code === "VALIDATE_TOKEN_ERROR") {
-        console.warn(isTokenValid.otherData.message);
+        if (import.meta.env.DEV) {
+          console.warn(
+            isTokenValid.otherData?.message || "Token validation aborted",
+          );
+        }
       }
     }
     verifyTokenAndClearData();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   async function updateAuthData(newAuthData) {

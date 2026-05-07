@@ -11,3 +11,12 @@ export function sendRejectedResponse(data) {
     otherData: data.otherData || {},
   };
 }
+
+//since not all api errors are json format
+export async function handleApiError(raw) {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return raw; // not JSON
+  }
+}
