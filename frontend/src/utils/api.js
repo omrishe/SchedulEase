@@ -9,16 +9,52 @@ export function getBaseUrl() {
 }
 
 export const httpOptions = {
-  get: () => ({
-    method: "GET",
-    credentials: "include",
-  }),
+  get: (withCred = true) => {
+    const options = {
+      method: "GET",
+    };
+    if (withCred) {
+      options.credentials = "include";
+    }
+    return options;
+  },
 
-  post: () => ({
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-  }),
+  post: (withCred = true) => {
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    if (withCred) {
+      options.credentials = "include";
+    }
+    return options;
+  },
+
+  patch: (withCred = true) => {
+    const options = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    if (withCred) {
+      options.credentials = "include";
+    }
+    return options;
+  },
+
+  delete: (withCred = true) => {
+    const options = {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    if (withCred) {
+      options.credentials = "include";
+    }
+    return options;
+  },
 };

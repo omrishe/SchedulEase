@@ -115,6 +115,7 @@ router.post("/login", async (req, res) => {
       secure: true,
       sameSite: "none",
       maxAge: 12 * 60 * 60 * 1000, //12 hours life of token cookie
+      partitioned: true,
     });
     const { _id, createdAt, updatedAt, hashedPassword, __v, ...data } =
       userData.toObject();

@@ -5,9 +5,7 @@ const User = require("../Models/userModel.js");
 
 function authenticateToken(req, res, next) {
   const token = req.cookies.loginToken;
-  console.log("token is:", token);
   if (!token) {
-    console.log("got invalid token and he is:", token);
     return res.status(401).json(
       sendRejectedResponse({
         type: "loginRequired",
