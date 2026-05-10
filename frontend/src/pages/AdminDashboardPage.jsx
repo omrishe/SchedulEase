@@ -53,7 +53,7 @@ export function AdminDashboardPage({ userAuthData }) {
   if (userAuthData.role !== "admin") {
     return (
       <div className="admin-forbidden">
-        <div className="admin-forbidden-icon">🔒</div>
+        <div className="admin-forbidden-icon"></div>
         <h2>Access Denied</h2>
         <p>You don't have permission to view this page.</p>
         <button
@@ -87,7 +87,7 @@ export function AdminDashboardPage({ userAuthData }) {
       {/* Section 1: Availability */}
       <section className="admin-section">
         <div className="admin-section-header">
-          <span className="admin-section-icon">📅</span>
+          <span className="admin-section-icon"></span>
           <h2 className="admin-section-title">Set Availability</h2>
         </div>
         <p className="admin-section-desc">
@@ -115,7 +115,7 @@ export function AdminDashboardPage({ userAuthData }) {
       {/* Section 3: Appointments */}
       <section className="admin-section">
         <div className="admin-section-header">
-          <span className="admin-section-icon">📋</span>
+          <span className="admin-section-icon"></span>
           <h2 className="admin-section-title">Appointments</h2>
         </div>
         <p className="admin-section-desc">

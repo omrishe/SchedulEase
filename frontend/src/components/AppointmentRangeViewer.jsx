@@ -3,6 +3,7 @@ import AppointmentDetails from "./AppointmentDetails";
 import { useState, useCallback } from "react";
 import DatePickerInput from "./DatePickerInput";
 import { addDaysToDate } from "../utils/dateHandlers";
+import { getErrorMessage } from "../utils/errorHandling.js";
 
 //a component to overview all appointments
 export default function AppointmentRangeViewer({
@@ -32,6 +33,9 @@ export default function AppointmentRangeViewer({
     } else if (data.type === "loginRequired") {
       setRenderAppointments(false);
       setErrorText("please log in");
+    } else {
+      setRenderAppointments(false);
+      setErrorText(getErrorMessage(data.code));
     }
   }, [startDate, endDate, fetchAppointmentsFunc]);
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { userLogIn } from "../services/authService.js";
 import { useNavigate, useParams } from "react-router-dom";
+import { getErrorMessage } from "../utils/errorHandling.js";
 
 export default function LoginPage({ updateAuthData }) {
   const { slug } = useParams();
@@ -28,7 +29,7 @@ export default function LoginPage({ updateAuthData }) {
       setFormData((prev) => ({ ...prev, password: "" }));
       setTimeout(() => navigatePage(`/store/${slug}/`), 1500);
     } else {
-      setMessage(authResult.message);
+      setMessage(getErrorMessage(authResult.code));
     }
   }
 

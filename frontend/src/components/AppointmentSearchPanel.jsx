@@ -3,6 +3,7 @@ import AppointmentDetails from "./AppointmentDetails";
 import { useState, useCallback } from "react";
 import DatePickerInput from "./DatePickerInput";
 import { addDaysToDate } from "../utils/dateHandlers";
+import { getErrorMessage } from "../utils/errorHandling.js";
 
 //a component to overview all appointments
 export default function AppointmentSearchPanel({
@@ -41,7 +42,7 @@ export default function AppointmentSearchPanel({
         setErrorText("please log in");
       } else {
         setPageState("error");
-        setErrorText(data.message || "an error occurred please try again");
+        setErrorText(getErrorMessage(data.code));
       }
     }
   }, [startDate, endDate, fetchAppointmentsFunc]);

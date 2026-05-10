@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { formatSelectedDate, resetTime } from "../utils/dateHandlers";
 import TimeSlotSkeleton from "./loadingComponents/TimeSlotSkeleton";
+import { getErrorMessage } from "../utils/errorHandling.js";
 export default function TimePicker({
   date,
   availableTimeSlots,
@@ -14,10 +15,7 @@ export default function TimePicker({
     if (appointmentInfo.storeId) {
       const serverResponse = await handleChooseTimeOnlick(timeSelected);
       if (!serverResponse.isSuccess) {
-        setResponse(
-          serverResponse.message ||
-            "an error occured while setting appointment",
-        );
+        setResponse(getErrorMessage(serverResponse.code));
         setIsError(true);
       } else {
         setIsError(false);

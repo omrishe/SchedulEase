@@ -6,8 +6,8 @@ import {
   adminEditService,
 } from "../services/storeService.js";
 import { ServiceForm } from "./ServiceForm";
-import ServiceCardSkeleton from "./loadingComponents/ServiceCardSkeleton.jsx";
 import { v4 as uuidv4 } from "uuid";
+import { getErrorMessage } from "../utils/errorHandling.js";
 
 export default function ServicesSection({ userAuthData }) {
   const [formData, setFormaData] = useState([
@@ -50,7 +50,11 @@ export default function ServicesSection({ userAuthData }) {
         serviceNote: svc.serviceNote,
       })),
     );
-    setMessage(response.message);
+    if (!response.isSuccess) {
+      setMessage(getErrorMessage(response.code));
+    } else {
+      setMessage(response.message);
+    }
     return;
   }
 
@@ -111,7 +115,7 @@ export default function ServicesSection({ userAuthData }) {
       setEditData(null);
       setServiceSelected(null);
     } else {
-      setMessage(serverResponse.message);
+      setMessage(getErrorMessage(serverResponse.code));
     }
   }
 
@@ -141,6 +145,8 @@ export default function ServicesSection({ userAuthData }) {
       setStoreSvc(serverResponse.otherData);
       setMessage(serverResponse.message);
       setServiceSelected(null);
+    } else {
+      setMessage(getErrorMessage(serverResponse.code));
     }
   }
 

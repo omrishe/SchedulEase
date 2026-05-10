@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getErrorMessage } from "../utils/errorHandling.js";
 export default function TimeSelector({
   date,
   times,
@@ -11,7 +12,7 @@ export default function TimeSelector({
   async function submitSelectedTime() {
     const serverResponse = await handleChooseTimeOnlick(timeArray);
     if (!serverResponse.isSuccess) {
-      setResponse(serverResponse.message);
+      setResponse(getErrorMessage(serverResponse.code));
     } else {
       setResponse(serverResponse.message || "failed to update available times");
     }

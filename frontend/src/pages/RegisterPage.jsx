@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { signup } from "../services/authService.js";
 import { useNavigate, useParams } from "react-router-dom";
+import { getErrorMessage } from "../utils/errorHandling.js";
 
 function RegisterPage({ setToken, className }) {
   const { slug } = useParams();
@@ -33,7 +34,7 @@ function RegisterPage({ setToken, className }) {
       setFormData({ userName: "", password: "", email: "" });
       setTimeout(() => navigatePage(`/store/${slug}/login`), 1500);
     } else {
-      setMessage(serverResponse.message);
+      setMessage(getErrorMessage(serverResponse.code));
     }
   }
 
