@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "sam:dev": "sam build && sam local start-api",
-    "sam:deploy" : "sam deploy --parameter-overrides Stage=production"
+    "sam:deploy" : "sam deploy --parameter-overrides Stage=production",
+    "seed":"node database/seed.js" 
   },
   "keywords": [],
   "author": "",

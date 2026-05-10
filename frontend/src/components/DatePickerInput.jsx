@@ -13,6 +13,8 @@ export default function DatePickerInput({ setDate }) {
       }} // returns the new date
       dateFormat="yyyy/MM/dd"
       placeholderText="Select a date"
+      portalId="root"
+      popperPlacement="bottom-start"
     />
   );
 }

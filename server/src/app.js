@@ -9,13 +9,8 @@ const https = require("https");
 const fs = require("fs");
 const cookieParser = require("cookie-parser");
 const { isDatabaseConnected } = require("../middlewares/middlewares");
-
+const allowedOrigins = require("../config/allowedOrigins");
 const app = express();
-const allowedOrigins = [
-  "https://localhost:5173", // development npm run dev
-  "http://localhost:4173", // development npm run preview
-  "https://d4finm2krx1ce.cloudfront.net", // production -cloudfront
-];
 
 app.use(
   cors({

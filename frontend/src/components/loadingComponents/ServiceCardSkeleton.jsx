@@ -1,5 +1,4 @@
-import "../App.css";
-
+import "../../App.css";
 
 //skeleton for service cards
 export default function ServiceCardSkeleton({ count = 4 }) {

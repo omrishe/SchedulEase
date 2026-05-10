@@ -15,14 +15,6 @@ const {
 const { normalizeDate } = require("../utils/dateHandlers.js");
 const router = express.Router();
 
-/*req.user is (cookies fields)
-  userId: '68b32227049037ff819e6caa',
-  role: 'admin',
-  storeId: '68b3220f049037ff819e6ca1',
-  iat: 1760361011,
-  exp: 1760404211
-  */
-
 router.post("/new-appointment", authenticateToken, async (req, res) => {
   try {
     const { appointmentInfo: appointmentData } = req.body;

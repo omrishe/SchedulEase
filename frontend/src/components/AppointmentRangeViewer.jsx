@@ -5,7 +5,7 @@ import DatePickerInput from "./DatePickerInput";
 import { addDaysToDate } from "../utils/dateHandlers";
 
 //a component to overview all appointments
-export default function AppointmentDashboard({
+export default function AppointmentRangeViewer({
   fetchAppointmentsFunc,
   adminMode,
 }) {
@@ -16,7 +16,6 @@ export default function AppointmentDashboard({
   const [appointments, setAppointments] = useState([]);
   const [renderAppointments, setRenderAppointments] = useState(false);
   const [errorText, setErrorText] = useState("");
-
   /*
   this fetches the data using the parent given fetching function and saves it
   used useCallback so it wont fetch unless one of the dates changed

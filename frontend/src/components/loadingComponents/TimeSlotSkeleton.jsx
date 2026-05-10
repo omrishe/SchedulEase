@@ -1,5 +1,4 @@
-import "../App.css";
-
+import "../../App.css";
 
 //skeleton for time slots
 export default function TimeSlotSkeleton({ count = 8 }) {

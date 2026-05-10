@@ -1,5 +1,4 @@
-import "../App.css";
-
+import "../../App.css";
 
 //skeleton for appointment cards
 export default function AppointmentCardSkeleton({ count = 3 }) {
