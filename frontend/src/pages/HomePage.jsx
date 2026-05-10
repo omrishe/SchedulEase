@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { logout } from "../services/authService.js";
-import { AppointmentSelection } from "../components/AppointmentSelection.jsx";
+import { AppointmentBookingController } from "../components/AppointmentBookingController.jsx";
 import { getUserBookingInfo } from "../services/appointmentsService.js";
-import AppointmentViewer from "../components/AppointmentViewer.jsx";
+import AppointmentSearchPanel from "../components/AppointmentSearchPanel.jsx";
 
-function MainPage({ userAuthData, resetUserData }) {
+function HomePage({ userAuthData, resetUserData }) {
   const navigatePage = useNavigate();
   const [appointmentInfo, setAppointment] = useState({
     date: new Date(),
@@ -88,9 +88,10 @@ function MainPage({ userAuthData, resetUserData }) {
       Logout
     </button>
   );
-
+  console.log(slug);
   return (
     <div className="mainPageContainer">
+      {slug === "demo-store" && <label>this a demo store</label>}
       <div className="interactionContainer">
         {/**displays welcome msg if not logged in and welcome userName if logged in */}
         {welcomeMsg}
@@ -119,21 +120,21 @@ function MainPage({ userAuthData, resetUserData }) {
           <button className="wazeBtn waze" onClick={openWaze}></button>
         </div>
       </div>
-      <AppointmentSelection
+      <AppointmentBookingController
         userName={userAuthData.userName}
         appointmentInfo={appointmentInfo}
         updateAppointmentInfo={updateAppointmentInfo}
         slug={slug}
-      ></AppointmentSelection>
+      ></AppointmentBookingController>
       {userAuthData.userName ? (
-        <AppointmentViewer
+        <AppointmentSearchPanel
           fetchAppointmentsFunc={fetchUserAppointments}
           adminMode={false}
-        ></AppointmentViewer>
+        ></AppointmentSearchPanel>
       ) : (
         <label>Please log in to view your appointments</label>
       )}
     </div>
   );
 }
-export default MainPage;
+export default HomePage;

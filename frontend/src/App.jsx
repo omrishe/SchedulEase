@@ -1,13 +1,13 @@
 import "./App.css";
 import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import MainPage from "./pages/MainPage.jsx";
-import Login from "./pages/Login.jsx";
-import Register from "./pages/Register.jsx";
+import HomePage from "./pages/HomePage.jsx";
+import LoginPage from "./pages/LoginPage.jsx";
+import RegisterPage from "./pages/RegisterPage.jsx";
 import { validateToken } from "./services/authService.js";
-import { AdminPanel } from "./pages/AdminPanel.jsx";
-import SuperAdminPanel from "./pages/SuperAdminPanel.jsx";
-import NotFound from "./pages/NotFound.jsx";
+import { AdminDashboardPage } from "./pages/AdminDashboardPage.jsx";
+import SystemAdminPage from "./pages/SystemAdminPage.jsx";
+import NotFoundPage from "./pages/NotFoundPage.jsx";
 
 //main entery point
 //contains helper functions and define the routing
@@ -90,34 +90,38 @@ function App() {
         <Route
           path="/store/:slug"
           element={
-            <MainPage
+            <HomePage
               userAuthData={userAuthData}
               resetUserData={resetUserData}
-            ></MainPage>
+            ></HomePage>
           }
         ></Route>
         <Route
           path="/store/:slug/login"
           element={
-            <Login
+            <LoginPage
               userAuthData={userAuthData}
               updateAuthData={updateAuthData}
-            ></Login>
+            ></LoginPage>
           }
         ></Route>
         <Route
           path="/store/:slug/register"
-          element={<Register></Register>}
+          element={<RegisterPage></RegisterPage>}
         ></Route>
         <Route
           path="/store/:slug/adminPanel"
-          element={<AdminPanel userAuthData={userAuthData}></AdminPanel>}
+          element={
+            <AdminDashboardPage
+              userAuthData={userAuthData}
+            ></AdminDashboardPage>
+          }
         ></Route>
         <Route
           path="/superadminPanel"
-          element={<SuperAdminPanel></SuperAdminPanel>}
+          element={<SystemAdminPage></SystemAdminPage>}
         ></Route>
-        <Route path="*" element={<NotFound />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );

@@ -1,14 +1,14 @@
-import MenuItems from "./MenuItem.jsx";
+import ServiceSelector from "./ServiceSelector.jsx";
 import { useState, useEffect } from "react";
-import SingleChoiceCalendar from "./SingleChoiceCalendar.jsx";
-import ChooseTime from "./ChooseTime.jsx";
+import AppointmentCalendar from "./AppointmentCalendar.jsx";
+import TimePicker from "./TimePicker.jsx";
 import { createAppointment } from "../services/appointmentsService.js";
 import { sendRejectedResponse } from "../utils/responseHandler.js";
-import { resetTime } from "../utils/dateHandlers";
+import { resetTime } from "../utils/dateHandlers.js";
 import { getAvailableAppointmentsDates } from "../services/appointmentsService.js";
 import { getStoreServices } from "../services/storeService.js";
 
-export function AppointmentSelection({
+export function AppointmentBookingController({
   appointmentInfo,
   updateAppointmentInfo,
   userName,
@@ -119,27 +119,27 @@ export function AppointmentSelection({
   return (
     <div className="appointmentMainWindow">
       {windowChooser === "items" && (
-        <MenuItems
+        <ServiceSelector
           appointmentInfo={appointmentInfo}
           services={services}
           onNextServiceBtnPress={(serviceName) =>
             updateAppointmentInfo({ service: serviceName })
           }
           setWindow={setWindow}
-        ></MenuItems>
+        ></ServiceSelector>
       )}
       {windowChooser === "date" && (
         <div className="setDateContainer">
-          <SingleChoiceCalendar
+          <AppointmentCalendar
             date={appointmentInfo.date}
             updateDate={updateAppointmentInfo}
-          ></SingleChoiceCalendar>
-          <ChooseTime //display set appointment area
+          ></AppointmentCalendar>
+          <TimePicker //display set appointment area
             date={appointmentInfo.date}
             availableTimeSlots={availableTimeSlots}
             handleChooseTimeOnlick={handleChooseTimeOnClick}
             appointmentInfo={appointmentInfo}
-          ></ChooseTime>
+          ></TimePicker>
         </div>
       )}
     </div>

@@ -6,7 +6,7 @@ import {
   adminEditService,
 } from "../services/storeService.js";
 import { ServiceForm } from "./ServiceForm";
-import ServiceCardSkeleton from "./ServiceCardSkeleton";
+import ServiceCardSkeleton from "./loadingComponents/ServiceCardSkeleton.jsx";
 import { v4 as uuidv4 } from "uuid";
 
 export default function ServicesSection({ userAuthData }) {

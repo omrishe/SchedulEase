@@ -2,7 +2,7 @@ import { useState } from "react";
 import { userLogIn } from "../services/authService.js";
 import { useNavigate, useParams } from "react-router-dom";
 
-export default function Login({ updateAuthData }) {
+export default function LoginPage({ updateAuthData }) {
   const { slug } = useParams();
   const navigatePage = useNavigate();
   const [formData, setFormData] = useState({

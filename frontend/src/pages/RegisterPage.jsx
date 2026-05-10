@@ -2,7 +2,7 @@ import { useState } from "react";
 import { signup } from "../services/authService.js";
 import { useNavigate, useParams } from "react-router-dom";
 
-function Register({ setToken, className }) {
+function RegisterPage({ setToken, className }) {
   const { slug } = useParams();
   const [formData, setFormData] = useState({
     userName: "",
@@ -118,4 +118,4 @@ function Register({ setToken, className }) {
     </div>
   );
 }
-export default Register;
+export default RegisterPage;

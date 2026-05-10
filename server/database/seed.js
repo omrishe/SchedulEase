@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const connectToMongo = require("./db");
 const Store = require("../Models/storeModel");
 const StoreTimeSlot = require("../Models/storeTimeSlotsModel");
-
 const { storeNames, servicesData, announcements } = require("./seedData");
 
 function getRandomInt(min, max) {
@@ -19,24 +18,24 @@ function getRandomItem(array) {
 async function createStores(count = 3) {
   console.log(`Creating ${count} stores...`);
   const stores = [];
-  let firstStore = await Store.findOne({ storeSlug: "omris-barbershop" });
+  let firstStore = await Store.findOne({ storeSlug: "demo-store" });
   if (!firstStore) {
     firstStore = new Store({
-      storeName: "omris-barbershop",
-      storeSlug: "omris-barbershop",
+      storeName: "demo-store",
+      storeSlug: "demo-store",
       storePhoneNumber: "123-456-7890",
       storeCoordinates: "40.7128,-74.0060",
-      storeNote: "Welcome to Omri's Barbershop!",
+      storeNote: "this is demonstration store",
       announcement: "Best fades in town!",
       services: servicesData,
     });
     await firstStore.save();
-    console.log("Created 'omris-barbershop'");
+
+    console.log("Created 'demo-store'");
   } else {
-    console.log("Store 'omris-barbershop' already exists, reusing it.");
+    console.log("Store 'demo-store' already exists, reusing it.");
   }
   stores.push(firstStore);
-
   for (let i = 1; i < count; i++) {
     const name = getRandomItem(storeNames);
     const slug =

@@ -1,15 +1,15 @@
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import ShowTime from "../components/ShowTime";
-import SingleChoiceCalendar from "../components/SingleChoiceCalendar";
+import TimeSelector from "../components/TimeSelector.jsx";
+import AppointmentCalendar from "../components/AppointmentCalendar.jsx";
 import { getAllStoreAppointments } from "../services/appointmentsService.js";
-import AppointmentViewer from "../components/AppointmentViewer";
+import AppointmentSearchPanel from "../components/AppointmentSearchPanel.jsx";
 import { setStoreOwnerAvailability } from "../services/storeService.js";
-import ServicesSection from "../components/ServicesSection";
+import ServicesSection from "../components/ServicesSection.jsx";
 import config from "../config.json";
 
-export function AdminPanel({ userAuthData }) {
+export function AdminDashboardPage({ userAuthData }) {
   const storeOpenHours = config.storeOpenHours;
   const [date, setDate] = useState(new Date());
   const maxTimeSelections = 24;
@@ -26,7 +26,7 @@ export function AdminPanel({ userAuthData }) {
     const dateObjects = timeArray.map((time) => createDateWithTime(time));
     const response = await setStoreOwnerAvailability(
       dateObjects,
-      userAuthData.storeId
+      userAuthData.storeId,
     );
     return response;
   }
@@ -39,7 +39,7 @@ export function AdminPanel({ userAuthData }) {
       date.getMonth(),
       date.getDate(),
       hours,
-      minutes
+      minutes,
     );
   }
 
@@ -72,7 +72,9 @@ export function AdminPanel({ userAuthData }) {
       <div className="admin-header">
         <div className="admin-header-left">
           <h1 className="admin-title">Admin Dashboard</h1>
-          <span className="admin-subtitle">Manage your store settings and appointments</span>
+          <span className="admin-subtitle">
+            Manage your store settings and appointments
+          </span>
         </div>
         <button
           className="admin-back-btn"
@@ -88,20 +90,22 @@ export function AdminPanel({ userAuthData }) {
           <span className="admin-section-icon">📅</span>
           <h2 className="admin-section-title">Set Availability</h2>
         </div>
-        <p className="admin-section-desc">Pick a date and select the time slots you're available.</p>
+        <p className="admin-section-desc">
+          Pick a date and select the time slots you're available.
+        </p>
         <div className="admin-availability-grid">
           <div className="admin-calendar-wrapper">
-            <SingleChoiceCalendar
+            <AppointmentCalendar
               updateDate={updateDate}
               date={date}
-            ></SingleChoiceCalendar>
+            ></AppointmentCalendar>
           </div>
-          <ShowTime
+          <TimeSelector
             times={storeOpenHours}
             date={{ date: date }}
             maxTimeSelections={maxTimeSelections}
             handleChooseTimeOnlick={handleSetMenuItemBtn}
-          ></ShowTime>
+          ></TimeSelector>
         </div>
       </section>
 
@@ -114,13 +118,14 @@ export function AdminPanel({ userAuthData }) {
           <span className="admin-section-icon">📋</span>
           <h2 className="admin-section-title">Appointments</h2>
         </div>
-        <p className="admin-section-desc">View and manage all booked appointments.</p>
-        <AppointmentViewer
+        <p className="admin-section-desc">
+          View and manage all booked appointments.
+        </p>
+        <AppointmentSearchPanel
           fetchAppointmentsFunc={fetchAppointmentsFunc}
           adminMode={true}
-        ></AppointmentViewer>
+        ></AppointmentSearchPanel>
       </section>
     </div>
   );
 }
-

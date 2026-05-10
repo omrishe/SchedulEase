@@ -1,11 +1,11 @@
 import ToggleSwitch from "./ToggleSwitch";
-import ShowAppointmentsInfo from "./ShowAppointmentsInfo";
+import AppointmentDetails from "./AppointmentDetails";
 import { useState, useCallback } from "react";
-import PopupDatePicker from "./PopupDatePicker";
+import DatePickerInput from "./DatePickerInput";
 import { addDaysToDate } from "../utils/dateHandlers";
 
 //a component to overview all appointments
-export default function AppointmentViewer({
+export default function AppointmentSearchPanel({
   fetchAppointmentsFunc,
   adminMode,
 }) {
@@ -23,29 +23,28 @@ export default function AppointmentViewer({
   also we send the next day of endDate to show booking of the same day also
   */
   const loadAppointments = useCallback(async () => {
-    if(startDate >= endDate){
+    if (startDate >= endDate) {
       setPageState("error");
       setErrorText("start date must be equal or before end date");
       return;
+    } else {
+      setPageState("loading");
+      const data = await fetchAppointmentsFunc(
+        startDate,
+        addDaysToDate(endDate, 1),
+      );
+      if (data.isSuccess) {
+        setPageState("success");
+        setAppointments(data.otherData);
+      } else if (data.type === "loginRequired") {
+        setPageState("error");
+        setErrorText("please log in");
+      } else {
+        setPageState("error");
+        setErrorText(data.message || "an error occurred please try again");
+      }
     }
-    else{
-    setPageState("loading");
-    const data = await fetchAppointmentsFunc(
-      startDate,
-      addDaysToDate(endDate, 1)
-    );
-    if (data.isSuccess) {
-      setPageState("success");
-      setAppointments(data.otherData);
-    } else if (data.type === "loginRequired") {
-      setPageState("error");
-      setErrorText("please log in");
-    }
-    else{
-      setPageState("error");
-      setErrorText(data.message || "an error occurred please try again");
-    }
-  }}, [startDate, endDate, fetchAppointmentsFunc]);
+  }, [startDate, endDate, fetchAppointmentsFunc]);
 
   return (
     <div className="appointmentViewerContainer">
@@ -53,14 +52,29 @@ export default function AppointmentViewer({
       <div className="datePickerRow">
         <div className="dateGroup">
           <label>Start Date</label>
-          <PopupDatePicker setDate={(date) => {setPageState(""); setStartDate(date)}}></PopupDatePicker>
+          <DatePickerInput
+            setDate={(date) => {
+              setPageState("");
+              setStartDate(date);
+            }}
+          ></DatePickerInput>
         </div>
         <div className="dateGroup">
-          <label>End Date</label> 
-          <PopupDatePicker setDate={(date) => {setPageState(""); setEndDate(date)}}></PopupDatePicker>
+          <label>End Date</label>
+          <DatePickerInput
+            setDate={(date) => {
+              setPageState("");
+              setEndDate(date);
+            }}
+          ></DatePickerInput>
         </div>
         <div className="dateGroup">
-          <button className="loadAppointmentsBtn" onClick={() => loadAppointments()}>Confirm</button>
+          <button
+            className="loadAppointmentsBtn"
+            onClick={() => loadAppointments()}
+          >
+            Confirm
+          </button>
         </div>
       </div>
       {adminMode && (
@@ -77,11 +91,11 @@ export default function AppointmentViewer({
       ) : pageState === "error" ? (
         <div className="viewerErrorMsg"> {errorText}</div>
       ) : pageState === "success" ? (
-        <ShowAppointmentsInfo
+        <AppointmentDetails
           adminMode={adminMode}
           includeFreeAppointments={includeFreeAppointments}
           appointments={appointments}
-        ></ShowAppointmentsInfo>
+        ></AppointmentDetails>
       ) : (
         <></>
       )}

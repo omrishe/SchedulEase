@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-export default function PopupDatePicker({ setDate }) {
+export default function DatePickerInput({ setDate }) {
   const [selectedDate, setselectedDate] = useState();
   return (
     <DatePicker

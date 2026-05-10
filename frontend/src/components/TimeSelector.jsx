@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-export default function ShowTime({
+export default function TimeSelector({
   date,
   times,
   handleChooseTimeOnlick,
@@ -41,7 +41,7 @@ export default function ShowTime({
         setResponse(
           `maximum amount of choices ${
             maxTimeSelections === 1 ? "is 1" : ` are ${maxTimeSelections}`
-          }`
+          }`,
         );
       }
     }
@@ -69,7 +69,7 @@ export default function ShowTime({
             >
               {timeInput}{" "}
             </button>
-          )
+          ),
         )}
       </div>
       {timeArray && (

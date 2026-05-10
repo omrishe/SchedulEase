@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { formatSelectedDate, resetTime } from "../utils/dateHandlers";
-import TimeSlotSkeleton from "./TimeSlotSkeleton";
-export default function ChooseTime({
+import TimeSlotSkeleton from "./loadingComponents/TimeSlotSkeleton";
+export default function TimePicker({
   date,
   availableTimeSlots,
   handleChooseTimeOnlick,

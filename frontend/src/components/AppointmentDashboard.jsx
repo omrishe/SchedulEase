@@ -1,11 +1,11 @@
 import ToggleSwitch from "./ToggleSwitch";
-import ShowAppointmentsInfo from "./ShowAppointmentsInfo";
+import AppointmentDetails from "./AppointmentDetails";
 import { useState, useCallback } from "react";
-import PopupDatePicker from "./PopupDatePicker";
+import DatePickerInput from "./DatePickerInput";
 import { addDaysToDate } from "../utils/dateHandlers";
 
 //a component to overview all appointments
-export default function AppointmentOverview({
+export default function AppointmentDashboard({
   fetchAppointmentsFunc,
   adminMode,
 }) {
@@ -25,7 +25,7 @@ export default function AppointmentOverview({
   const loadAppointments = useCallback(async () => {
     const data = await fetchAppointmentsFunc(
       startDate,
-      addDaysToDate(endDate, 1)
+      addDaysToDate(endDate, 1),
     );
     if (data.isSuccess) {
       setRenderAppointments(true);
@@ -41,10 +41,15 @@ export default function AppointmentOverview({
       <label>View Your Appointments</label>
       <div className="datePickerRow">
         <label>Start Date</label>
-        <PopupDatePicker setDate={setStartDate}></PopupDatePicker>
+        <DatePickerInput setDate={setStartDate}></DatePickerInput>
         <label>End Date</label>
-        <PopupDatePicker setDate={(date) => setEndDate(date)}></PopupDatePicker>
-        <button className="loadAppointmentsBtn" onClick={() => loadAppointments()}>Confirm</button>
+        <DatePickerInput setDate={(date) => setEndDate(date)}></DatePickerInput>
+        <button
+          className="loadAppointmentsBtn"
+          onClick={() => loadAppointments()}
+        >
+          Confirm
+        </button>
       </div>
       {adminMode && (
         <ToggleSwitch
@@ -53,11 +58,11 @@ export default function AppointmentOverview({
         ></ToggleSwitch>
       )}
       {renderAppointments ? (
-        <ShowAppointmentsInfo
+        <AppointmentDetails
           adminMode={adminMode}
           includeFreeAppointments={includeFreeAppointments}
           appointments={appointments}
-        ></ShowAppointmentsInfo>
+        ></AppointmentDetails>
       ) : (
         <span>{errorText}</span>
       )}
