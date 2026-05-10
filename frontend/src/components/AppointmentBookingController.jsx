@@ -35,14 +35,12 @@ export function AppointmentBookingController({
           setWindow={setWindow}
         />
       )}
-
       {windowChooser === "date" && (
         <div className="setDateContainer">
           <AppointmentCalendar
             date={appointmentInfo.date}
             updateDate={updateAppointmentInfo}
           />
-
           <TimePicker
             date={appointmentInfo.date}
             availableTimeSlots={availableTimeSlots}

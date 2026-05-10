@@ -19,7 +19,7 @@ export function useAppointmentBooking({
   const [services, setServices] = useState(["loading"]);
   const [availableTimeSlots, setAvailableTimeSlots] = useState({});
 
-  // Fetch services
+  // Fetch services function
   useEffect(() => {
     async function getServices() {
       try {
@@ -38,7 +38,7 @@ export function useAppointmentBooking({
     getServices();
   }, [slug]);
 
-  // Fetch available slots
+  // Fetch available slots function
   useEffect(() => {
     const controller = new AbortController();
     const signal = controller.signal;
@@ -82,8 +82,7 @@ export function useAppointmentBooking({
     return () => controller.abort();
   }, [appointmentInfo.date, userName, slug]);
 
-  // Book appointment
-
+  // Book appointment function
   const handleChooseTimeOnClick = useCallback(
     async (time) => {
       try {
@@ -120,7 +119,6 @@ export function useAppointmentBooking({
     [appointmentInfo.date, updateAppointmentInfo],
   );
 
-  // Exposed API
   return {
     windowChooser,
     setWindow,
