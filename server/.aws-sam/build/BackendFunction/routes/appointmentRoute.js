@@ -65,15 +65,48 @@ router.post("/new-appointment", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error(error);
     if (error.code === 11000) {
-      return res.status(401).json(
+      return res.status(409).json(
         sendRejectedResponse({
+          code: "APPOINTMENT_DUPLICATE",
           message: "invalid appointment please refresh page",
         }),
       );
     }
-    return res.status(400).json(
+    if (error.message === "Missing required appointment data") {
+      return res.status(400).json(
+        sendRejectedResponse({
+          code: "APPOINTMENT_MISSING_DATA",
+          message: error.message,
+        }),
+      );
+    }
+    if (error.message === "User does not exist") {
+      return res.status(404).json(
+        sendRejectedResponse({
+          code: "USER_NOT_FOUND",
+          message: error.message,
+        }),
+      );
+    }
+    if (error.message === "Invalid appointmentData date format") {
+      return res.status(400).json(
+        sendRejectedResponse({
+          code: "APPOINTMENT_INVALID_DATE",
+          message: error.message,
+        }),
+      );
+    }
+    if (error.message === "Time slot not available or already taken") {
+      return res.status(409).json(
+        sendRejectedResponse({
+          code: "SLOT_UNAVAILABLE",
+          message: error.message,
+        }),
+      );
+    }
+    return res.status(500).json(
       sendRejectedResponse({
-        code: error.code,
+        code: "INTERNAL_ERROR",
         message:
           "an error has occured while creating appointment please try again later",
       }),
@@ -145,20 +178,25 @@ router.get(
       console.error("an error occured see below for details:\n", error);
       if (error.message === "Store not found") {
         return res
-          .status(400)
-          .json(sendRejectedResponse({ message: "Store not found" }));
+          .status(404)
+          .json(sendRejectedResponse({ code: "STORE_NOT_FOUND", message: "Store not found" }));
       }
       if (error.message === "Store identifier missing") {
         return res
           .status(400)
-          .json(sendRejectedResponse({ message: "Store identifier missing" }));
+          .json(sendRejectedResponse({ code: "STORE_IDENTIFIER_MISSING", message: "Store identifier missing" }));
       }
-      if (error.message === "Cannot query past dates") {
+      if (error.message.startsWith("Cannot query past dates")) {
         return res
           .status(403)
-          .json(sendRejectedResponse({ message: "Cannot query past dates" }));
+          .json(sendRejectedResponse({ code: "APPOINTMENTS_PAST_DATE", message: "Cannot query past dates" }));
       }
-      return res.status(400).json(sendRejectedResponse());
+      if (error.message === "Invalid date format" || error.message === "Invalid date") {
+        return res
+          .status(400)
+          .json(sendRejectedResponse({ code: "INVALID_DATE_FORMAT", message: error.message }));
+      }
+      return res.status(500).json(sendRejectedResponse({ code: "INTERNAL_ERROR" }));
     }
   },
 );
@@ -210,11 +248,10 @@ router.get(
       );
     } catch (err) {
       console.error("Error fetching appointments:", err);
-      res.status(500);
-      res.json(
+      return res.status(500).json(
         sendRejectedResponse({
+          code: "APPOINTMENTS_FETCH_ERROR",
           message: "Error fetching appointments",
-          otherData: err.message,
         }),
       );
     }
@@ -266,11 +303,10 @@ router.get("/get-user-booking-info", authenticateToken, async (req, res) => {
     );
   } catch (err) {
     console.error("Error fetching appointments:", err);
-    res.status(500);
-    res.json(
+    return res.status(500).json(
       sendRejectedResponse({
+        code: "APPOINTMENTS_FETCH_ERROR",
         message: "Error fetching appointments",
-        otherData: err.message,
       }),
     );
   }
@@ -292,11 +328,10 @@ router.get(
         }),
       ); //return appointmenet data
     } catch (err) {
-      res.status(500);
-      res.json(
+      return res.status(500).json(
         sendRejectedResponse({
+          code: "APPOINTMENTS_FETCH_ERROR",
           message: "Error fetching appointments",
-          otherData: err.message,
         }),
       );
     }

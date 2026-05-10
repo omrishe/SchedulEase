@@ -31,10 +31,15 @@ router.get("/get-store-info", authenticateToken, async (req, res) => {
     res.status(400);
     if (error.message === "no such store exists") {
       return res.json(
-        sendRejectedResponse({ message: "no such store exists" }),
+        sendRejectedResponse({
+          code: "STORE_NOT_FOUND",
+          message: "Store not found.",
+        }),
       );
     }
-    return res.json(sendRejectedResponse({}));
+    return res
+      .status(500)
+      .json(sendRejectedResponse({ code: "INTERNAL_ERROR" }));
   }
 });
 
@@ -51,10 +56,10 @@ router.post("/new", authenticateToken, async (req, res) => {
     );
   } catch (error) {
     console.error("an error occured while trying to save store data", error);
-    res.status(400);
-    res.json(
+    return res.status(500).json(
       sendRejectedResponse({
-        message: "an error occured while trying to save store data",
+        code: "STORE_CREATE_ERROR",
+        message: "An error occurred while trying to save store data.",
       }),
     );
   }
@@ -97,10 +102,26 @@ router.post(
       res.json(sendSucessResponse({ message: "added successfully" }));
     } catch (error) {
       console.error("an error has occured,see logs for more info", error);
-      res.status(400);
-      res.json(
+      if (error.message === "Invalid dates array") {
+        return res.status(400).json(
+          sendRejectedResponse({
+            code: "SLOTS_INVALID_DATES",
+            message: "The dates provided are invalid.",
+          }),
+        );
+      }
+      if (error.message === "Invalid date format") {
+        return res.status(400).json(
+          sendRejectedResponse({
+            code: "INVALID_DATE_FORMAT",
+            message: "One or more dates have an invalid format.",
+          }),
+        );
+      }
+      return res.status(500).json(
         sendRejectedResponse({
-          message: "an error has occured,see logs for more info\n",
+          code: "SLOTS_CREATE_ERROR",
+          message: "An error occurred while adding time slots.",
         }),
       );
     }
@@ -152,17 +173,41 @@ router.post(
         "error while trying to save store time slots see log",
         error,
       );
-      res.status(400);
-      res.json(
+      if (error.message === "User not found") {
+        return res.status(404).json(
+          sendRejectedResponse({
+            code: "USER_NOT_FOUND",
+            message: "User not found.",
+          }),
+        );
+      }
+      if (error.message === "invalid auth") {
+        return res.status(403).json(
+          sendRejectedResponse({
+            code: "AUTH_FORBIDDEN",
+            message: "You do not have permission to perform this action.",
+          }),
+        );
+      }
+      if (error.message === "store does not exist") {
+        return res.status(404).json(
+          sendRejectedResponse({
+            code: "STORE_NOT_FOUND",
+            message: "Store not found.",
+          }),
+        );
+      }
+      return res.status(500).json(
         sendRejectedResponse({
-          message: "an error has occured,see logs for more info",
+          code: "STORE_SERVICES_ERROR",
+          message: "An error occurred while saving services.",
         }),
       );
     }
   },
 );
 
-router.get("/get-services", async (req, res) => {
+router.get("/fetch-Store-Data", async (req, res) => {
   try {
     const { storeId, storeSlug } = req.query;
     let fetchedStore;
@@ -194,16 +239,51 @@ router.get("/get-services", async (req, res) => {
   } catch (error) {
     console.error("an error occured see below for details:\n", error);
     if (error.message === "Store not found") {
-      return res
-        .status(400)
-        .json(sendRejectedResponse({ message: "Store not found" }));
+      return res.status(404).json(
+        sendRejectedResponse({
+          code: "STORE_NOT_FOUND",
+          message: "Store not found.",
+        }),
+      );
     }
     if (error.message === "Store identifier missing") {
-      return res
-        .status(400)
-        .json(sendRejectedResponse({ message: "Store identifier missing" }));
+      return res.status(400).json(
+        sendRejectedResponse({
+          code: "STORE_IDENTIFIER_MISSING",
+          message: "Store identifier is missing.",
+        }),
+      );
     }
-    return res.status(400).json(sendRejectedResponse());
+    return res
+      .status(500)
+      .json(sendRejectedResponse({ code: "INTERNAL_ERROR" }));
+  }
+});
+
+router.get("/check-slug/:slug", async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const storeExists = await Store.exists({ storeSlug: slug });
+    if (storeExists) {
+      return res.status(200).json(
+        sendSucessResponse({
+          message: "Store exists",
+          otherData: { exists: true },
+        }),
+      );
+    } else {
+      return res.status(404).json(
+        sendRejectedResponse({
+          code: "STORE_NOT_FOUND",
+          message: "Store not found.",
+        }),
+      );
+    }
+  } catch (error) {
+    console.error("Error checking slug:", error);
+    return res
+      .status(500)
+      .json(sendRejectedResponse({ code: "INTERNAL_ERROR" }));
   }
 });
 
@@ -239,10 +319,18 @@ router.delete(
       );
     } catch (error) {
       console.error("an error occured while trying to alter store data", error);
-      res.status(400);
-      res.json(
+      if (error.message === "Store not found") {
+        return res.status(404).json(
+          sendRejectedResponse({
+            code: "STORE_NOT_FOUND",
+            message: "Store not found.",
+          }),
+        );
+      }
+      return res.status(500).json(
         sendRejectedResponse({
-          message: "an error occured while trying to alter store data",
+          code: "STORE_DELETE_SERVICE_ERROR",
+          message: "An error occurred while deleting the service.",
         }),
       );
     }
@@ -288,9 +376,34 @@ router.patch(
       );
     } catch (error) {
       console.error("error while trying to update service", error);
-      res.status(400).json(
+      if (error.message === "serviceId and storeId are required") {
+        return res.status(400).json(
+          sendRejectedResponse({
+            code: "STORE_UPDATE_MISSING_FIELDS",
+            message: "Service ID and Store ID are required.",
+          }),
+        );
+      }
+      if (error.message === "Store not found") {
+        return res.status(404).json(
+          sendRejectedResponse({
+            code: "STORE_NOT_FOUND",
+            message: "Store not found.",
+          }),
+        );
+      }
+      if (error.message === "Service not found") {
+        return res.status(404).json(
+          sendRejectedResponse({
+            code: "SERVICE_NOT_FOUND",
+            message: "Service not found.",
+          }),
+        );
+      }
+      return res.status(500).json(
         sendRejectedResponse({
-          message: "an error occurred while updating the service",
+          code: "STORE_UPDATE_SERVICE_ERROR",
+          message: "An error occurred while updating the service.",
         }),
       );
     }

@@ -5,9 +5,9 @@ import {
   createStoreApi,
   getStoreInfoApi,
   addServiceToStoreApi,
-  getStoreServicesApi,
+  getStoreServicesApi as fetchStoreDataApi,
   setStoreOwnerAvailabilityApi,
-  adminEditServiceApi
+  adminEditServiceApi,
 } from "../api/storeApi.js";
 
 export function adminSetServices() {
@@ -86,17 +86,17 @@ export async function addServiceToStore(authData, formData) {
   }
 }
 
-export async function getStoreServices(storeIdentifier) {
+export async function fetchStoreData(storeIdentifier) {
   try {
     const query = storeIdentifier.storeId
       ? `storeId=${storeIdentifier.storeId}`
       : `storeSlug=${storeIdentifier.storeSlug}`;
-    const response = await getStoreServicesApi(query);
+    const response = await fetchStoreDataApi(query);
+    const data = await response.json();
     if (response.ok) {
-      const storeServices = await response.json();
-      return storeServices;
+      return data;
     } else {
-      throw new Error(`server  ${response.status} error occured`);
+      return data;
     }
   } catch (error) {
     return sendRejectedResponse({
@@ -125,7 +125,11 @@ export async function setStoreOwnerAvailability(dateObjects, _id) {
 
 export async function adminEditService(storeId, serviceId, updatedFields) {
   try {
-    const response = await adminEditServiceApi(storeId, serviceId, updatedFields);
+    const response = await adminEditServiceApi(
+      storeId,
+      serviceId,
+      updatedFields,
+    );
     const data = await response.json();
     return data;
   } catch (error) {

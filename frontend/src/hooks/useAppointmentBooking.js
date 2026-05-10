@@ -5,7 +5,7 @@ import {
   createAppointment,
 } from "../services/appointmentsService.js";
 
-import { getStoreServices } from "../services/storeService.js";
+import { fetchStoreData } from "../services/storeService.js";
 import { sendRejectedResponse } from "../utils/responseHandler.js";
 import { resetTime } from "../utils/dateHandlers.js";
 
@@ -18,15 +18,18 @@ export function useAppointmentBooking({
   const [windowChooser, setWindow] = useState("items");
   const [services, setServices] = useState(["loading"]);
   const [availableTimeSlots, setAvailableTimeSlots] = useState({});
+  const [storeNotFound, setStoreNotFound] = useState(false);
 
   // Fetch services function
   useEffect(() => {
-    async function getServices() {
+    async function getStoreData() {
       try {
-        const res = await getStoreServices({ storeSlug: slug });
+        const res = await fetchStoreData({ storeSlug: slug });
 
         if (res.isSuccess) {
           setServices(res.otherData);
+        } else if (res.code === "STORE_NOT_FOUND") {
+          setStoreNotFound(true);
         }
       } catch (error) {
         if (import.meta.env.DEV) {
@@ -35,7 +38,7 @@ export function useAppointmentBooking({
       }
     }
 
-    getServices();
+    getStoreData();
   }, [slug]);
 
   // Fetch available slots function
@@ -125,5 +128,6 @@ export function useAppointmentBooking({
     services,
     availableTimeSlots,
     handleChooseTimeOnClick,
+    storeNotFound,
   };
 }

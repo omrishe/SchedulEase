@@ -4,7 +4,6 @@ import { logout } from "../services/authService.js";
 import { AppointmentBookingController } from "../components/AppointmentBookingController.jsx";
 import { getUserBookingInfo } from "../services/appointmentsService.js";
 import AppointmentSearchPanel from "../components/AppointmentSearchPanel.jsx";
-
 function HomePage({ userAuthData, resetUserData }) {
   const navigatePage = useNavigate();
   const [appointmentInfo, setAppointment] = useState({

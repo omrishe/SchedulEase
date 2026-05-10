@@ -8,6 +8,7 @@ import { validateToken } from "./services/authService.js";
 import { AdminDashboardPage } from "./pages/AdminDashboardPage.jsx";
 import SystemAdminPage from "./pages/SystemAdminPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
+import StoreNotFoundPage from "./pages/StoreNotFoundPage.jsx";
 
 //main entery point
 //contains helper functions and define the routing
@@ -121,6 +122,7 @@ function App() {
           path="/superadminPanel"
           element={<SystemAdminPage></SystemAdminPage>}
         ></Route>
+        <Route path="/store-not-found" element={<StoreNotFoundPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>

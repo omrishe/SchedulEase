@@ -31,7 +31,7 @@ export function addServiceToStoreApi(authData, formData) {
 }
 
 export function getStoreServicesApi(query) {
-  return fetch(`${serverAddress}/get-services?${query}`, httpOptions.get());
+  return fetch(`${serverAddress}/fetch-Store-Data?${query}`, httpOptions.get());
 }
 
 export function setStoreOwnerAvailabilityApi(dateObjects, _id) {

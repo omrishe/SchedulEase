@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import {
   addServiceToStore,
-  getStoreServices,
+  fetchStoreData,
   adminDelService,
   adminEditService,
 } from "../services/storeService.js";
@@ -30,7 +30,7 @@ export default function ServicesSection({ userAuthData }) {
   useEffect(() => {
     async function getServices() {
       setIsLoading(true);
-      const serverResponse = await getStoreServices(userAuthData);
+      const serverResponse = await fetchStoreData(userAuthData);
       if (serverResponse.isSuccess) {
         setStoreSvc(serverResponse.otherData);
       }

@@ -1,6 +1,7 @@
 import ServiceSelector from "./ServiceSelector.jsx";
 import AppointmentCalendar from "./AppointmentCalendar.jsx";
 import TimePicker from "./TimePicker.jsx";
+import { Navigate } from "react-router-dom";
 
 import { useAppointmentBooking } from "../hooks/useAppointmentBooking.js";
 
@@ -16,12 +17,17 @@ export function AppointmentBookingController({
     services,
     availableTimeSlots,
     handleChooseTimeOnClick,
+    storeNotFound,
   } = useAppointmentBooking({
     appointmentInfo,
     updateAppointmentInfo,
     userName,
     slug,
   });
+
+  if (storeNotFound) {
+    return <Navigate to="/store-not-found" replace />;
+  }
 
   return (
     <div className="appointmentMainWindow">

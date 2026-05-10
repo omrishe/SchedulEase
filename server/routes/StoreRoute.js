@@ -31,10 +31,15 @@ router.get("/get-store-info", authenticateToken, async (req, res) => {
     res.status(400);
     if (error.message === "no such store exists") {
       return res.json(
-        sendRejectedResponse({ code: "STORE_NOT_FOUND", message: "Store not found." }),
+        sendRejectedResponse({
+          code: "STORE_NOT_FOUND",
+          message: "Store not found.",
+        }),
       );
     }
-    return res.status(500).json(sendRejectedResponse({ code: "INTERNAL_ERROR" }));
+    return res
+      .status(500)
+      .json(sendRejectedResponse({ code: "INTERNAL_ERROR" }));
   }
 });
 
@@ -202,7 +207,7 @@ router.post(
   },
 );
 
-router.get("/get-services", async (req, res) => {
+router.get("/fetch-Store-Data", async (req, res) => {
   try {
     const { storeId, storeSlug } = req.query;
     let fetchedStore;
@@ -234,16 +239,51 @@ router.get("/get-services", async (req, res) => {
   } catch (error) {
     console.error("an error occured see below for details:\n", error);
     if (error.message === "Store not found") {
-      return res
-        .status(404)
-        .json(sendRejectedResponse({ code: "STORE_NOT_FOUND", message: "Store not found." }));
+      return res.status(404).json(
+        sendRejectedResponse({
+          code: "STORE_NOT_FOUND",
+          message: "Store not found.",
+        }),
+      );
     }
     if (error.message === "Store identifier missing") {
-      return res
-        .status(400)
-        .json(sendRejectedResponse({ code: "STORE_IDENTIFIER_MISSING", message: "Store identifier is missing." }));
+      return res.status(400).json(
+        sendRejectedResponse({
+          code: "STORE_IDENTIFIER_MISSING",
+          message: "Store identifier is missing.",
+        }),
+      );
     }
-    return res.status(500).json(sendRejectedResponse({ code: "INTERNAL_ERROR" }));
+    return res
+      .status(500)
+      .json(sendRejectedResponse({ code: "INTERNAL_ERROR" }));
+  }
+});
+
+router.get("/check-slug/:slug", async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const storeExists = await Store.exists({ storeSlug: slug });
+    if (storeExists) {
+      return res.status(200).json(
+        sendSucessResponse({
+          message: "Store exists",
+          otherData: { exists: true },
+        }),
+      );
+    } else {
+      return res.status(404).json(
+        sendRejectedResponse({
+          code: "STORE_NOT_FOUND",
+          message: "Store not found.",
+        }),
+      );
+    }
+  } catch (error) {
+    console.error("Error checking slug:", error);
+    return res
+      .status(500)
+      .json(sendRejectedResponse({ code: "INTERNAL_ERROR" }));
   }
 });
 

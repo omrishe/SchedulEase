@@ -55,30 +55,52 @@ router.post("/signup", async (req, res) => {
     //return the object that was saved as it appears in the db
   } catch (error) {
     res.status(400);
-    if (error.message === "email already exists") {
+    if (error.message === "Missing required fields") {
       return res.json(
         sendRejectedResponse({
-          code: "INVALID_EMAIL",
-          message: "email already exists",
+          code: "AUTH_MISSING_FIELDS",
+          message: "Please fill in all required fields.",
         }),
       );
     }
-    if (error.message === "invalid password format") {
+    if (error.message === "Invalid email format") {
       return res.json(
         sendRejectedResponse({
-          code: "INVALID_PASSWORD",
-          message: "Password validation failed",
+          code: "AUTH_INVALID_EMAIL_FORMAT",
+          message: "The email address format is invalid.",
+        }),
+      );
+    }
+    if (
+      error.message === "email already exists" ||
+      error.message === "invalid password format"
+    ) {
+      return res.json(
+        sendRejectedResponse({
+          code: "AUTH_INVALID_CREDENTIALS",
+          message:
+            "The information you entered is incorrect. Please try again.",
+        }),
+      );
+    }
+    if (error.message === "Store not found") {
+      return res.json(
+        sendRejectedResponse({
+          code: "STORE_NOT_FOUND",
+          message: "Store not found.",
         }),
       );
     }
     if (error.name === "ValidationError") {
       return res.json(
         sendRejectedResponse({
-          message: "couldnt save document to database",
+          code: "AUTH_VALIDATION_ERROR",
+          message:
+            "Could not create account. Please check your details and try again.",
         }),
       );
     }
-    return res.json(sendRejectedResponse());
+    return res.json(sendRejectedResponse({ code: "INTERNAL_ERROR" }));
   }
 });
 
@@ -132,7 +154,12 @@ router.post("/login", async (req, res) => {
     console.error(error);
     res.status(400);
     if (error.message === "no store found") {
-      return res.json(sendRejectedResponse({ message: "no store found" }));
+      return res.json(
+        sendRejectedResponse({
+          code: "STORE_NOT_FOUND",
+          message: "Store not found.",
+        }),
+      );
     }
     if (
       error.message === "no user found" ||
@@ -140,13 +167,13 @@ router.post("/login", async (req, res) => {
     ) {
       return res.json(
         sendRejectedResponse({
-          code: "INVALID_INPUT",
+          code: "AUTH_INVALID_CREDENTIALS",
           message:
             "The email or password you entered is incorrect. Please try again.",
         }),
       );
     }
-    return res.json(sendRejectedResponse());
+    return res.json(sendRejectedResponse({ code: "INTERNAL_ERROR" }));
   }
 });
 
