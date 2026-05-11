@@ -607,6 +607,35 @@
   text-align: right;
 }
 
+.timeSelect-prompt {
+  font-size: large;
+}
+
+.timeSelect-confirmation-container {
+  display: flex;
+  flex-direction: column;
+  align-content: flex-start;
+}
+
+.timeSelect-response-msg {
+  text-align: left;
+}
+
+.timeSelect-response-msg.visible {
+  visibility: visible;
+}
+
+.timeSelect-response-msg.hidden {
+  visibility: hidden;
+}
+
+.timeSelect-response-msg.success {
+  color: green;
+}
+
+.timeSelect-response-msg.error {
+  color: red;
+}
 
 
 
@@ -1177,7 +1206,8 @@
 
 .appointmentCard {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  width:500px;
+  grid-template-columns: 150px 150px auto;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
   border-radius: 12px;

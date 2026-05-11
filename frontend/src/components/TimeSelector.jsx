@@ -56,7 +56,7 @@ export default function TimeSelector({
 
   return (
     <div className="mainShowTimeContainer">
-      <span style={{ fontSize: "large" }}>please choose time</span>
+      <span className="timeSelect-prompt">please choose time</span>
       <div className="displayTimeContainer">
         {times.map(
           // sets the times user can choose
@@ -74,13 +74,7 @@ export default function TimeSelector({
         )}
       </div>
       {timeArray && (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignContent: "flex-end",
-          }}
-        >
+        <div className="timeSelect-confirmation-container">
           <span>
             {maxTimeSelections === 1 && timeArray[0]
               ? `at ${timeArray[0]}`
@@ -92,7 +86,11 @@ export default function TimeSelector({
           >
             Confirm
           </button>
-          <p style={{ visibility: response ? "visible" : "hidden" }}>
+          <p
+            className={`timeSelect-response-msg ${response ? "visible" : "hidden"} ${
+              response === "added successfully" ? "success" : "error"
+            }`}
+          >
             {response}
           </p>
         </div>

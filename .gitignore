@@ -11,3 +11,4 @@ README.MD
 .aws-sam
 server/.aws-sam
 .env.*
+.vscode/settings.json

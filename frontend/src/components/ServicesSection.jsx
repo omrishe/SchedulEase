@@ -9,6 +9,11 @@ import { ServiceForm } from "./ServiceForm";
 import { v4 as uuidv4 } from "uuid";
 import { getErrorMessage } from "../utils/errorHandling.js";
 import ServiceCardSkeleton from "./loadingComponents/ServiceCardSkeleton.jsx";
+import {
+  MAX_SERVICE_NAME_LENGTH,
+  MAX_PRICE,
+  MAX_SERVICE_NOTE_LENGTH,
+} from "../config.js";
 
 export default function ServicesSection({ userAuthData }) {
   const [formData, setFormaData] = useState([
@@ -43,6 +48,20 @@ export default function ServicesSection({ userAuthData }) {
   // Add service to the store
   async function addService(e) {
     e.preventDefault();
+    for (const svc of formData) {
+      if (svc.name.length > MAX_SERVICE_NAME_LENGTH) {
+        setMessage(`Service name cannot exceed ${MAX_SERVICE_NAME_LENGTH} characters.`);
+        return;
+      }
+      if (Number(svc.price) > MAX_PRICE) {
+        setMessage(`Service price cannot exceed ${MAX_PRICE}.`);
+        return;
+      }
+      if (svc.serviceNote && svc.serviceNote.length > MAX_SERVICE_NOTE_LENGTH) {
+        setMessage(`Service note cannot exceed ${MAX_SERVICE_NOTE_LENGTH} characters.`);
+        return;
+      }
+    }
     const response = await addServiceToStore(
       userAuthData,
       formData.map((svc) => ({
@@ -101,6 +120,18 @@ export default function ServicesSection({ userAuthData }) {
   // Submit the edit to the server
   async function submitEdit(e) {
     e.preventDefault();
+    if (editData.name.length > MAX_SERVICE_NAME_LENGTH) {
+      setMessage(`Service name cannot exceed ${MAX_SERVICE_NAME_LENGTH} characters.`);
+      return;
+    }
+    if (Number(editData.price) > MAX_PRICE) {
+      setMessage(`Service price cannot exceed ${MAX_PRICE}.`);
+      return;
+    }
+    if (editData.serviceNote && editData.serviceNote.length > MAX_SERVICE_NOTE_LENGTH) {
+      setMessage(`Service note cannot exceed ${MAX_SERVICE_NOTE_LENGTH} characters.`);
+      return;
+    }
     const serverResponse = await adminEditService(
       userAuthData.storeId,
       editData.srvId,
@@ -216,11 +247,14 @@ export default function ServicesSection({ userAuthData }) {
                     name="name"
                     value={editData.name}
                     onChange={handleEditInputChange}
+                    maxLength={MAX_SERVICE_NAME_LENGTH}
                   />
                   <label htmlFor="edit-price">service price</label>
                   <input
                     id="edit-price"
                     name="price"
+                    type="number"
+                    max={MAX_PRICE}
                     value={editData.price}
                     onChange={handleEditInputChange}
                   />
@@ -230,6 +264,7 @@ export default function ServicesSection({ userAuthData }) {
                     name="serviceNote"
                     value={editData.serviceNote}
                     onChange={handleEditInputChange}
+                    maxLength={MAX_SERVICE_NOTE_LENGTH}
                   />
                 </div>
                 <div className="admin-form-actions">

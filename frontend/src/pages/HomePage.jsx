@@ -87,7 +87,6 @@ function HomePage({ userAuthData, resetUserData }) {
       Logout
     </button>
   );
-  console.log(slug);
   return (
     <div className="mainPageContainer">
       {slug === "demo-store" && <label>this a demo store</label>}

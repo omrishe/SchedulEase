@@ -1,0 +1,5 @@
+module.exports = {
+  MAX_SERVICE_NAME_LENGTH: 15,
+  MAX_PRICE: 5000,
+  MAX_SERVICE_NOTE_LENGTH: 25,
+};
