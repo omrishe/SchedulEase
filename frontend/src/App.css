@@ -792,6 +792,22 @@
   align-items: center;
   gap: 0.6rem;
 }
+.timeSelect-confirm-time-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1.25rem;
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 0.8rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
+}
 
 .admin-section-icon {
   font-size: 1.35rem;

@@ -86,7 +86,12 @@ export default function TimeSelector({
               ? `at ${timeArray[0]}`
               : ""}
           </span>
-          <button onClick={submitSelectedTime}>Confirm</button>
+          <button
+            className="timeSelect-confirm-time-btn"
+            onClick={submitSelectedTime}
+          >
+            Confirm
+          </button>
           <p style={{ visibility: response ? "visible" : "hidden" }}>
             {response}
           </p>

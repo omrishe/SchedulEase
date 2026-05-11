@@ -8,6 +8,7 @@ import {
 import { ServiceForm } from "./ServiceForm";
 import { v4 as uuidv4 } from "uuid";
 import { getErrorMessage } from "../utils/errorHandling.js";
+import ServiceCardSkeleton from "./loadingComponents/ServiceCardSkeleton.jsx";
 
 export default function ServicesSection({ userAuthData }) {
   const [formData, setFormaData] = useState([
@@ -190,7 +191,7 @@ export default function ServicesSection({ userAuthData }) {
           {serviceSelected && (
             <div className="admin-service-actions">
               <button className="admin-edit-btn" onClick={onEditSrvClicked}>
-                ✏️ Edit "{serviceSelected.name}"
+                Edit "{serviceSelected.name}"
               </button>
               <button
                 className="admin-delete-btn"
