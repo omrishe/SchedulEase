@@ -50,7 +50,7 @@ export default function AppointmentSearchPanel({
   return (
     <div className="appointmentViewerContainer">
       <label>View Your Appointments</label>
-      <div className="datePickerRow">
+      <div className="appointment-date-range">
         <div className="dateGroup">
           <label>Start Date</label>
           <DatePickerInput
@@ -71,7 +71,7 @@ export default function AppointmentSearchPanel({
         </div>
         <div className="dateGroup">
           <button
-            className="loadAppointmentsBtn"
+            className="appointment-load-button"
             onClick={() => loadAppointments()}
           >
             Confirm

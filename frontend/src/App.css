@@ -1140,20 +1140,14 @@
   color: #94a3b8;
 }
 
-.datePickerRow {
+.appointment-date-range {
   display: flex;
   align-items: flex-end;
   gap: 0.5rem;
   flex-wrap: wrap;
 }
 
-.datePickerRow label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
+
 
 .dateGroup {
   display: flex;
@@ -1162,9 +1156,9 @@
 }
 
 
-.datePickerRow .react-datepicker-wrapper input,
+.appointment-date-range .react-datepicker-wrapper input,
 .appointmentViewerContainer .react-datepicker-wrapper input {
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem 0.5rem;
   border: 1.5px solid #e2e8f0;
   border-radius: 8px;
   font-size: 0.875rem;
@@ -1172,17 +1166,17 @@
   background: #ffffff;
   outline: none;
   transition: all 0.15s ease;
-  width: 130px;
+  width: 125px;
 }
 
-.datePickerRow .react-datepicker-wrapper input:focus,
+.appointment-date-range .react-datepicker-wrapper input:focus,
 .appointmentViewerContainer .react-datepicker-wrapper input:focus {
   border-color: #6366f1;
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
 
 
-.loadAppointmentsBtn {
+.appointment-load-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1198,7 +1192,7 @@
   box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25);
 }
 
-.loadAppointmentsBtn:hover {
+.appointment-load-button:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
 }
@@ -1206,7 +1200,6 @@
 
 .appointmentCard {
   display: grid;
-  width:500px;
   grid-template-columns: 150px 150px auto;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
@@ -1419,10 +1412,17 @@
     grid-template-columns: 1fr;
   }
 
-  .datePickerRow {
+  .appointment-date-field{
+    display: flex;
     flex-direction: column;
-    align-items: flex-start;
   }
+  .appointment-date-field label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
 
   .appointmentCard {
     grid-template-columns: 1fr 1fr;
@@ -1614,7 +1614,7 @@
     grid-template-columns: 1fr;
   }
 
-  .datePickerRow {
+  .appointment-date-range {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -1674,10 +1674,6 @@
   display: block;
 }
 
-.notFoundSubtitle {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
 
 .notFoundActions {
   display: flex;

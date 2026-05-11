@@ -40,15 +40,21 @@ export default function AppointmentRangeViewer({
   }, [startDate, endDate, fetchAppointmentsFunc]);
 
   return (
-    <div className="appointmentOverviewContainer">
-      <label>View Your Appointments</label>
-      <div className="datePickerRow">
-        <label>Start Date</label>
-        <DatePickerInput setDate={setStartDate}></DatePickerInput>
-        <label>End Date</label>
-        <DatePickerInput setDate={(date) => setEndDate(date)}></DatePickerInput>
+    <div className="appointment-overview">
+      <label className="appointmentOverviewTitle">View Your Appointments</label>
+      <div className="appointment-date-range">
+        <div className="appointment-date-field">
+          <label>Start Date</label>
+          <DatePickerInput setDate={setStartDate}></DatePickerInput>
+        </div>
+        <div className="appointment-date-field">
+          <label>End Date</label>
+          <DatePickerInput
+            setDate={(date) => setEndDate(date)}
+          ></DatePickerInput>
+        </div>
         <button
-          className="loadAppointmentsBtn"
+          className="appointment-load-button"
           onClick={() => loadAppointments()}
         >
           Confirm
