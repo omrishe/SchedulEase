@@ -2,6 +2,7 @@ import { useState } from "react";
 import { signup } from "../services/authService.js";
 import { useNavigate, useParams } from "react-router-dom";
 import { getErrorMessage } from "../utils/errorHandling.js";
+import { MAX_USER_NAME_LENGTH } from "../config.js";
 
 function RegisterPage({ setToken, className }) {
   const { slug } = useParams();
@@ -46,7 +47,10 @@ function RegisterPage({ setToken, className }) {
         "Invalid email address. Must contain '@' and a valid domain";
     }
     if (!formData.userName) {
-      errors.userName = "name cant be empty";
+      errors.userName = "user name cant be empty";
+    }
+    if (formData.userName.length > MAX_USER_NAME_LENGTH) {
+      errors.userName = `user name max length is ${MAX_USER_NAME_LENGTH}`;
     }
     if (!formData.password) {
       errors.password = "password cant be empty";

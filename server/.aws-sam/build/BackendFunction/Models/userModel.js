@@ -1,8 +1,14 @@
 const mongoose = require("mongoose");
+const { MAX_USER_NAME_LENGTH } = require("../config");
 
 const authSchema = new mongoose.Schema(
   {
-    userName: { type: String, required: false, trim: true },
+    userName: {
+      type: String,
+      required: false,
+      trim: true,
+      maxlength: MAX_USER_NAME_LENGTH,
+    },
     email: {
       type: String,
       required: true,
@@ -18,7 +24,7 @@ const authSchema = new mongoose.Schema(
       ref: "Store",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports =

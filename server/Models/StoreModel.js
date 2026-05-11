@@ -26,7 +26,8 @@ const servicesSchema = new mongoose.Schema(
           validator: function (v) {
             return !isNaN(Number(v));
           },
-          message: `Price set: ${props.value} must be a valid number`,
+          message: (props) =>
+            `Price set: ${props.value} must be a valid number`,
         },
         {
           validator: function (v) {
