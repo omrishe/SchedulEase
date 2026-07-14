@@ -1,4 +1,4 @@
-this system code was written by hand, if you find any issues kindly post them in issues
+this system code was 90% written by hand, if you find any issues kindly post them in issues
 
 # SchedulEase
 
