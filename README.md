@@ -1,3 +1,5 @@
+this system code was written by hand, if you find any issues kindly post them in issues
+
 # SchedulEase
 
 **SchedulEase** is a full-stack appointment scheduling platform designed for small businesses such as barbershops, nail salons, and clinics. It enables customers to easily book appointments online while giving business owners full control over services, availability, and bookings through a clean management interface.
